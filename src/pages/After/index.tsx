@@ -150,7 +150,7 @@ const TableList: React.FC = () => {
           await waitTime(2000);
           console.log(values);
           message.success('提交成功');
-          return request(`http://192.168.1.148:5000/`, {
+          return request(`http://www.onelux.club:5000/`, {
             method: 'POST',
             data: {...values},
             requestType: 'form',
