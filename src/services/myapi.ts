@@ -3,14 +3,14 @@
 import { request } from 'umi';
 
 export async function login(values: any) {
-  return request('http://192.168.1.148:5000/receive', {
+  return request('http://www.onelux.club:5000/receive', {
     method: 'POST',
     data: {...values},
     requestType:'form',
   });
 }
 export async function queryafter(): Promise<{ data: any }> {
-  return request('http://192.168.1.148:5000/after/change');
+  return request('http://www.onelux.club:5000/after/change');
 }
 
 export async function updateRule(data: { [key: string]: any }, options?: { [key: string]: any }) {
@@ -28,7 +28,7 @@ export async function updateRule(data: { [key: string]: any }, options?: { [key:
  */
 export async function edit_after(editId:any) {
   console.log(editId)
-  return request( 'http://192.168.1.148:5000/after/change',{
+  return request( 'http://www.onelux.club:5000/after/change',{
     method:'PUT',
     data: {editId},
     requestType: 'form',
@@ -41,7 +41,7 @@ export async function edit_after(editId:any) {
  */
 export async function get_after(params:any){
   console.log(params)
-  return request('http://192.168.1.148:5000/aftersale', {
+  return request('http://www.onelux.club:5000/aftersale', {
     method:'POST',
     data: {...params},
     requestType: 'form',
