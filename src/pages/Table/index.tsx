@@ -105,7 +105,7 @@ class App extends React.Component{
           return request<{
             method:'GET',
             data: [];
-          }>('http://192.168.1.148:5000/data', {
+          }>('http://www.onelux.club:5000/data', {
             params,
           });
         }}
