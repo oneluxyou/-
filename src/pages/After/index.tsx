@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import ProTable from '@ant-design/pro-table';
 import {PageContainer} from "@ant-design/pro-layout";
 import request from "umi-request";
-import {Button, Tag, Space, Menu, Dropdown, message, Tooltip, Modal} from 'antd';
+import {Button, Tag, Space, Menu, Dropdown, message, Tooltip, Modal, Table} from 'antd';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProForm, {
   ProFormDigit,
@@ -60,7 +60,6 @@ const TableList: React.FC = () => {
     {
       title:'登记人',
       dataIndex: '登记人',
-      hideInSearch:true,
       filters: true,
       onFilter: true,
     },
@@ -81,7 +80,6 @@ const TableList: React.FC = () => {
     {
       title: 'SKU',
       dataIndex: 'SKU',
-      hideInSearch:true,
     },
     {
       title:'处理方式',
@@ -89,6 +87,17 @@ const TableList: React.FC = () => {
       hideInSearch:true,
       filters: true,
       onFilter: true,
+      valueType: 'select',
+      valueEnum: {
+        'Wait Reply': {text:'Wait Reply'},
+        'Cancel Order': {text:'Cancel Order'},
+        'Closed': {text:'Closed'},
+        'Replacement': {text:'Replacement'},
+        'Refund': {text:'Refund'},
+        'Used': {text:'Used'},
+        'Refund and Replacement': {text:'Refund and Replacement'},
+        'Delivery Consultation': {text:'Delivery Consultation'}
+      }
     },
     {
       title:'Refund',
@@ -100,16 +109,50 @@ const TableList: React.FC = () => {
       title:'Replacement',
       dataIndex:'Replacement',
       hideInSearch:true,
+      filters: true,
+      onFilter: true,
+      valueType: 'select',
+      valueEnum: {
+        'RP-国外新件': {text:'RP-国外新件'},
+        'RP-国外配件': {text:'RP-国外配件'},
+        'RP-国外退件': {text:'RP-国外退件'},
+        'RP-国内补寄配件': {text:'RP-国内补寄配件'},
+      }
     },
     {
       title:'Used',
       dataIndex:'Used',
       hideInSearch:true,
+      filters: true,
+      onFilter: true,
+      valueType: 'select',
+      valueEnum: {
+        '买家承担': {text:'买家承担'},
+        '卖家承担-上门取件': {text:'卖家承担-上门取件'},
+        '卖家承担-退货标签': {text:'卖家承担-退货标签'},
+        '拦截': {text:'拦截'},
+      }
     },
     {
       title:'原因',
       dataIndex:'原因',
       hideInSearch:true,
+      filters: true,
+      onFilter: true,
+      valueType: 'select',
+      valueEnum: {
+        '少配件': {text:'少配件'},
+        '外观问题（安装前）': {text:'外观问题（安装前）'},
+        '组装问题（安装中）': {text:'组装问题（安装中）'},
+        '结构问题（安装后）': {text:'结构问题（安装后）'},
+        '其它质量问题': {text:'其它质量问题'},
+        '质量&少配件': {text:'质量&少配件'},
+        '运输破损': {text:'运输破损'},
+        '仓库': {text:'仓库'},
+        '快递': {text:'快递'},
+        '买家': {text:'买家'},
+        '销售': {text:'销售'},
+      }
     },
     {
       title:'售后反馈',
@@ -141,6 +184,7 @@ const TableList: React.FC = () => {
     },
   ]
   return (
+
     <PageContainer>
       <ProForm<{
         name: string;
@@ -269,9 +313,11 @@ const TableList: React.FC = () => {
       <br/>
 
       <ProTable
+
         search={{
         labelWidth:"auto",
-        span: 10
+        span: 10,
+        defaultCollapsed:false,
         }}
         columns={column}
         actionRef={actionRef}
@@ -295,11 +341,10 @@ const TableList: React.FC = () => {
             editId={editId}
           />
       }
-
-
     </PageContainer>
   );
 }
 
 export default TableList
+
 
