@@ -9,7 +9,8 @@ import ProForm, {
   ModalForm,
   ProFormText,
   ProFormSelect,
-} from '@ant-design/pro-form';
+}from '@ant-design/pro-form';
+import type { ProFormInstance } from '@ant-design/pro-form';
 import Edit from './components/Edit'
 import {get_after} from "@/services/myapi";
 
@@ -31,9 +32,8 @@ const waitTime = (time: number = 100) => {
  */
 
 
-
-
 const TableList: React.FC = () => {
+
   //编辑part
   const [isModalVisibleEdit, setIsModalVisibleEdit] = useState(false)
   //控制模态框的显示和隐藏
@@ -43,10 +43,10 @@ const TableList: React.FC = () => {
   }
   const [editId, setEditId] = useState(false)
   const actionRef = useRef<ActionType>();
+  const formRef = useRef<ProFormInstance>()
 
 
   const onTableChange = () => {};
-
 //表格part
   const column: ProColumns[] = [
 
@@ -184,23 +184,41 @@ const TableList: React.FC = () => {
     },
   ]
   return (
-
     <PageContainer>
       <ProForm<{
         name: string;
         company: string;
-      }>
-        onFinish={async (values) => {
+      }
+      >
+        formRef={formRef}
+        onFinish={async (values,...rest) => {
           await waitTime(2000);
           console.log(values);
           message.success('提交成功');
+
           return request(`http://www.onelux.club:5000/`, {
             method: 'POST',
             data: {...values},
             requestType: 'form',
+
+          }).then(res=>{
+            //自行根据条件清除
+            formRef.current?.resetFields();
           });
+
           //if (response.status === undefined) message.success('添加成功')
-        }}
+        }
+        }
+      /*  submitter={
+          {
+            render:(props,doms)=>{
+              return [
+                <button onClick={()=>props.form?.resetFields()}>重置</button>
+                 ]
+                  }
+          }
+        }*/
+
       >
         <ProForm.Group>
           <ProFormText
@@ -349,5 +367,4 @@ const TableList: React.FC = () => {
 }
 
 export default TableList
-
 
