@@ -83,8 +83,8 @@ const Login: React.FC = () => {
       <div className={styles.content}>
         <LoginForm
           logo={<img alt="logo" src="/figma.svg" />}
-          title="One lux"
-          subTitle={intl.formatMessage({ id: '石优民是鄞州区最靓的仔' })}
+          title="Antd Pro"
+          subTitle={intl.formatMessage({ id: 'based on ant design' })}
           initialValues={{
             autoLogin: true,
           }}
