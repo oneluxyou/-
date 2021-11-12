@@ -206,19 +206,9 @@ const TableList: React.FC = () => {
             //自行根据条件清除
             formRef.current?.resetFields();
           });
+        }
+        }
 
-          //if (response.status === undefined) message.success('添加成功')
-        }
-        }
-      /*  submitter={
-          {
-            render:(props,doms)=>{
-              return [
-                <button onClick={()=>props.form?.resetFields()}>重置</button>
-                 ]
-                  }
-          }
-        }*/
 
       >
         <ProForm.Group>
