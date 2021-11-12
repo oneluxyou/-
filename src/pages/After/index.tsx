@@ -190,6 +190,7 @@ const TableList: React.FC = () => {
         company: string;
       }
       >
+        autoComplete="on"
         formRef={formRef}
         onFinish={async (values,...rest) => {
           await waitTime(2000);
