@@ -15,6 +15,9 @@ import Edit from './components/Edit'
 import {get_after} from "@/services/myapi";
 
 
+
+
+
 const waitTime = (time: number = 100) => {
   return new Promise((resolve) => {
     setTimeout(() => {
@@ -194,17 +197,22 @@ const TableList: React.FC = () => {
         autoComplete="on"
         formRef={formRef}
         onFinish={async (values,...rest) => {
-          await waitTime(2000);
+          await waitTime(1000);
           console.log(values);
-          message.success('提交成功');
 
           return request(`http://www.onelux.club:5000/`, {
             method: 'POST',
             data: {...values},
             requestType: 'form',
-
           }).then(res=>{
             //自行根据条件清除
+            console.log(res)
+            if (res === 'OK'){
+              message.success('提交成功');
+            }
+            else{
+              message.error('订单号已存在')
+            }
             formRef.current?.resetFields();
           });
         }
@@ -343,7 +351,7 @@ const TableList: React.FC = () => {
           pageSize: 100,
         }}
         dateFormatter="string"
-        headerTitle="高级表格"
+        headerTitle="售后表格"
       />
       {
         !isModalVisibleEdit ? '':
