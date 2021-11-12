@@ -54,7 +54,7 @@ const TableList: React.FC = () => {
       title:'登记日期',
       dataIndex: '登记日期',
       hideInSearch:true,
-      sorter: (a, b) => a.登记日期 - b.登记日期,
+      sorter: (a, b) => a.id - b.id,
       //数据库格式问题
     },
     {
@@ -66,6 +66,7 @@ const TableList: React.FC = () => {
     {
       title: '店铺',
       dataIndex: '店铺',
+      sorter: (a, b) => a.店铺 - b.店铺,
       hideInSearch:true,
       filters: true,
       onFilter: true,
@@ -339,7 +340,7 @@ const TableList: React.FC = () => {
         request={async (params = {}) => get_after(params)}
 
         pagination={{
-          pageSize: 5,
+          pageSize: 100,
         }}
         dateFormatter="string"
         headerTitle="高级表格"
