@@ -52,13 +52,13 @@ export async function get_after(params:any){
 /*
 周转的data数据
  */
-export async function get_zhouzhuan_data(){
+export async function get_zhouzhuan_data(params:any){
+  console.log(params)
   return request('http://www.onelux.club:5000/zhouzhuan/data',{
     method:'POST',
-    data:['getdata'],
+    data:{...params},
     requestType: 'form',
   })
 }
-
 
 
