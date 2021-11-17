@@ -1,18 +1,19 @@
-import React from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import { PageContainer } from "@ant-design/pro-layout";
-import ProTable from "@ant-design/pro-table";
+import ProTable, {ActionType, ProColumns} from "@ant-design/pro-table";
 import {get_zhouzhuan_data} from "@/services/myapi";
 import {useRequest} from "@@/plugin-request/request";
-
+import request from "umi-request";
 
 
 const App: React.FC = () => {
 
+  const onTableChange = () => {};
   const { data } = useRequest({
     url: 'http://www.onelux.club:5000/zhouzhuan/columns',
     method: 'get',
   });
-
+  const actionRef = useRef<ActionType>();
   const arr = [];
   for (const key in data) {
     if (Object.prototype.hasOwnProperty.call(data, key)) {
@@ -21,7 +22,9 @@ const App: React.FC = () => {
         dataIndex: data[key].dataIndex,
         width: data[key]?.width || '',
         fixed: data[key]?.fixed || '',
-        hideInSearch: data[key]?.hideInSearch || ''
+        hideInSearch: data[key]?.hideInSearch || '',
+        ellipsis: data[key]?.ellipsis || '',
+        valueEnum: data[key]?.valueEnum || ''
       })
     }
   }
@@ -30,16 +33,25 @@ const App: React.FC = () => {
     <PageContainer>
       <ProTable
         columns = {arr}
+        request={async (params= {}) => get_zhouzhuan_data(params)}
 
-        scroll={{ x: 1000, y: 400 }}
-        request={async () => get_zhouzhuan_data()}
         search={{
           labelWidth:"auto",
           span: 8,
           defaultCollapsed:false,
         }}
-        bordered
-        title={() => 'SKU序号周转表'}
+
+        actionRef={actionRef}
+        onChange={onTableChange}
+
+        pagination={{
+          pageSize: 100,
+        }}
+
+        scroll={{ x: 1000, y: 400 }}
+
+        headerTitle='SKU序号周转表'
+
       />
     </PageContainer>
   )
