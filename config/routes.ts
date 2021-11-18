@@ -20,9 +20,9 @@
   },
   {
     path: '/welcome',
-    name: 'welcome',
-    icon: 'smile',
-    component: './Welcome',
+    name: '周转表',
+    icon: 'TableOutlined',
+    component: './Table',
   },
   {
     path:'/todo',
@@ -30,11 +30,6 @@
     name:'todo',
     component: './Todo',
   },
-  {
-    path:'/table',
-    icon:'smile',
-    name:'table',
-    component:'./Table'
   },
   {
     path:'/after',
