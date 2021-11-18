@@ -30,7 +30,6 @@
     name:'todo',
     component: './Todo',
   },
-  },
   {
     path:'/after',
     icon:'smile',
