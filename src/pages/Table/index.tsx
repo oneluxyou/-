@@ -3,7 +3,7 @@ import { PageContainer } from "@ant-design/pro-layout";
 import ProTable, {ActionType, ProColumns} from "@ant-design/pro-table";
 import {get_zhouzhuan_data} from "@/services/myapi";
 import {useRequest} from "@@/plugin-request/request";
-import request from "umi-request";
+
 
 
 const App: React.FC = () => {
