@@ -45,24 +45,7 @@ export default defineConfig({
   esbuild: {},
   title: false,
   ignoreMomentLocale: true,
-  proxy: {
-    '/skuinfo': {
-      target: 'http://www.onelux.club:5000',
-      changeOrigin: true,
-    },
-    '/sku/insert': {
-      target: 'http://www.onelux.club:5000',
-      changeOrigin: true,
-    },
-    '/sku/change': {
-      target: 'http://www.onelux.club:5000',
-      changeOrigin: true,
-    },
-    '/sku/static': {
-      target: 'http://www.onelux.club:5000',
-      changeOrigin: true,
-    },
-  },
+  proxy: {},
   manifest: {
     basePath: '/',
   },

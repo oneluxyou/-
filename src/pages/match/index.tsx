@@ -19,7 +19,7 @@ import { useRequest } from 'umi';
 
 const TableList: React.FC = () => {
   const { data } = useRequest({
-    url: '/sku/static',
+    url: 'http://www.onelux.club:5000/sku/static',
     method: 'get',
   });
   //编辑part
@@ -34,7 +34,7 @@ const TableList: React.FC = () => {
     setEditId(id);
   };
 
-  const onTableChange = () => {};
+  const onTableChange = () => { };
   //表格part、
   const column: ProColumns[] = [
     {
@@ -214,7 +214,7 @@ const TableList: React.FC = () => {
           ) {
             if (sku_in == true) {
               values['店铺'] = JSON.stringify(values['店铺']);
-              return request(`/sku/insert`, {
+              return request(`http://www.onelux.club:5000/sku/insert`, {
                 method: 'POST',
                 data: { ...values },
                 requestType: 'form',
@@ -280,7 +280,7 @@ const TableList: React.FC = () => {
               eBay_雅秦: 'eBay-雅秦',
               Nextfur_Shopify: 'Nextfur-Shopify',
             }}
-            // rules={[{ required: true, message: '请输入店铺!' }]}
+          // rules={[{ required: true, message: '请输入店铺!' }]}
           />
           <ProFormText
             width="md"
@@ -329,7 +329,7 @@ const TableList: React.FC = () => {
         onChange={onTableChange}
         request={async (params = {}) => {
           console.log(params);
-          const result = request('/skuinfo', {
+          const result = request('http://www.onelux.club:5000/skuinfo', {
             method: 'POST',
             data: { ...params },
             requestType: 'form',

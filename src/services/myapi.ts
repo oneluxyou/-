@@ -61,7 +61,7 @@ export async function get_zhouzhuan_data(params: any) {
 
 export async function edit_sku(editId: any) {
   console.log(editId);
-  return request('/sku/change', {
+  return request('http://www.onelux.club:5000/sku/change', {
     method: 'PUT',
     data: { editId },
     requestType: 'form',

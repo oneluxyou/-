@@ -80,7 +80,7 @@ const Edit = (props) => {
             console.log(sku);
             values['店铺'] = JSON.stringify(values['店铺']);
             if (sku_in == true) {
-              return request(`/sku/change`, {
+              return request(`http://www.onelux.club:5000/sku/change`, {
                 method: 'POST',
                 data: { ...values },
                 requestType: 'form',
@@ -160,35 +160,35 @@ const Edit = (props) => {
               name="运营"
               label="运营"
               placeholder="请输入运营人员,若为多个,请用英文','隔开"
-              // rules={[{ required: true, message: '请输入运营人员!' }]}
+            // rules={[{ required: true, message: '请输入运营人员!' }]}
             />
             <ProFormText
               width="md"
               name="运维"
               label="运维"
               placeholder="请输入运维人员,若为多个,请用英文','隔开"
-              // rules={[{ required: true, message: '请输入运维人员!' }]}
+            // rules={[{ required: true, message: '请输入运维人员!' }]}
             />
             <ProFormText
               width="md"
               name="组别"
               placeholder="请输入小组组别,若为多个,请用英文','隔开"
               label="组别"
-              // rules={[{ required: true, message: '请输入小组组别' }]}
+            // rules={[{ required: true, message: '请输入小组组别' }]}
             />
             <ProFormDatePicker
               width="md"
               name="开始时间"
               placeholder="请输入开始时间"
               label="开始时间"
-              // rules={[{ required: true, message: '请输入小组组别' }]}
+            // rules={[{ required: true, message: '请输入小组组别' }]}
             />
             <ProFormDatePicker
               width="md"
               name="结束时间"
               placeholder="请输入开始时间"
               label="结束时间"
-              // rules={[{ required: true, message: '请输入小组组别' }]}
+            // rules={[{ required: true, message: '请输入小组组别' }]}
             />
           </ProForm.Group>
         </ProForm>
