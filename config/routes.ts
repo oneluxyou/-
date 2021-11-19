@@ -25,21 +25,37 @@
     component: './Table',
   },
   {
-    path:'/todo',
-    icon:'HeatMapOutlined',
-    name:'todo',
+    path: '/todo',
+    icon: 'HeatMapOutlined',
+    name: 'todo',
     component: './Todo',
   },
   {
-    path:'/after',
-    icon:'smile',
-    name:'after',
-    routes:[
+    path: '/after',
+    icon: 'smile',
+    name: 'after',
+    routes: [
       {
-        path:'/after/add',
-        name:'售后登记',
-        icon:'smile',
-        component:'./After',
+        path: '/after/add',
+        name: '售后登记',
+        icon: 'smile',
+        component: './After',
+      },
+    ],
+  },
+  {
+    path: '/match',
+    name: '匹配表',
+    icon: 'crown',
+    routes: [
+      {
+        path: '/match/index',
+        name: '对应信息更新',
+        icon: 'smile',
+        component: './match/index',
+      },
+      {
+        component: './404',
       },
     ],
   },
