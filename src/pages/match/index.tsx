@@ -222,7 +222,6 @@ const TableList: React.FC = () => {
                 //自行根据条件清除
                 message.success('提交成功');
                 formRef.current?.resetFields();
-                location.reload();
               });
             }
           } else {
