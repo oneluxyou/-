@@ -34,7 +34,7 @@ const TableList: React.FC = () => {
     setEditId(id);
   };
 
-  const onTableChange = () => { };
+  const onTableChange = () => {};
   //表格part、
   const column: ProColumns[] = [
     {
@@ -66,6 +66,8 @@ const TableList: React.FC = () => {
       title: '组别',
       dataIndex: '组别',
       key: '组别',
+      filters: true,
+      onFilter: true,
       valueEnum: {
         利芬组_A组: '利芬组_A组',
         利芬组_B组: '利芬组_C组',
@@ -279,7 +281,7 @@ const TableList: React.FC = () => {
               eBay_雅秦: 'eBay-雅秦',
               Nextfur_Shopify: 'Nextfur-Shopify',
             }}
-          // rules={[{ required: true, message: '请输入店铺!' }]}
+            // rules={[{ required: true, message: '请输入店铺!' }]}
           />
           <ProFormText
             width="md"
