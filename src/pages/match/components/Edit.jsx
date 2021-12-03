@@ -137,6 +137,8 @@ const Edit = (props) => {
                 Walmart_赫曼: 'Walmart-赫曼',
                 Walmart_信盒: 'Walmart-信盒',
                 Walmart_宫本: 'Walmart-宫本',
+                哒唛旺: '哒唛旺',
+                简砾: '简砾',
                 赫曼: '赫曼',
                 信盒: '信盒',
                 宫本: '宫本',
@@ -160,14 +162,14 @@ const Edit = (props) => {
               name="运营"
               label="运营"
               placeholder="请输入运营人员,若为多个,请用英文','隔开"
-              // rules={[{ required: true, message: '请输入运营人员!' }]}
+            // rules={[{ required: true, message: '请输入运营人员!' }]}
             />
             <ProFormText
               width="md"
               name="运维"
               label="运维"
               placeholder="请输入运维人员,若为多个,请用英文','隔开"
-              // rules={[{ required: true, message: '请输入运维人员!' }]}
+            // rules={[{ required: true, message: '请输入运维人员!' }]}
             />
             <ProFormSelect
               width="md"
@@ -186,21 +188,21 @@ const Edit = (props) => {
                 利芬组_I组: '利芬组_I组',
                 利芬组_J组: '利芬组_J组',
               }}
-              // rules={[{ required: true, message: '请输入小组组别' }]}
+            // rules={[{ required: true, message: '请输入小组组别' }]}
             />
             <ProFormDatePicker
               width="md"
               name="开始时间"
               placeholder="请输入开始时间"
               label="开始时间"
-              // rules={[{ required: true, message: '请输入小组组别' }]}
+            // rules={[{ required: true, message: '请输入小组组别' }]}
             />
             <ProFormDatePicker
               width="md"
               name="结束时间"
               placeholder="请输入开始时间"
               label="结束时间"
-              // rules={[{ required: true, message: '请输入小组组别' }]}
+            // rules={[{ required: true, message: '请输入小组组别' }]}
             />
           </ProForm.Group>
         </ProForm>

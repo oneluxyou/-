@@ -34,7 +34,7 @@ const TableList: React.FC = () => {
     setEditId(id);
   };
 
-  const onTableChange = () => {};
+  const onTableChange = () => { };
   //表格part、
   const column: ProColumns[] = [
     {
@@ -93,6 +93,8 @@ const TableList: React.FC = () => {
         Walmart_信盒: 'Walmart-信盒',
         Walmart_宫本: 'Walmart-宫本',
         Walmart: 'Walmart',
+        哒唛旺: '哒唛旺',
+        简砾: '简砾',
         赫曼: '赫曼',
         信盒: '信盒',
         宫本: '宫本',
@@ -265,6 +267,8 @@ const TableList: React.FC = () => {
               Walmart_赫曼: 'Walmart-赫曼',
               Walmart_信盒: 'Walmart-信盒',
               Walmart_宫本: 'Walmart-宫本',
+              哒唛旺: '哒唛旺',
+              简砾: '简砾',
               赫曼: '赫曼',
               信盒: '信盒',
               宫本: '宫本',
@@ -281,7 +285,7 @@ const TableList: React.FC = () => {
               eBay_雅秦: 'eBay-雅秦',
               Nextfur_Shopify: 'Nextfur-Shopify',
             }}
-            // rules={[{ required: true, message: '请输入店铺!' }]}
+          // rules={[{ required: true, message: '请输入店铺!' }]}
           />
           <ProFormText
             width="md"
