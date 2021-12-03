@@ -45,7 +45,6 @@ const TableList: React.FC = () => {
     setEditId(id)
   }
   const [editId, setEditId] = useState(false)
-  const [skuValue, setskuValue] = useState('')
   const actionRef = useRef<ActionType>();
   const formRef = useRef<ProFormInstance>()
 
@@ -215,7 +214,6 @@ const TableList: React.FC = () => {
               message.error('订单号已存在')
             }
             formRef.current?.resetFields();
-            setskuValue('');
           });
         }
         }
@@ -260,14 +258,7 @@ const TableList: React.FC = () => {
             rules={[{ required: true, message: '请输入店铺!' }]}
           />
           <ProFormText width="md" name="订单号" label="订单号" rules={[{ required: true, message: '请输入订单号!' }]} />
-          <ProFormText width="md" name="SKU" label="SKU" tooltip="请勿输入渠道SKU/订单号/包裹号" placeholder="两箱包形如'USAN1018800-5,USAN1018800-6'" rules={[{ required: true, message: '两箱包的请输入两个公司SKU' }]} fieldProps={{
-            onChange: (e) => {
-              const { value } = e.target;
-              setskuValue(value.replace("，", ",").replace(/"/g, "").replace(/\s(?=$)/g, "").replace(/,(?=$)/g, "").replace(/\s(?!$)/g, ",").replace(/'/g, "").replace(/,{2,}/g, ","))
-            },
-            value: skuValue
-          }}
-          />
+          <ProFormText width="md" name="SKU" label="SKU" tooltip="请勿输入渠道SKU/订单号/包裹号" placeholder="两箱包形如'USAN1018800-5,USAN1018800-6'" rules={[{ required: true, message: '两箱包的请输入两个公司SKU' }]} />
           <ProFormSelect
             width="md"
             name="处理方式"
