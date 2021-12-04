@@ -208,28 +208,22 @@ const TableList: React.FC = () => {
           sku.forEach((element: string) => {
             if (!data.sku_name.find((item: string) => item == element)) {
               sku_in = false;
-              message.error('传入的SKU:' + element + '不正确');
+              message.error('传入的SKU:' + element + '不正确(注:捆绑sku要拆成产品sku)');
             }
           });
           // eslint-disable-next-line @typescript-eslint/dot-notation
-          if (
-            (values['渠道sku'] != null && values['渠道sku'] != '') ||
-            (values['ASIN'] != null && values['ASIN'] != '')
-          ) {
-            if (sku_in == true) {
-              values['店铺'] = JSON.stringify(values['店铺']);
-              return request(`http://www.onelux.club:5000/sku/insert`, {
-                method: 'POST',
-                data: { ...values },
-                requestType: 'form',
-              }).then(() => {
-                //自行根据条件清除
-                message.success('提交成功');
-                formRef.current?.resetFields();
-              });
-            }
-          } else {
-            message.error('必须要存在渠道sku或者ASIN');
+
+          if (sku_in == true) {
+            values['店铺'] = JSON.stringify(values['店铺']);
+            return request(`http://www.onelux.club:5000/sku/insert`, {
+              method: 'POST',
+              data: { ...values },
+              requestType: 'form',
+            }).then(() => {
+              //自行根据条件清除
+              message.success('提交成功');
+              formRef.current?.resetFields();
+            });
           }
         }}
       >
@@ -240,6 +234,7 @@ const TableList: React.FC = () => {
             label="渠道sku"
             placeholder="请输入渠道sku"
             tooltip="例如USAN1023801-1+2"
+            rules={[{ required: true, message: '请输入渠道SKU!' }]}
           />
           <ProFormText
             width="md"
