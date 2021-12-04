@@ -280,7 +280,7 @@ const TableList: React.FC = () => {
               eBay_雅秦: 'eBay-雅秦',
               Nextfur_Shopify: 'Nextfur-Shopify',
             }}
-          // rules={[{ required: true, message: '请输入店铺!' }]}
+            rules={[{ required: true, message: '请输入店铺!' }]}
           />
           <ProFormText
             width="md"

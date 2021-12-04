@@ -110,6 +110,7 @@ const Edit = (props) => {
               label="渠道sku"
               placeholder="请输入渠道sku"
               tooltip="例如USAN1023801-1+2"
+              rules={[{ required: true, message: '请输入渠道sku!' }]}
             />
             <ProFormText
               width="md"
