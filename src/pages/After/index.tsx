@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/no-for-in-array */
+/* eslint-disable @typescript-eslint/dot-notation */
 import React, { useState, useRef } from 'react';
 import ProTable from '@ant-design/pro-table';
 import { PageContainer } from "@ant-design/pro-layout";
 import request from "umi-request";
-import { Button, Tag, Space, Menu, Dropdown, message, Tooltip, Modal, Table } from 'antd';
+import { Button, Tag, Space, Menu, Dropdown, message, Tooltip, Modal, Table, AutoComplete, Col, Row } from 'antd';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProForm, {
   ProFormDigit,
@@ -187,6 +189,74 @@ const TableList: React.FC = () => {
       ]
     },
   ]
+  // 表单缓存
+  const storage = window.localStorage;
+  const temp_dict = [new Array(), new Array(), new Array(), new Array(), new Array()] as any;
+  let temp_data = new Array();
+  const item_dict = ['dengji', 'dingdan', 'osku', 'shouhou', 'beizhu'];
+  const form_dict = ['登记人', '订单号', 'SKU', '原因', 'Replacement']
+  const renderItem = (title: string, index: number, item: string) => ({
+    value: title,
+    label: (
+      <span>
+        {title}
+        <a
+          style={{ float: 'right' }}
+          onClick={() => {
+            temp_dict[item_dict.indexOf(item)] = [];
+            const item_data = eval(storage[item]).split('|');
+            item_data.splice(index, 1);
+            for (const key in item_data) {
+              if (Object.prototype.hasOwnProperty.call(item_data, key)) {
+                const element = item_data[key];
+                temp_dict[item_dict.indexOf(item)].push(renderItem(element, parseInt(key), item));
+              }
+            }
+            let temp_storage = item_data.join('|');
+            temp_storage = JSON.stringify(temp_storage);
+            storage[item] = temp_storage;
+            //自行根据条件清除
+            // eslint-disable-next-line @typescript-eslint/no-use-before-define
+            if (item_dict.indexOf(item) == 0) {
+              setdengji(temp_dict[0]);
+            } else if (item_dict.indexOf(item) == 1) {
+              setdingdan(temp_dict[1]);
+            } else if (item_dict.indexOf(item) == 2) {
+              setosku(temp_dict[2]);
+            } else if (item_dict.indexOf(item) == 3) {
+              setshouhou(temp_dict[3]);
+            } else if (item_dict.indexOf(item) == 4) {
+              setbeizhu(temp_dict[4]);
+            }
+          }}
+        >
+          Delete
+        </a>
+      </span>
+    )
+  }
+  );
+  for (const key in item_dict) {
+    if (Object.prototype.hasOwnProperty.call(item_dict, key)) {
+      const element = item_dict[key];
+      if (element in storage) {
+        temp_dict[key] = new Array();
+        temp_data = eval(storage[element]).split('|');
+        for (const key2 in temp_data) {
+          if (Object.prototype.hasOwnProperty.call(temp_data, key2)) {
+            const i = temp_data[key2];
+            temp_dict[key].push(renderItem(i, parseInt(key2), item_dict[key]));
+          }
+        }
+      }
+    }
+  }
+
+  const [dengji, setdengji] = useState(temp_dict[0]) as any;
+  const [dingdan, setdingdan] = useState(temp_dict[1]) as any;
+  const [osku, setosku] = useState(temp_dict[2]) as any;
+  const [shouhou, setshouhou] = useState(temp_dict[3]) as any;
+  const [beizhu, setbeizhu] = useState(temp_dict[4]) as any;
   return (
     <PageContainer>
       <ProForm<{
@@ -209,6 +279,57 @@ const TableList: React.FC = () => {
             console.log(res)
             if (res === 'OK') {
               message.success('提交成功');
+              for (const key in item_dict) {
+                temp_dict[key] = new Array();
+                if (item_dict[key] in storage) {
+                  temp_data = eval(storage[item_dict[key]]).split('|');
+                  for (const key2 in temp_data) {
+                    if (Object.prototype.hasOwnProperty.call(temp_data, key2)) {
+                      const element = temp_data[key2];
+                      temp_dict[key].push(renderItem(element, parseInt(key2), item_dict[key]));
+                    }
+                  }
+                  if (temp_data.indexOf(values[form_dict[key]]) == -1) {
+                    temp_data.push(values[form_dict[key]]);
+                    temp_dict[key].push(renderItem(values[form_dict[key]], temp_data.length - 1, item_dict[key]));
+                    console.log('提交后', temp_data)
+                    let temp_storage = temp_data.join('|');
+                    temp_storage = JSON.stringify(temp_storage);
+                    storage[item_dict[key]] = temp_storage;
+                    //自行根据条件清除
+                    if (parseInt(key) == 0) {
+                      setdengji(temp_dict[0]);
+                    } else if (parseInt(key) == 1) {
+                      setdingdan(temp_dict[1]);
+                    } else if (parseInt(key) == 2) {
+                      setosku(temp_dict[2]);
+                    } else if (parseInt(key) == 3) {
+                      setshouhou(temp_dict[3]);
+                    } else if (parseInt(key) == 4) {
+                      setbeizhu(temp_dict[4]);
+                    }
+                  }
+                } else {
+                  temp_data = []
+                  temp_data.push(values[form_dict[key]]);
+                  temp_dict[key].push(renderItem(values[form_dict[key]], temp_data.length - 1, item_dict[key]));
+                  let temp_storage = temp_data.join('|');
+                  temp_storage = JSON.stringify(temp_storage);
+                  storage[item_dict[key]] = temp_storage;
+                  //自行根据条件清除
+                  if (parseInt(key) == 0) {
+                    setdengji(temp_dict[0]);
+                  } else if (parseInt(key) == 1) {
+                    setdingdan(temp_dict[1]);
+                  } else if (parseInt(key) == 2) {
+                    setosku(temp_dict[2]);
+                  } else if (parseInt(key) == 3) {
+                    setshouhou(temp_dict[3]);
+                  } else if (parseInt(key) == 4) {
+                    setbeizhu(temp_dict[4]);
+                  }
+                }
+              }
             }
             else {
               message.error('订单号已存在')
@@ -220,116 +341,192 @@ const TableList: React.FC = () => {
 
 
       >
-        <ProForm.Group>
-          <ProFormText
-            width="md"
-            name="登记人"
-            label="登记人"
-            placeholder="请输入名称"
-            tooltip="请勿输入渠道SKU/订单号/包裹号"
-            rules={[{ required: true, message: '请输入名称!' }]}
-          />
-          <ProFormSelect
-            width="md"
-            name="店铺"
-            label="店铺"
-            placeholder="请输入店铺"
-            valueEnum={{
-              '赫曼': '赫曼',
-              '信盒': '信盒',
-              '宫本': '宫本',
-              '森月': '森月',
-              '维禄': '维禄',
-              '玲琅': '玲琅',
-              '信盒-法国': '信盒-法国',
-              '信盒-意大利': '信盒-意大利',
-              '信盒-西班牙': '信盒-西班牙',
-              'Wayfair-信盒': 'Wayfair-信盒',
-              'Wayfair-维禄': 'Wayfair-维禄',
-              'Walmart-优瑞斯特': 'Walmart-优瑞斯特',
-              'Walmart-赫曼': 'Walmart-赫曼',
-              'Walmart-信盒': 'Walmart-信盒',
-              'Walmart-宫本': 'Walmart-宫本',
-              'eBay-玲琅': 'eBay-玲琅',
-              'eBay-治润': 'eBay-治润',
-              'eBay-雅秦': 'eBay-雅秦',
-              'Nextfur-Shopify': 'Nextfur-Shopify',
-            }}
-            rules={[{ required: true, message: '请输入店铺!' }]}
-          />
-          <ProFormText width="md" name="订单号" label="订单号" rules={[{ required: true, message: '请输入订单号!' }]} />
-          <ProFormText width="md" name="SKU" label="SKU" tooltip="请勿输入渠道SKU/订单号/包裹号" placeholder="两箱包形如'USAN1018800-5,USAN1018800-6'" rules={[{ required: true, message: '两箱包的请输入两个公司SKU' }, { pattern: /[^,||^，]$/, message: '最后一位不能为,' }]} />
-          <ProFormSelect
-            width="md"
-            name="处理方式"
-            label="处理方式"
-            placeholder="请输入处理方式"
-            valueEnum={{
-              'Wait Reply': 'Wait Reply',
-              'Cancel Order': 'Cancel Order',
-              'Closed': 'Closed',
-              'Replacement': 'Replacement',
-              'Refund': 'Refund',
-              'Used': 'Used',
-              'Refund and Replacement': 'Refund and Replacement',
-              'Delivery Consultation': 'Delivery Consultation',
-            }}
-            rules={[{ required: true, message: '请输入处理方式!' }]}
-          />
-          <ProFormDigit
-            width="md"
-            name="Refund"
-            label="Refund"
-            placeholder=""
-            initialValue="0"
-            tooltip="若无退款,默认输入0"
-            rules={[{ required: true, message: '若无退款,请输入0' }]}
-          />
-          <ProFormSelect
-            width="md"
-            name="原因"
-            label="原因"
-            placeholder="请输入原因"
-            valueEnum={{
-              '少配件': '少配件',
-              '外观问题（安装前）': '外观问题（安装前）',
-              '组装问题（安装中）': '组装问题（安装中）',
-              '结构问题（安装后）': '结构问题（安装后）',
-              '其它质量问题': '其它质量问题',
-              '质量&少配件': '质量&少配件',
-              '运输破损': '运输破损',
-              '仓库': '仓库',
-              '快递': '快递',
-              '买家': '买家',
-              '销售': '销售',
-            }}
-            rules={[{ required: true, message: '请输入原因!' }]}
-          />
-          <ProFormSelect
-            width="md"
-            name="Replacement"
-            label="Replacement"
-            valueEnum={{
-              'RP-国外新件': 'RP-国外新件',
-              'RP-国外配件': 'RP-国外配件',
-              'RP-国外退件': 'RP-国外退件',
-              'RP-国内补寄配件': 'RP-国内补寄配件',
-            }}
-          />
-          <ProFormSelect
-            width="md"
-            name="Used"
-            label="退件"
-            valueEnum={{
-              '买家承担': '买家承担',
-              '卖家承担-上门取件': '卖家承担-上门取件',
-              '卖家承担-退货标签': '卖家承担-退货标签',
-              '拦截': '拦截',
-            }}
-          />
-          <ProFormText width="md" name="售后反馈" label="售后反馈" />
-          <ProFormText width="xl" name="备注" label="备注" />
-        </ProForm.Group>
+        <Row>
+          <Col span={5}>
+            <ProForm.Item
+              name="登记人"
+              label="登记人"
+              tooltip="请勿输入渠道SKU/订单号/包裹号"
+              rules={[{ required: true, message: '请输入名称!' }]}
+            >
+              <AutoComplete
+                placeholder="请输入名称"
+                options={dengji}
+              />
+            </ProForm.Item>
+          </Col>
+          <Col span={5} offset={1}>
+            <ProForm.Item
+              name="店铺"
+              label="店铺"
+              rules={[{ required: true, message: '请输入店铺!' }]}
+            >
+              <ProFormSelect
+                width="md"
+                valueEnum={{
+                  '赫曼': '赫曼',
+                  '信盒': '信盒',
+                  '宫本': '宫本',
+                  '森月': '森月',
+                  '维禄': '维禄',
+                  '玲琅': '玲琅',
+                  '信盒-法国': '信盒-法国',
+                  '信盒-意大利': '信盒-意大利',
+                  '信盒-西班牙': '信盒-西班牙',
+                  'Wayfair-信盒': 'Wayfair-信盒',
+                  'Wayfair-维禄': 'Wayfair-维禄',
+                  'Walmart-优瑞斯特': 'Walmart-优瑞斯特',
+                  'Walmart-赫曼': 'Walmart-赫曼',
+                  'Walmart-信盒': 'Walmart-信盒',
+                  'Walmart-宫本': 'Walmart-宫本',
+                  'eBay-玲琅': 'eBay-玲琅',
+                  'eBay-治润': 'eBay-治润',
+                  'eBay-雅秦': 'eBay-雅秦',
+                  'Nextfur-Shopify': 'Nextfur-Shopify',
+                }}
+              />
+            </ProForm.Item>
+          </Col>
+          <Col span={5} offset={1}>
+            <ProForm.Item
+              name="订单号"
+              label="订单号"
+              rules={[{ required: true, message: '请输入' }]}
+              tooltip="例如USAN1023801-1,USAN1023801-2 (多个sku用,隔开)，捆绑SKU请拆成对应的SKU"
+            >
+              <AutoComplete
+                placeholder="请输入订单号!"
+                options={dingdan}
+              />
+            </ProForm.Item>
+          </Col>
+          <Col span={5} offset={1}>
+            <ProForm.Item
+              name="SKU"
+              label="SKU"
+              rules={[{ required: true, message: '两箱包的请输入两个公司SKU' }, { pattern: /[^,||^，]$/, message: '最后一位不能为,' }]}
+              tooltip="请勿输入渠道SKU/订单号/包裹号"
+            >
+              <AutoComplete
+                placeholder="两箱包形如'USAN1018800-5,USAN1018800-6'"
+                options={osku}
+              />
+            </ProForm.Item>
+          </Col>
+        </Row>
+        <Row>
+          <Col span={5} >
+            <ProForm.Item
+              name="处理方式"
+              label="处理方式"
+              rules={[{ required: true, message: '请输入处理方式!' }]}
+            >
+              <ProFormSelect
+                width="md"
+                placeholder="请输入处理方式"
+                valueEnum={{
+                  'Wait Reply': 'Wait Reply',
+                  'Cancel Order': 'Cancel Order',
+                  'Closed': 'Closed',
+                  'Replacement': 'Replacement',
+                  'Refund': 'Refund',
+                  'Used': 'Used',
+                  'Refund and Replacement': 'Refund and Replacement',
+                  'Delivery Consultation': 'Delivery Consultation',
+                }}
+
+              />
+            </ProForm.Item>
+          </Col>
+          <Col span={5} offset={1}>
+            <ProFormDigit
+              width="md"
+              name="Refund"
+              label="Refund"
+              placeholder=""
+              initialValue="0"
+              tooltip="若无退款,默认输入0"
+              rules={[{ required: true, message: '若无退款,请输入0' }]}
+            />
+          </Col>
+          <Col span={5} offset={1}>
+            <ProForm.Item
+              name="原因"
+              label="原因"
+              rules={[{ required: true, message: '请输入原因!' }]}
+            >
+              <ProFormSelect
+                width="md"
+                placeholder="请输入原因"
+                valueEnum={{
+                  '少配件': '少配件',
+                  '外观问题（安装前）': '外观问题（安装前）',
+                  '组装问题（安装中）': '组装问题（安装中）',
+                  '结构问题（安装后）': '结构问题（安装后）',
+                  '其它质量问题': '其它质量问题',
+                  '质量&少配件': '质量&少配件',
+                  '运输破损': '运输破损',
+                  '仓库': '仓库',
+                  '快递': '快递',
+                  '买家': '买家',
+                  '销售': '销售',
+                }}
+              />
+            </ProForm.Item>
+          </Col>
+          <Col span={5} offset={1}>
+            <ProForm.Item
+              name="Replacement"
+              label="Replacement"
+            >
+              <ProFormSelect
+                width="md"
+                valueEnum={{
+                  'RP-国外新件': 'RP-国外新件',
+                  'RP-国外配件': 'RP-国外配件',
+                  'RP-国外退件': 'RP-国外退件',
+                  'RP-国内补寄配件': 'RP-国内补寄配件',
+                }}
+              />
+            </ProForm.Item>
+          </Col>
+        </Row>
+        <Row>
+          <Col span={5}>
+            <ProForm.Item
+              name="Used"
+              label="退件"
+            >
+              <ProFormSelect
+                width="md"
+                valueEnum={{
+                  '买家承担': '买家承担',
+                  '卖家承担-上门取件': '卖家承担-上门取件',
+                  '卖家承担-退货标签': '卖家承担-退货标签',
+                  '拦截': '拦截',
+                }}
+              />
+            </ProForm.Item>
+          </Col>
+          <Col span={5} offset={1}>
+            <ProForm.Item
+              name="售后反馈" label="售后反馈"
+            >
+              <AutoComplete
+                options={shouhou}
+              />
+            </ProForm.Item>
+          </Col>
+          <Col span={5} offset={1}>
+            <ProForm.Item
+              name="备注" label="备注"
+            >
+              <AutoComplete
+                options={beizhu}
+              />
+            </ProForm.Item>
+          </Col>
+        </Row>
       </ProForm>
       <br />
 

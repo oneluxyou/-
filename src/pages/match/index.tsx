@@ -4,9 +4,9 @@ import React, { useState, useRef } from 'react';
 import ProTable from '@ant-design/pro-table';
 import { PageContainer } from '@ant-design/pro-layout';
 import request from 'umi-request';
-import { Button, message } from 'antd';
+import { Button, message, Col, Row, AutoComplete } from 'antd';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
-import ProForm, { ProFormText, ProFormSelect } from '@ant-design/pro-form';
+import ProForm, { ProFormSelect } from '@ant-design/pro-form';
 import type { ProFormInstance } from '@ant-design/pro-form';
 import Edit from './components/Edit';
 import { useRequest } from 'umi';
@@ -189,6 +189,75 @@ const TableList: React.FC = () => {
     link.download = 'ASIN对应信息表.csv';
     link.click();
   };
+  // 表单缓存
+  const storage = window.localStorage;
+  const temp_dict = [new Array(), new Array(), new Array(), new Array(), new Array()] as any;
+  let temp_data = new Array();
+  const item_dict = ['qudaosku', 'asin', 'sku', 'yunying', 'yunwei'];
+  const form_dict = ['渠道sku', 'ASIN', '公司SKU', '运营', '运维']
+  const renderItem = (title: string, index: number, item: string) => ({
+    value: title,
+    label: (
+      <span>
+        {title}
+        <a
+          style={{ float: 'right' }}
+          onClick={() => {
+            temp_dict[item_dict.indexOf(item)] = [];
+            const item_data = eval(storage[item]).split('|');
+            item_data.splice(index, 1);
+            for (const key in item_data) {
+              if (Object.prototype.hasOwnProperty.call(item_data, key)) {
+                const element = item_data[key];
+                temp_dict[item_dict.indexOf(item)].push(renderItem(element, parseInt(key), item));
+              }
+            }
+            let temp_storage = item_data.join('|');
+            temp_storage = JSON.stringify(temp_storage);
+            storage[item] = temp_storage;
+            //自行根据条件清除
+            // eslint-disable-next-line @typescript-eslint/no-use-before-define
+            if (item_dict.indexOf(item) == 0) {
+              setqudaosku(temp_dict[0]);
+            } else if (item_dict.indexOf(item) == 1) {
+              setasin(temp_dict[1]);
+            } else if (item_dict.indexOf(item) == 2) {
+              setosku(temp_dict[2]);
+            } else if (item_dict.indexOf(item) == 3) {
+              setyunying(temp_dict[3]);
+            } else if (item_dict.indexOf(item) == 4) {
+              setyunwei(temp_dict[4]);
+            }
+          }}
+        >
+          Delete
+        </a>
+      </span>
+    )
+  }
+  );
+  for (const key in item_dict) {
+    if (Object.prototype.hasOwnProperty.call(item_dict, key)) {
+      const element = item_dict[key];
+      if (element in storage) {
+        temp_dict[key] = new Array();
+        temp_data = eval(storage[element]).split('|');
+        for (const key2 in temp_data) {
+          if (Object.prototype.hasOwnProperty.call(temp_data, key2)) {
+            const i = temp_data[key2];
+            temp_dict[key].push(renderItem(i, parseInt(key2), item_dict[key]));
+          }
+        }
+      }
+    }
+  }
+
+
+  const [qudaosku, setqudaosku] = useState(temp_dict[0]) as any;
+  const [asin, setasin] = useState(temp_dict[1]) as any;
+  const [osku, setosku] = useState(temp_dict[2]) as any;
+  const [yunying, setyunying] = useState(temp_dict[3]) as any;
+  const [yunwei, setyunwei] = useState(temp_dict[4]) as any;
   return (
     <PageContainer>
       <ProForm<{
@@ -218,6 +287,57 @@ const TableList: React.FC = () => {
               data: { ...values },
               requestType: 'form',
             }).then(() => {
+              for (const key in item_dict) {
+                temp_dict[key] = new Array();
+                if (item_dict[key] in storage) {
+                  temp_data = eval(storage[item_dict[key]]).split('|');
+                  for (const key2 in temp_data) {
+                    if (Object.prototype.hasOwnProperty.call(temp_data, key2)) {
+                      const element = temp_data[key2];
+                      temp_dict[key].push(renderItem(element, parseInt(key2), item_dict[key]));
+                    }
+                  }
+                  if (temp_data.indexOf(values[form_dict[key]]) == -1) {
+                    temp_data.push(values[form_dict[key]]);
+                    temp_dict[key].push(renderItem(values[form_dict[key]], temp_data.length - 1, item_dict[key]));
+                    console.log('提交后', temp_data)
+                    let temp_storage = temp_data.join('|');
+                    temp_storage = JSON.stringify(temp_storage);
+                    storage[item_dict[key]] = temp_storage;
+                    //自行根据条件清除
+                    if (parseInt(key) == 0) {
+                      setqudaosku(temp_dict[0]);
+                    } else if (parseInt(key) == 1) {
+                      setasin(temp_dict[1]);
+                    } else if (parseInt(key) == 2) {
+                      setosku(temp_dict[2]);
+                    } else if (parseInt(key) == 3) {
+                      setyunying(temp_dict[3]);
+                    } else if (parseInt(key) == 4) {
+                      setyunwei(temp_dict[4]);
+                    }
+                  }
+                } else {
+                  temp_data = []
+                  temp_data.push(values[form_dict[key]]);
+                  temp_dict[key].push(renderItem(values[form_dict[key]], temp_data.length - 1, item_dict[key]));
+                  let temp_storage = temp_data.join('|');
+                  temp_storage = JSON.stringify(temp_storage);
+                  storage[item_dict[key]] = temp_storage;
+                  //自行根据条件清除
+                  if (parseInt(key) == 0) {
+                    setqudaosku(temp_dict[0]);
+                  } else if (parseInt(key) == 1) {
+                    setasin(temp_dict[1]);
+                  } else if (parseInt(key) == 2) {
+                    setosku(temp_dict[2]);
+                  } else if (parseInt(key) == 3) {
+                    setyunying(temp_dict[3]);
+                  } else if (parseInt(key) == 4) {
+                    setyunwei(temp_dict[4]);
+                  }
+                }
+              }
               //自行根据条件清除
               message.success('提交成功');
               formRef.current?.resetFields();
@@ -225,92 +345,131 @@ const TableList: React.FC = () => {
           }
         }}
       >
-        <ProForm.Group>
-          <ProFormText
-            width="md"
-            name="渠道sku"
-            label="渠道sku"
-            placeholder="请输入渠道sku"
-            tooltip="例如USAN1023801-1+2"
-            rules={[{ required: true, message: '请输入渠道SKU!' }]}
-          />
-          <ProFormText
-            width="md"
-            name="ASIN"
-            label="ASIN"
-            placeholder="请输入ASIN"
-            tooltip="为亚马逊平台上的编码标识,例如B08NBZLZJQ,其他平台上则写Item ID字段,例如568192404"
-          />
-          <ProFormText
-            width="md"
-            name="公司SKU"
-            label="公司SKU"
-            placeholder="请输入SKU,多个sku用英文的‘,’隔开"
-            tooltip="例如USAN1023801-1,USAN1023801-2 (多个sku用,隔开)，捆绑SKU请拆成对应的SKU"
-            rules={[{ required: true, message: '请输入SKU!' }]}
-          />
-          <ProFormSelect
-            width="md"
-            name="店铺"
-            label="店铺"
-            // tooltip="产品所在的店铺"
-            // options={data?.store_name || ['赫曼', '信盒', '信盒-法国', '信盒-西班牙', '维禄', '森月', '宫本', '卟噜卟噜', '玲琅', '哒唛旺', '简砾', 'Wayfair-信盒', 'Walmart-赫曼', 'Walmart-宫本', 'Walmart-信盒', 'Walmart-优瑞斯特', 'Nextfur-Shopify', 'eBay-雅秦', 'eBay-玲琅', 'Wayfair-维禄', 'eBay-治润']}
-            valueEnum={{
-              Walmart_优瑞斯特: 'Walmart-优瑞斯特',
-              Walmart_赫曼: 'Walmart-赫曼',
-              Walmart_信盒: 'Walmart-信盒',
-              Walmart_宫本: 'Walmart-宫本',
-              哒唛旺: '哒唛旺',
-              简砾: '简砾',
-              赫曼: '赫曼',
-              信盒: '信盒',
-              宫本: '宫本',
-              森月: '森月',
-              维禄: '维禄',
-              玲琅: '玲琅',
-              Wayfair_信盒: 'Wayfair-信盒',
-              Wayfair_维禄: 'Wayfair-维禄',
-              eBay_玲琅: 'eBay-玲琅',
-              eBay_治润: 'eBay-治润',
-              eBay_雅秦: 'eBay-雅秦',
-              Nextfur_Shopify: 'Nextfur-Shopify',
-            }}
-            rules={[{ required: true, message: '请输入店铺!' }]}
-          />
-          <ProFormText
-            width="md"
-            name="运营"
-            label="运营"
-            placeholder="请输入运营人员,若为多个,请用英文','隔开"
-            rules={[{ required: true, message: '请输入运营人员!' }]}
-          />
-          <ProFormText
-            width="md"
-            name="运维"
-            label="运维"
-            placeholder="请输入运维人员,若为多个,请用英文','隔开"
-            rules={[{ required: true, message: '请输入运维人员!' }]}
-          />
-          <ProFormSelect
-            width="md"
-            name="组别"
-            // placeholder="请输入小组组别,若为多个,请用英文','隔开"
-            label="组别"
-            // rules={[{ required: true, message: '请输入小组组别' }]}
-            valueEnum={{
-              利芬组_A组: '利芬组_A组',
-              利芬组_B组: '利芬组_B组',
-              利芬组_C组: '利芬组_C组',
-              利芬组_D组: '利芬组_D组',
-              利芬组_E组: '利芬组_E组',
-              利芬组_F组: '利芬组_F组',
-              利芬组_G组: '利芬组_G组',
-              利芬组_H组: '利芬组_H组',
-              利芬组_I组: '利芬组_I组',
-              利芬组_J组: '利芬组_J组',
-            }}
-          />
-        </ProForm.Group>
+        <Row>
+          <Col span={5}>
+            <ProForm.Item
+              name="渠道sku"
+              label="渠道sku"
+              tooltip="例如USAN1023801-1+2"
+              rules={[{ required: true, message: '请输入渠道SKU!' }]}
+            >
+              <AutoComplete
+                placeholder="请输入渠道sku"
+                options={qudaosku}
+              />
+            </ProForm.Item>
+          </Col>
+          <Col span={5} offset={1}>
+            <ProForm.Item
+              name="ASIN"
+              label="ASIN"
+              tooltip="为亚马逊平台上的编码标识,例如B08NBZLZJQ,其他平台上则写Item ID字段,例如568192404"
+              rules={[{ required: true, message: '请输入ASIN!' }]}
+            >
+              <AutoComplete
+                placeholder="请输入ASIN"
+                options={asin}
+              />
+            </ProForm.Item>
+          </Col>
+          <Col span={5} offset={1}>
+            <ProForm.Item
+              name="公司SKU"
+              label="公司SKU"
+              tooltip="例如USAN1023801-1,USAN1023801-2 (多个sku用,隔开)，捆绑SKU请拆成对应的SKU"
+              rules={[{ required: true, message: '请输入SKU!' }]}
+            >
+              <AutoComplete
+                placeholder="请输入SKU!"
+                options={osku}
+              />
+            </ProForm.Item>
+          </Col>
+          <Col span={5} offset={1}>
+            <ProForm.Item
+              name="店铺"
+              label="店铺"
+              rules={[{ required: true, message: '请输入店铺!' }]}
+            >
+              <ProFormSelect
+                width="md"
+                // tooltip="产品所在的店铺"
+                // options={data?.store_name || ['赫曼', '信盒', '信盒-法国', '信盒-西班牙', '维禄', '森月', '宫本', '卟噜卟噜', '玲琅', '哒唛旺', '简砾', 'Wayfair-信盒', 'Walmart-赫曼', 'Walmart-宫本', 'Walmart-信盒', 'Walmart-优瑞斯特', 'Nextfur-Shopify', 'eBay-雅秦', 'eBay-玲琅', 'Wayfair-维禄', 'eBay-治润']}
+                valueEnum={{
+                  Walmart_优瑞斯特: 'Walmart-优瑞斯特',
+                  Walmart_赫曼: 'Walmart-赫曼',
+                  Walmart_信盒: 'Walmart-信盒',
+                  Walmart_宫本: 'Walmart-宫本',
+                  哒唛旺: '哒唛旺',
+                  简砾: '简砾',
+                  赫曼: '赫曼',
+                  信盒: '信盒',
+                  宫本: '宫本',
+                  森月: '森月',
+                  维禄: '维禄',
+                  玲琅: '玲琅',
+                  Wayfair_信盒: 'Wayfair-信盒',
+                  Wayfair_维禄: 'Wayfair-维禄',
+                  eBay_玲琅: 'eBay-玲琅',
+                  eBay_治润: 'eBay-治润',
+                  eBay_雅秦: 'eBay-雅秦',
+                  Nextfur_Shopify: 'Nextfur-Shopify',
+                }}
+                rules={[{ required: true, message: '请输入店铺!' }]}
+              />
+            </ProForm.Item>
+          </Col>
+        </Row>
+        <Row>
+          <Col span={5}>
+            <ProForm.Item
+              name="运营"
+              label="运营"
+              rules={[{ required: true, message: '请输入运营人员!' }]}
+            >
+              <AutoComplete
+                placeholder="请输入运营人员,若为多个,请用英文','隔开"
+                options={yunying}
+              />
+            </ProForm.Item>
+          </Col>
+          <Col span={5} offset={1}>
+            <ProForm.Item
+              name="运维"
+              label="运维"
+              rules={[{ required: true, message: '请输入运维人员!' }]}
+            >
+              <AutoComplete
+                placeholder="请输入运维人员,若为多个,请用英文','隔开"
+                options={yunwei}
+              />
+            </ProForm.Item>
+          </Col>
+          <Col span={5} offset={1}>
+            <ProForm.Item
+              name="组别"
+              label="组别"
+            >
+              <ProFormSelect
+                width="md"
+                // placeholder="请输入小组组别,若为多个,请用英文','隔开"
+                // rules={[{ required: true, message: '请输入小组组别' }]}
+                valueEnum={{
+                  利芬组_A组: '利芬组_A组',
+                  利芬组_B组: '利芬组_B组',
+                  利芬组_C组: '利芬组_C组',
+                  利芬组_D组: '利芬组_D组',
+                  利芬组_E组: '利芬组_E组',
+                  利芬组_F组: '利芬组_F组',
+                  利芬组_G组: '利芬组_G组',
+                  利芬组_H组: '利芬组_H组',
+                  利芬组_I组: '利芬组_I组',
+                  利芬组_J组: '利芬组_J组',
+                }}
+              />
+            </ProForm.Item>
+          </Col>
+        </Row>
       </ProForm>
       <br />
       <ProTable
