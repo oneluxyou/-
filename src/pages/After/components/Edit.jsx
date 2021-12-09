@@ -123,10 +123,10 @@ const Edit = (props) => {
                   'eBay-雅秦':'eBay-雅秦',
                   'Nextfur-Shopify':'Nextfur-Shopify',
                   '旗辰':'旗辰',
-                  '塞迦曼'：'塞迦曼',
-                  '启珊'：'启珊',
-                  '驰甬'：'驰甬',
-                  '杉绮'：'杉绮',
+                  '塞迦曼':'塞迦曼',
+                  '启珊':'启珊',
+                  '驰甬':'驰甬',
+                  '杉绮':'杉绮',
                 }}
                 rules={[{ required: true, message: '请输入店铺!' }]}
               />
