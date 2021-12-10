@@ -194,7 +194,7 @@ const TableList: React.FC = () => {
   const temp_dict = [new Array(), new Array(), new Array(), new Array(), new Array()] as any;
   let temp_data = new Array();
   const item_dict = ['dengji', 'dingdan', 'osku', 'shouhou', 'beizhu'];
-  const form_dict = ['登记人', '订单号', 'SKU', '原因', 'Replacement']
+  const form_dict = ['登记人', '订单号', 'SKU', '售后反馈', '备注'];
   const renderItem = (title: string, index: number, item: string) => ({
     value: title,
     label: (
