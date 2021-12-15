@@ -193,8 +193,8 @@ const TableList: React.FC = () => {
   const storage = window.localStorage;
   const temp_dict = [new Array(), new Array(), new Array(), new Array(), new Array()] as any;
   let temp_data = new Array();
-  const item_dict = ['dengji', 'dingdan', 'osku', 'shouhou', 'beizhu'];
-  const form_dict = ['登记人', '订单号', 'SKU', '售后反馈', '备注'];
+  const item_dict = ['dengji', 'osku', 'shouhou', 'beizhu'];
+  const form_dict = ['登记人', 'SKU', '售后反馈', '备注'];
   const renderItem = (title: string, index: number, item: string) => ({
     value: title,
     label: (
@@ -220,13 +220,11 @@ const TableList: React.FC = () => {
             if (item_dict.indexOf(item) == 0) {
               setdengji(temp_dict[0]);
             } else if (item_dict.indexOf(item) == 1) {
-              setdingdan(temp_dict[1]);
+              setosku(temp_dict[1]);
             } else if (item_dict.indexOf(item) == 2) {
-              setosku(temp_dict[2]);
+              setshouhou(temp_dict[2]);
             } else if (item_dict.indexOf(item) == 3) {
-              setshouhou(temp_dict[3]);
-            } else if (item_dict.indexOf(item) == 4) {
-              setbeizhu(temp_dict[4]);
+              setbeizhu(temp_dict[3]);
             }
           }}
         >
@@ -253,10 +251,9 @@ const TableList: React.FC = () => {
   }
 
   const [dengji, setdengji] = useState(temp_dict[0]) as any;
-  const [dingdan, setdingdan] = useState(temp_dict[1]) as any;
-  const [osku, setosku] = useState(temp_dict[2]) as any;
-  const [shouhou, setshouhou] = useState(temp_dict[3]) as any;
-  const [beizhu, setbeizhu] = useState(temp_dict[4]) as any;
+  const [osku, setosku] = useState(temp_dict[1]) as any;
+  const [shouhou, setshouhou] = useState(temp_dict[2]) as any;
+  const [beizhu, setbeizhu] = useState(temp_dict[3]) as any;
   return (
     <PageContainer>
       <ProForm<{
@@ -270,7 +267,7 @@ const TableList: React.FC = () => {
           await waitTime(1000);
           console.log(values);
 
-          return request(`http://www.onelux.club:5000/`, {
+          return request(`http://192.168.1.115:5000/`, {
             method: 'POST',
             data: { ...values },
             requestType: 'form',
@@ -300,13 +297,11 @@ const TableList: React.FC = () => {
                     if (parseInt(key) == 0) {
                       setdengji(temp_dict[0]);
                     } else if (parseInt(key) == 1) {
-                      setdingdan(temp_dict[1]);
+                      setosku(temp_dict[1]);
                     } else if (parseInt(key) == 2) {
-                      setosku(temp_dict[2]);
+                      setshouhou(temp_dict[2]);
                     } else if (parseInt(key) == 3) {
-                      setshouhou(temp_dict[3]);
-                    } else if (parseInt(key) == 4) {
-                      setbeizhu(temp_dict[4]);
+                      setbeizhu(temp_dict[3]);
                     }
                   }
                 } else {
@@ -320,13 +315,11 @@ const TableList: React.FC = () => {
                   if (parseInt(key) == 0) {
                     setdengji(temp_dict[0]);
                   } else if (parseInt(key) == 1) {
-                    setdingdan(temp_dict[1]);
+                    setosku(temp_dict[1]);
                   } else if (parseInt(key) == 2) {
-                    setosku(temp_dict[2]);
+                    setshouhou(temp_dict[2]);
                   } else if (parseInt(key) == 3) {
-                    setshouhou(temp_dict[3]);
-                  } else if (parseInt(key) == 4) {
-                    setbeizhu(temp_dict[4]);
+                    setbeizhu(temp_dict[3]);
                   }
                 }
               }
@@ -383,11 +376,11 @@ const TableList: React.FC = () => {
                   'eBay-治润': 'eBay-治润',
                   'eBay-雅秦': 'eBay-雅秦',
                   'Nextfur-Shopify': 'Nextfur-Shopify',
-                  '旗辰':'旗辰',
-                  '塞迦曼':'塞迦曼',
-                  '启珊':'启珊',
-                  '驰甬':'驰甬',
-                  '杉绮':'杉绮',
+                  '旗辰': '旗辰',
+                  '塞迦曼': '塞迦曼',
+                  '启珊': '启珊',
+                  '驰甬': '驰甬',
+                  '杉绮': '杉绮',
                 }}
               />
             </ProForm.Item>
@@ -401,7 +394,6 @@ const TableList: React.FC = () => {
             >
               <AutoComplete
                 placeholder="请输入订单号!"
-                options={dingdan}
               />
             </ProForm.Item>
           </Col>
