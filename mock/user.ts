@@ -13,8 +13,6 @@ async function getFakeCaptcha(req: Request, res: Response) {
   return res.json('captcha-xxx');
 }
 
-
-
 /**
  * 当前用户的权限，如果为空代表没登录
  * current user access， if is '', user need login
@@ -29,25 +27,25 @@ const getAccess = () => {
 // 代码中会兼容本地 service mock 以及部署站点的静态数据
 export default {
   // 支持值为 Object 和 Array
-  'GET /api/currentUser': (req: Request, res: Response) => {
-    if (!getAccess()) {
-      res.status(401).send({
-        data: {
-          isLogin: false,
-        },
-        errorCode: '401',
-        errorMessage: '请先登录！',
-        success: true,
-      });
-      return;
-    }
-    res.send({
-      success: true,
-      data: {
-        name: 'Serati Ma',
-      },
-    });
-  },
+  // 'GET /api/currentUser': (req: Request, res: Response) => {
+  //   if (!getAccess()) {
+  //     res.status(401).send({
+  //       data: {
+  //         isLogin: false,
+  //       },
+  //       errorCode: '401',
+  //       errorMessage: '请先登录！',
+  //       success: true,
+  //     });
+  //     return;
+  //   }
+  //   res.send({
+  //     success: true,
+  //     data: {
+  //       name: 'Serati Ma',
+  //     },
+  //   });
+  // },
   // GET POST 可省略
   'GET /api/users': [
     {
@@ -153,4 +151,3 @@ export default {
 
   'GET  /api/login/captcha': getFakeCaptcha,
 };
-

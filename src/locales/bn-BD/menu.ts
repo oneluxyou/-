@@ -36,7 +36,7 @@ export default {
   'menu.result.success': 'সাফল্য',
   'menu.result.fail': 'ব্যর্থ',
   'menu.exception': 'ব্যতিক্রম',
-  'menu.exception.not-permission': '403',
+  'menu.exception.not-ssion': '403',
   'menu.exception.not-find': '404',
   'menu.exception.server-error': '500',
   'menu.exception.trigger': 'ট্রিগার',

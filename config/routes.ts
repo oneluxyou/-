@@ -60,6 +60,29 @@
     ],
   },
   {
+    path: '/dashboard',
+    name: '仪表盘',
+    icon: 'crown',
+    routes: [
+      {
+        path: '/dashboard/saleTotal',
+        name: '销售汇总',
+        icon: 'smile',
+        component: './dashboard/saleTotal/index',
+        access: 'Skusaler',
+      },
+      {
+        path: '/dashboard/skuTotal',
+        name: 'sku汇总',
+        icon: 'smile',
+        component: './dashboard/skuTotal/index',
+      },
+      {
+        component: './404',
+      },
+    ],
+  },
+  {
     path: '/admin',
     name: 'admin',
     icon: 'crown',

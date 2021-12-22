@@ -3,7 +3,10 @@
  * */
 export default function access(initialState: { currentUser?: API.CurrentUser | undefined }) {
   const { currentUser } = initialState || {};
+  // console.log(currentUser && currentUser.authority === 'leader');
+  // console.log(currentUser?.authority);
   return {
-    canAdmin: currentUser && currentUser.access === 'admin',
+    Skusaler: () =>
+      currentUser && (currentUser.authority === 'admin' || currentUser.authority === 'leader'),
   };
 }

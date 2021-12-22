@@ -19,7 +19,7 @@ import { useRequest } from 'umi';
 
 const TableList: React.FC = () => {
   const { data } = useRequest({
-    url: 'http://www.onelux.club:5000/sku/static',
+    url: 'http://192.168.1.115:5000/sku/static',
     method: 'get',
   });
   //编辑part
@@ -70,7 +70,7 @@ const TableList: React.FC = () => {
       onFilter: true,
       valueEnum: {
         利芬组_A组: '利芬组_A组',
-        利芬组_B组: '利芬组_C组',
+        利芬组_B组: '利芬组_B组',
         利芬组_C组: '利芬组_C组',
         利芬组_D组: '利芬组_D组',
         利芬组_E组: '利芬组_E组',
@@ -218,14 +218,19 @@ const TableList: React.FC = () => {
             //自行根据条件清除
             // eslint-disable-next-line @typescript-eslint/no-use-before-define
             if (item_dict.indexOf(item) == 0) {
+              // eslint-disable-next-line @typescript-eslint/no-use-before-define
               setqudaosku(temp_dict[0]);
             } else if (item_dict.indexOf(item) == 1) {
+              // eslint-disable-next-line @typescript-eslint/no-use-before-define
               setasin(temp_dict[1]);
             } else if (item_dict.indexOf(item) == 2) {
+              // eslint-disable-next-line @typescript-eslint/no-use-before-define
               setosku(temp_dict[2]);
             } else if (item_dict.indexOf(item) == 3) {
+              // eslint-disable-next-line @typescript-eslint/no-use-before-define
               setyunying(temp_dict[3]);
             } else if (item_dict.indexOf(item) == 4) {
+              // eslint-disable-next-line @typescript-eslint/no-use-before-define
               setyunwei(temp_dict[4]);
             }
           }}
@@ -282,7 +287,7 @@ const TableList: React.FC = () => {
 
           if (sku_in == true) {
             values['店铺'] = JSON.stringify(values['店铺']);
-            return request(`http://www.onelux.club:5000/sku/insert`, {
+            return request(`http://192.168.1.115:5000/sku/insert`, {
               method: 'POST',
               data: { ...values },
               requestType: 'form',
@@ -453,7 +458,7 @@ const TableList: React.FC = () => {
               <ProFormSelect
                 width="md"
                 // placeholder="请输入小组组别,若为多个,请用英文','隔开"
-                // rules={[{ required: true, message: '请输入小组组别' }]}
+                rules={[{ required: true, message: '请输入小组组别' }]}
                 valueEnum={{
                   利芬组_A组: '利芬组_A组',
                   利芬组_B组: '利芬组_B组',
@@ -483,7 +488,7 @@ const TableList: React.FC = () => {
         onChange={onTableChange}
         request={async (params = {}) => {
           console.log(params);
-          const result = request('http://www.onelux.club:5000/skuinfo', {
+          const result = request('http://192.168.1.115:5000/skuinfo', {
             method: 'POST',
             data: { ...params },
             requestType: 'form',

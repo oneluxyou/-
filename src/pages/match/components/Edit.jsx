@@ -80,7 +80,7 @@ const Edit = (props) => {
             console.log(sku);
             values['店铺'] = JSON.stringify(values['店铺']);
             if (sku_in == true) {
-              return request(`http://www.onelux.club:5000/sku/change`, {
+              return request(`/sku/change`, {
                 method: 'POST',
                 data: { ...values },
                 requestType: 'form',

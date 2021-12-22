@@ -1,16 +1,16 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { PageContainer } from "@ant-design/pro-layout";
-import ProTable, {ActionType, ProColumns} from "@ant-design/pro-table";
-import {get_zhouzhuan_data} from "@/services/myapi";
-import {useRequest} from "@@/plugin-request/request";
+import ProTable, { ActionType, ProColumns } from "@ant-design/pro-table";
+import { get_zhouzhuan_data } from "@/services/myapi";
+import { useRequest } from "@@/plugin-request/request";
 
 
 
 const App: React.FC = () => {
 
-  const onTableChange = () => {};
+  const onTableChange = () => { };
   const { data } = useRequest({
-    url: 'http://www.onelux.club:5000/zhouzhuan/columns',
+    url: 'http://192.168.1.115:5000/zhouzhuan/columns',
     method: 'get',
   });
   const actionRef = useRef<ActionType>();
@@ -29,16 +29,16 @@ const App: React.FC = () => {
     }
   }
 
-  return(
+  return (
     <PageContainer>
       <ProTable
-        columns = {arr}
-        request={async (params= {}) => get_zhouzhuan_data(params)}
+        columns={arr}
+        request={async (params = {}) => get_zhouzhuan_data(params)}
 
         search={{
-          labelWidth:"auto",
+          labelWidth: "auto",
           span: 8,
-          defaultCollapsed:false,
+          defaultCollapsed: false,
         }}
 
         actionRef={actionRef}
