@@ -19,7 +19,7 @@ import { useRequest } from 'umi';
 
 const TableList: React.FC = () => {
   const { data } = useRequest({
-    url: 'http://192.168.1.115:5000/sku/static',
+    url: 'http://www.onelux.club:5000/sku/static',
     method: 'get',
   });
   //编辑part
@@ -287,7 +287,7 @@ const TableList: React.FC = () => {
 
           if (sku_in == true) {
             values['店铺'] = JSON.stringify(values['店铺']);
-            return request(`http://192.168.1.115:5000/sku/insert`, {
+            return request(`http://www.onelux.club:5000/sku/insert`, {
               method: 'POST',
               data: { ...values },
               requestType: 'form',
@@ -488,7 +488,7 @@ const TableList: React.FC = () => {
         onChange={onTableChange}
         request={async (params = {}) => {
           console.log(params);
-          const result = request('http://192.168.1.115:5000/skuinfo', {
+          const result = request('http://www.onelux.club:5000/skuinfo', {
             method: 'POST',
             data: { ...params },
             requestType: 'form',

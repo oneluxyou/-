@@ -28,7 +28,7 @@ export async function updateRule(data: { [key: string]: any }, options?: { [key:
  */
 export async function edit_after(editId: any) {
   console.log(editId);
-  return request('http://192.168.1.115:5000/after/change', {
+  return request('http://www.onelux.club:5000/after/change', {
     method: 'PUT',
     data: { editId },
     requestType: 'form',
@@ -52,7 +52,7 @@ export async function get_after(params: any) {
  */
 export async function get_zhouzhuan_data(params: any) {
   console.log(params);
-  return request('http://192.168.1.115:5000/zhouzhuan/data', {
+  return request('http://www.onelux.club:5000/zhouzhuan/data', {
     method: 'POST',
     data: { ...params },
     requestType: 'form',
@@ -61,7 +61,7 @@ export async function get_zhouzhuan_data(params: any) {
 
 export async function edit_sku(editId: any) {
   console.log(editId);
-  return request('http://192.168.1.115:5000/sku/change', {
+  return request('http://www.onelux.club:5000/sku/change', {
     method: 'PUT',
     data: { editId },
     requestType: 'form',

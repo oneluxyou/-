@@ -72,7 +72,7 @@ const Edit = (props) => {
               console.log(values);
               message.success('提交成功');
               isShowModal(false);
-              return request(`http://192.168.1.115:5000/after/change`, {
+              return request(`http://www.onelux.club:5000/after/change`, {
                 method: 'POST',
                 data: { ...values },
                 requestType: 'form',

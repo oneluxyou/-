@@ -267,7 +267,7 @@ const TableList: React.FC = () => {
           await waitTime(1000);
           console.log(values);
 
-          return request(`http://192.168.1.115:5000/`, {
+          return request(`http://www.onelux.club:5000/`, {
             method: 'POST',
             data: { ...values },
             requestType: 'form',

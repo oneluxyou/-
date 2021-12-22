@@ -47,59 +47,59 @@ export default defineConfig({
   ignoreMomentLocale: true,
   proxy: {
     '/saleTotal': {
-      target: 'http://192.168.1.115:5000',
+      target: 'http://www.onelux.club:5000',
       changeOrigin: true,
     },
     '/saleTotalExcel': {
-      target: 'http://192.168.1.115:5000',
+      target: 'http://www.onelux.club:5000',
       changeOrigin: true,
     },
     '/saleTotalMakeExcel': {
-      target: 'http://192.168.1.115:5000',
+      target: 'http://www.onelux.club:5000',
       changeOrigin: true,
     },
     '/aftersale': {
-      target: 'http://192.168.1.115:5000',
+      target: 'http://www.onelux.club:5000',
       changeOrigin: true,
     },
     '/receive': {
-      target: 'http://192.168.1.115:5000',
+      target: 'http://www.onelux.club:5000',
       changeOrigin: true,
     },
     '/after/change': {
-      target: 'http://192.168.1.115:5000',
+      target: 'http://www.onelux.club:5000',
       changeOrigin: true,
     },
     '/skuinfo': {
-      target: 'http://192.168.1.115:5000',
+      target: 'http://www.onelux.club:5000',
       changeOrigin: true,
     },
     '/sku/insert': {
-      target: 'http://192.168.1.115:5000',
+      target: 'http://www.onelux.club:5000',
       changeOrigin: true,
     },
     '/sku/change': {
-      target: 'http://192.168.1.115:5000',
+      target: 'http://www.onelux.club:5000',
       changeOrigin: true,
     },
     '/sku/static': {
-      target: 'http://192.168.1.115:5000',
+      target: 'http://www.onelux.club:5000',
       changeOrigin: true,
     },
     '/sku/sale/total': {
-      target: 'http://192.168.1.115:5000',
+      target: 'http://www.onelux.club:5000',
       changeOrigin: true,
     },
     '/sku/sale/item/info': {
-      target: 'http://192.168.1.115:5000',
+      target: 'http://www.onelux.club:5000',
       changeOrigin: true,
     },
     '/currentUser': {
-      target: 'http://192.168.1.115:5000',
+      target: 'http://www.onelux.club:5000',
       changeOrigin: true,
     },
     '/map/info': {
-      target: 'http://192.168.1.115:5000',
+      target: 'http://www.onelux.club:5000',
       changeOrigin: true,
     },
   },
