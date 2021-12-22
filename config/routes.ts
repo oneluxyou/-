@@ -47,6 +47,7 @@
     path: '/match',
     name: '匹配表',
     icon: 'crown',
+    access: 'MatchManager',
     routes: [
       {
         path: '/match/index',
