@@ -5,7 +5,7 @@ import React from 'react';
 class NumericInput extends React.Component {
     onChange = (e: { target: { value: any; }; }) => {
         const { value } = e.target;
-        this.props.onChange(value.replace("，", ",").replace(/"/g, "").replace(/\s(?=$)/g, "").replace(/,(?=$)/g, "").replace(/\s(?!$)/g, ",").replace(/'/g, "").replace(/,{2,}/g, ","));
+        this.props.onChange(value.replace("，", ",").replace(/"/g, "").replace(/\s(?=$)/g, "").replace(/\s(?!$)/g, ",").replace(/'/g, "").replace(/,{2,}/g, ","));
     };
 
     // '.' at the end or only '-' in the input box.
@@ -58,6 +58,7 @@ class SkuInputDemo extends React.Component {
             <Form.Item
                 name={`sku`}
                 label={`sku`}
+                rules={[{ pattern: /[^,||^，]$/, message: '最后一位不能为,' }]}
             >
                 <NumericInput style={{ width: 200 }} value={this.state.value} onChange={this.onChange} />
             </Form.Item>

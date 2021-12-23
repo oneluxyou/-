@@ -6,6 +6,7 @@ import SkuInputDemo from './components/FormatInput'
 import OfflineData from './components/skuModel';
 // import OfflineData from './components/skuModel'
 const SkuTotal = () => {
+    // 表单数据
     const [form] = Form.useForm();
     const [dataT, setdataT] = useState([]) as any;
     const [dataE, setdataE] = useState([]) as any;
@@ -18,6 +19,12 @@ const SkuTotal = () => {
     const total_attribute = ['sku', '品名'].concat(attribute_value).concat(attribute_per).concat(['运营', '运维'])
     let first_data_temp: string | any[] = [];
     const [first_data, setfirst_data] = useState() as any;
+    // 个人信息数据
+    const [num_sum, setnum_sum] = useState([]) as any;
+    const [money_sum, setmoney_sum] = useState([]) as any;
+    const [promotion_sum, setpromotion_sum] = useState([]) as any;
+    const [after_sale_sum, setafter_sale_sum] = useState([]) as any;
+    const [gross_profit_sum, setgross_profit_sum] = useState([]) as any;
     // 表格列选择
     const [selectedRowKeys, setselectedRowKeys] = useState() as any;
     const onSelectChange = (value: any) => {
@@ -73,12 +80,10 @@ const SkuTotal = () => {
                         { label: '宫本', value: '宫本' },
                         { label: '森月', value: '森月' },
                         { label: '维禄', value: '维禄' },
-                        // { label: '简砾', value: '简砾' },
-                        // { label: '哒唛旺', value: '哒唛旺' },
+                        { label: '简砾', value: '简砾' },
+                        { label: '哒唛旺', value: '哒唛旺' },
                         { label: 'Ebay', value: 'Ebay' },
                         { label: 'Walmart', value: 'Walmart' },
-                        { label: 'u', value: 'u' },
-                        { label: '尚铭', value: '尚铭' },
                         { label: '9店铺总', value: '9店铺总' },
                     ]}
                         placeholder="请输入店铺"
@@ -255,7 +260,7 @@ const SkuTotal = () => {
         dataIndex: '平均售价',
         sorter: (a: { 平均售价: number; }, b: { 平均售价: number; }) => a.平均售价 - b.平均售价,
         render: (text: number) => <span>{text.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</span>,
-        width: 100,
+        width: 120,
     },
     {
         title: '销售额',
@@ -410,7 +415,7 @@ const SkuTotal = () => {
         ),
         dataIndex: '销售额贡献率',
         render: (text: number) => <span>{text.toFixed(4).toString()}%</span>,
-        width: 150,
+        width: 170,
     },
     {
         title: () => (
@@ -425,7 +430,7 @@ const SkuTotal = () => {
         ),
         dataIndex: '推广费贡献率',
         render: (text: number) => <span>{text.toFixed(4).toString()}%</span>,
-        width: 150,
+        width: 170,
     },
     {
         title: () => (
@@ -455,7 +460,7 @@ const SkuTotal = () => {
         ),
         dataIndex: '净毛利贡献率',
         render: (text: number) => <span>{text.toFixed(4).toString()}%</span>,
-        width: 150,
+        width: 170,
     },
     {
         title: '运营',
@@ -470,7 +475,6 @@ const SkuTotal = () => {
     const [columns, setcolumns] = useState(temp_columns) as any;
     const [attribute, setattribute] = useState(total_attribute) as any;
     const onFinish = async (values: any) => {
-        console.log(values);
         if (values['开始时间'] != null) {
             values['开始时间'] = values['开始时间'].format("YYYY-MM-DD");
         }
@@ -484,9 +488,19 @@ const SkuTotal = () => {
         });
         if (await result) {
             if (await result != 'false') {
+                const resp_data = await result;
+                const detail = document.getElementsByClassName("detail")[0] as HTMLElement;
+                detail.style.display = "block";
                 message.success('提交成功');
-                setdataT(await result);
-                setdataE(await result);
+                // 表格数据
+                setdataT(resp_data.sku_sale_table);
+                setdataE(resp_data.sku_sale_table);
+                // 个人信息
+                setnum_sum(resp_data.num_sum);
+                setmoney_sum(resp_data.money_sum);
+                setpromotion_sum(resp_data.promotion_sum);
+                setafter_sale_sum(resp_data.after_sale_sum);
+                setgross_profit_sum(resp_data.gross_profit_sum);
             }
             else {
                 message.error('无对应sku信息');
@@ -584,11 +598,11 @@ const SkuTotal = () => {
                 </Form>
             </Card>
             <Card>
+                <p style={{ display: "none" }} className="detail">销量总计:　{num_sum}　　　销售额总计:　{money_sum}　　　推广费用总计:　{promotion_sum}　　　售后费用总计:　{after_sale_sum}　　　净毛利润率:　{gross_profit_sum}</p>
                 <Row style={{ marginBottom: 5 }}>
                     <Col span={12}>
                         <span>列选择器：</span>
                         <Select style={{ width: 500 }} mode="multiple" defaultValue={['sku', '品名']} options={Option} onChange={ColChange} />
-
                     </Col>
                     <Col
                         span={12}
@@ -603,7 +617,7 @@ const SkuTotal = () => {
                 </Row>
                 <Table
                     columns={columns}
-                    scroll={{ x: 900, y: 500 }}
+                    scroll={{ x: 1300, y: 500 }}
                     dataSource={dataT}
                     rowSelection={rowSelection}
                     pagination={{
@@ -612,7 +626,7 @@ const SkuTotal = () => {
                         showSizeChanger: true,
                         showQuickJumper: true,
                         showTotal: (total) => {
-                            return `总共 ${total} 条数据`
+                            return (<div>总共{total} 条数据</div>)
                         }
                     }}
                 />
