@@ -70,8 +70,8 @@ const DemoAreaMap = () => {
     },
   };
 
-  return <AreaMap {...config} />;
+  return (
+    <AreaMap {...config} />
+  );
 };
-
-
 export default DemoAreaMap;

@@ -1,12 +1,12 @@
-import { Card } from 'antd';
-import DemoAreaMap from './components/Edit';
+// import { Card } from 'antd';
+// import ReactDOM from 'react-dom';
+// import DemoAreaMap from './components/Edit';
 const UsaMap = () => {
   return (
     <>
-      <Card>
-        <DemoAreaMap />
-      </Card>
+      {/* <div id="container"></div> */}
     </>
   );
 };
+// ReactDOM.render(<DemoAreaMap />, document.getElementById('container'));
 export default UsaMap;
