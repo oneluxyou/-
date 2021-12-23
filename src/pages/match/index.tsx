@@ -385,7 +385,7 @@ const TableList: React.FC = () => {
               rules={[{ required: true, message: '请输入SKU!' }]}
             >
               <AutoComplete
-                placeholder="请输入SKU!"
+                placeholder="请输入公司SKU"
                 options={osku}
               />
             </ProForm.Item>

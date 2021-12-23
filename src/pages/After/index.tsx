@@ -15,10 +15,7 @@ import ProForm, {
 import type { ProFormInstance } from '@ant-design/pro-form';
 import Edit from './components/Edit'
 import { get_after } from "@/services/myapi";
-
-
-
-
+import { useRequest } from 'umi';
 
 const waitTime = (time: number = 100) => {
   return new Promise((resolve) => {
@@ -38,7 +35,10 @@ const waitTime = (time: number = 100) => {
 
 
 const TableList: React.FC = () => {
-
+  const { data } = useRequest({
+    url: 'http://www.onelux.club:5000/sku/static',
+    method: 'get',
+  });
   //编辑part
   const [isModalVisibleEdit, setIsModalVisibleEdit] = useState(false)
   //控制模态框的显示和隐藏
@@ -264,32 +264,60 @@ const TableList: React.FC = () => {
         autoComplete="on"
         formRef={formRef}
         onFinish={async (values, ...rest) => {
-          await waitTime(1000);
-          console.log(values);
+          let sku_in = true;
+          let temp_sku = values['SKU'].replace('，', ',');
+          temp_sku = temp_sku.replace('	', '');
+          temp_sku = temp_sku.replace(' ', '');
+          const sku = temp_sku.split(',');
+          sku.forEach((element: string) => {
+            if (!data.sku_name.find((item: string) => item == element)) {
+              sku_in = false;
+              message.error('传入的SKU:' + element + '不正确(注:捆绑sku要拆成产品sku)');
+            }
+          });
 
-          return request(`http://www.onelux.club:5000/`, {
-            method: 'POST',
-            data: { ...values },
-            requestType: 'form',
-          }).then(res => {
-            //自行根据条件清除
-            console.log(res)
-            if (res === 'OK') {
-              message.success('提交成功');
-              for (const key in item_dict) {
-                temp_dict[key] = new Array();
-                if (item_dict[key] in storage) {
-                  temp_data = eval(storage[item_dict[key]]).split('|');
-                  for (const key2 in temp_data) {
-                    if (Object.prototype.hasOwnProperty.call(temp_data, key2)) {
-                      const element = temp_data[key2];
-                      temp_dict[key].push(renderItem(element, parseInt(key2), item_dict[key]));
+          if (sku_in == true) {
+            return request(`http://www.onelux.club:5000/`, {
+              method: 'POST',
+              data: { ...values },
+              requestType: 'form',
+            }).then(res => {
+              //自行根据条件清除
+              console.log(res)
+              if (res === 'OK') {
+                message.success('提交成功');
+                for (const key in item_dict) {
+                  temp_dict[key] = new Array();
+                  if (item_dict[key] in storage) {
+                    temp_data = eval(storage[item_dict[key]]).split('|');
+                    for (const key2 in temp_data) {
+                      if (Object.prototype.hasOwnProperty.call(temp_data, key2)) {
+                        const element = temp_data[key2];
+                        temp_dict[key].push(renderItem(element, parseInt(key2), item_dict[key]));
+                      }
                     }
-                  }
-                  if (temp_data.indexOf(values[form_dict[key]]) == -1) {
+                    if (temp_data.indexOf(values[form_dict[key]]) == -1) {
+                      temp_data.push(values[form_dict[key]]);
+                      temp_dict[key].push(renderItem(values[form_dict[key]], temp_data.length - 1, item_dict[key]));
+                      console.log('提交后', temp_data)
+                      let temp_storage = temp_data.join('|');
+                      temp_storage = JSON.stringify(temp_storage);
+                      storage[item_dict[key]] = temp_storage;
+                      //自行根据条件清除
+                      if (parseInt(key) == 0) {
+                        setdengji(temp_dict[0]);
+                      } else if (parseInt(key) == 1) {
+                        setosku(temp_dict[1]);
+                      } else if (parseInt(key) == 2) {
+                        setshouhou(temp_dict[2]);
+                      } else if (parseInt(key) == 3) {
+                        setbeizhu(temp_dict[3]);
+                      }
+                    }
+                  } else {
+                    temp_data = []
                     temp_data.push(values[form_dict[key]]);
                     temp_dict[key].push(renderItem(values[form_dict[key]], temp_data.length - 1, item_dict[key]));
-                    console.log('提交后', temp_data)
                     let temp_storage = temp_data.join('|');
                     temp_storage = JSON.stringify(temp_storage);
                     storage[item_dict[key]] = temp_storage;
@@ -304,31 +332,14 @@ const TableList: React.FC = () => {
                       setbeizhu(temp_dict[3]);
                     }
                   }
-                } else {
-                  temp_data = []
-                  temp_data.push(values[form_dict[key]]);
-                  temp_dict[key].push(renderItem(values[form_dict[key]], temp_data.length - 1, item_dict[key]));
-                  let temp_storage = temp_data.join('|');
-                  temp_storage = JSON.stringify(temp_storage);
-                  storage[item_dict[key]] = temp_storage;
-                  //自行根据条件清除
-                  if (parseInt(key) == 0) {
-                    setdengji(temp_dict[0]);
-                  } else if (parseInt(key) == 1) {
-                    setosku(temp_dict[1]);
-                  } else if (parseInt(key) == 2) {
-                    setshouhou(temp_dict[2]);
-                  } else if (parseInt(key) == 3) {
-                    setbeizhu(temp_dict[3]);
-                  }
                 }
               }
-            }
-            else {
-              message.error('订单号已存在')
-            }
-            formRef.current?.resetFields();
-          });
+              else {
+                message.error('订单号已存在')
+              }
+              formRef.current?.resetFields();
+            });
+          }
         }
         }
 
