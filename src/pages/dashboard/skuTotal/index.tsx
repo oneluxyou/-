@@ -74,18 +74,27 @@ const SkuTotal = () => {
                         },
                     ]}
                 >
-                    <Select options={[
-                        { label: '赫曼', value: '赫曼' },
-                        { label: '信盒', value: '信盒' },
-                        { label: '宫本', value: '宫本' },
-                        { label: '森月', value: '森月' },
-                        { label: '维禄', value: '维禄' },
-                        { label: '简砾', value: '简砾' },
-                        { label: '哒唛旺', value: '哒唛旺' },
-                        { label: 'Ebay', value: 'Ebay' },
-                        { label: 'Walmart', value: 'Walmart' },
-                        { label: '9店铺总', value: '9店铺总' },
-                    ]}
+                    <Select
+                        options={[
+                            { label: '赫曼', value: '赫曼' },
+                            { label: '信盒', value: '信盒' },
+                            { label: '宫本', value: '宫本' },
+                            { label: '森月', value: '森月' },
+                            { label: '维禄', value: '维禄' },
+                            { label: '简砾', value: '简砾' },
+                            { label: '哒唛旺', value: '哒唛旺' },
+                            { label: 'Walmart_优瑞斯特', value: 'walmart优瑞斯特' },
+                            { label: 'Walmart_赫曼', value: 'walmart赫曼' },
+                            { label: 'Walmart_信盒', value: 'walmart信盒' },
+                            { label: 'Walmart_宫本', value: 'walmart宫本' },
+                            { label: 'Wayfair_信盒', value: 'wayfair信盒' },
+                            { label: 'Wayfair_维禄', value: 'wayfair维禄' },
+                            { label: 'eBay_玲琅', value: 'ebay玲琅' },
+                            { label: 'eBay_治润', value: 'ebay治润' },
+                            { label: 'eBay_雅秦', value: 'ebay雅秦' },
+                            { label: '所有店铺', value: '总' },
+                        ]}
+                        defaultValue="总"
                         placeholder="请输入店铺"
                     />
 
@@ -233,7 +242,8 @@ const SkuTotal = () => {
             }
             }
         >
-            {text}</a>,
+            {text}
+        </a>,
         fixed: 'left',
         width: 150,
     },
@@ -581,6 +591,8 @@ const SkuTotal = () => {
                                 form.resetFields();
                                 setdataT([]);
                                 setdataE([]);
+                                const detail = document.getElementsByClassName("detail")[0] as HTMLElement;
+                                detail.style.display = "none";
                             }}
                         >
                             重置
