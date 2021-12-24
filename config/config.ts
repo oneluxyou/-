@@ -45,64 +45,64 @@ export default defineConfig({
   esbuild: {},
   title: false,
   ignoreMomentLocale: true,
-  proxy: {
-    '/saleTotal': {
-      target: 'http://www.onelux.club:5000',
-      changeOrigin: true,
-    },
-    '/saleTotalExcel': {
-      target: 'http://www.onelux.club:5000',
-      changeOrigin: true,
-    },
-    '/saleTotalMakeExcel': {
-      target: 'http://www.onelux.club:5000',
-      changeOrigin: true,
-    },
-    '/aftersale': {
-      target: 'http://www.onelux.club:5000',
-      changeOrigin: true,
-    },
-    '/receive': {
-      target: 'http://www.onelux.club:5000',
-      changeOrigin: true,
-    },
-    '/after/change': {
-      target: 'http://www.onelux.club:5000',
-      changeOrigin: true,
-    },
-    '/skuinfo': {
-      target: 'http://www.onelux.club:5000',
-      changeOrigin: true,
-    },
-    '/sku/insert': {
-      target: 'http://www.onelux.club:5000',
-      changeOrigin: true,
-    },
-    '/sku/change': {
-      target: 'http://www.onelux.club:5000',
-      changeOrigin: true,
-    },
-    '/sku/static': {
-      target: 'http://www.onelux.club:5000',
-      changeOrigin: true,
-    },
-    '/sku/sale/total': {
-      target: 'http://www.onelux.club:5000',
-      changeOrigin: true,
-    },
-    '/sku/sale/item/info': {
-      target: 'http://www.onelux.club:5000',
-      changeOrigin: true,
-    },
-    '/currentUser': {
-      target: 'http://www.onelux.club:5000',
-      changeOrigin: true,
-    },
-    '/map/info': {
-      target: 'http://www.onelux.club:5000',
-      changeOrigin: true,
-    },
-  },
+  // proxy: {
+  //   '/saleTotal': {
+  //     target: 'http://www.onelux.club:5000',
+  //     changeOrigin: true,
+  //   },
+  //   '/saleTotalExcel': {
+  //     target: 'http://www.onelux.club:5000',
+  //     changeOrigin: true,
+  //   },
+  //   '/saleTotalMakeExcel': {
+  //     target: 'http://www.onelux.club:5000',
+  //     changeOrigin: true,
+  //   },
+  //   '/aftersale': {
+  //     target: 'http://www.onelux.club:5000',
+  //     changeOrigin: true,
+  //   },
+  //   '/receive': {
+  //     target: 'http://www.onelux.club:5000',
+  //     changeOrigin: true,
+  //   },
+  //   '/after/change': {
+  //     target: 'http://www.onelux.club:5000',
+  //     changeOrigin: true,
+  //   },
+  //   '/skuinfo': {
+  //     target: 'http://www.onelux.club:5000',
+  //     changeOrigin: true,
+  //   },
+  //   '/sku/insert': {
+  //     target: 'http://www.onelux.club:5000',
+  //     changeOrigin: true,
+  //   },
+  //   '/sku/change': {
+  //     target: 'http://www.onelux.club:5000',
+  //     changeOrigin: true,
+  //   },
+  //   '/sku/static': {
+  //     target: 'http://www.onelux.club:5000',
+  //     changeOrigin: true,
+  //   },
+  //   '/sku/sale/total': {
+  //     target: 'http://www.onelux.club:5000',
+  //     changeOrigin: true,
+  //   },
+  //   '/sku/sale/item/info': {
+  //     target: 'http://www.onelux.club:5000',
+  //     changeOrigin: true,
+  //   },
+  //   '/currentUser': {
+  //     target: 'http://www.onelux.club:5000',
+  //     changeOrigin: true,
+  //   },
+  //   '/map/info': {
+  //     target: 'http://www.onelux.club:5000',
+  //     changeOrigin: true,
+  //   },
+  // },
   manifest: {
     basePath: '/',
   },
