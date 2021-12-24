@@ -79,6 +79,12 @@
         component: './dashboard/skuTotal/index',
       },
       {
+        path: '/dashboard/saleRank',
+        name: '组别销售情况',
+        icon: 'smile',
+        component: './dashboard/saleRank/index',
+      },
+      {
         component: './404',
       },
     ],
@@ -109,7 +115,7 @@
   },
   {
     path: '/',
-    redirect: '/welcome',
+    redirect: '/todo',
   },
   {
     component: './404',

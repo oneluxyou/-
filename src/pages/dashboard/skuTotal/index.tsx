@@ -221,7 +221,7 @@ const SkuTotal = () => {
             onClick={async () => {
                 setsku(text);
                 setskuName(record.品名);
-                const result = request(`/sku/sale/item/info`, {
+                const result = request(`http://www.onelux.club:5000/sku/sale/item/info`, {
                     method: 'POST',
                     data: { 'sku': text },
                     requestType: 'form',
@@ -491,7 +491,7 @@ const SkuTotal = () => {
         if (values['结束时间'] != null) {
             values['结束时间'] = values['结束时间'].format("YYYY-MM-DD");
         }
-        const result = request(`/sku/sale/total`, {
+        const result = request(`http://www.onelux.club:5000/sku/sale/total`, {
             method: 'POST',
             data: { ...values },
             requestType: 'form',

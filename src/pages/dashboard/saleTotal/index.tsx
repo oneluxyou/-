@@ -16,7 +16,7 @@ const SaleTotal: FC<AnalysisProps> = () => {
   const [currentTabKey, setCurrentTabKey] = useState<string>('');
 
   const { loading, data } = useRequest({
-    url: '/saleTotal',
+    url: 'http://www.onelux.club:5000/saleTotal',
     method: 'get',
   });
 
