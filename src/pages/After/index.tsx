@@ -36,7 +36,7 @@ const waitTime = (time: number = 100) => {
 
 const TableList: React.FC = () => {
   const { data } = useRequest({
-    url: 'http://www.onelux.club:5000/sku/static',
+    url: '/api/sku/static',
     method: 'get',
   });
   //编辑part
