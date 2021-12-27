@@ -72,18 +72,18 @@
         component: './dashboard/saleTotal/index',
         access: 'Skusaler',
       },
-      {
-        path: '/dashboard/skuTotal',
-        name: 'sku汇总',
-        icon: 'smile',
-        component: './dashboard/skuTotal/index',
-      },
-      {
-        path: '/dashboard/saleRank',
-        name: '组别销售情况',
-        icon: 'smile',
-        component: './dashboard/saleRank/index',
-      },
+      // {
+      //   path: '/dashboard/skuTotal',
+      //   name: 'sku汇总',
+      //   icon: 'smile',
+      //   component: './dashboard/skuTotal/index',
+      // },
+      // {
+      //   path: '/dashboard/saleRank',
+      //   name: '组别销售情况',
+      //   icon: 'smile',
+      //   component: './dashboard/saleRank/index',
+      // },
       {
         component: './404',
       },

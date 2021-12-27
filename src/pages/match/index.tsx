@@ -371,7 +371,6 @@ const TableList: React.FC = () => {
               name="ASIN"
               label="ASIN"
               tooltip="为亚马逊平台上的编码标识,例如B08NBZLZJQ,其他平台上则写Item ID字段,例如568192404"
-              rules={[{ required: true, message: '请输入ASIN!' }]}
             >
               <AutoComplete
                 placeholder="请输入ASIN"
