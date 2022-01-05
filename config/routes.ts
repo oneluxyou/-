@@ -19,18 +19,6 @@
     ],
   },
   {
-    path: '/welcome',
-    name: '周转表',
-    icon: 'TableOutlined',
-    component: './Table',
-  },
-  {
-    path: '/todo',
-    icon: 'HeatMapOutlined',
-    name: 'todo',
-    component: './Todo',
-  },
-  {
     path: '/after',
     icon: 'smile',
     name: 'after',
@@ -47,7 +35,6 @@
     path: '/match',
     name: '匹配表',
     icon: 'crown',
-    access: 'MatchManager',
     routes: [
       {
         path: '/match/index',
@@ -72,35 +59,17 @@
         component: './dashboard/saleTotal/index',
         access: 'Skusaler',
       },
-      // {
-      //   path: '/dashboard/skuTotal',
-      //   name: 'sku汇总',
-      //   icon: 'smile',
-      //   component: './dashboard/skuTotal/index',
-      // },
-      // {
-      //   path: '/dashboard/saleRank',
-      //   name: '组别销售情况',
-      //   icon: 'smile',
-      //   component: './dashboard/saleRank/index',
-      // },
       {
-        component: './404',
-      },
-    ],
-  },
-  {
-    path: '/admin',
-    name: 'admin',
-    icon: 'crown',
-    access: 'canAdmin',
-    component: './Admin',
-    routes: [
-      {
-        path: '/admin/sub-page',
-        name: 'sub-page',
+        path: '/dashboard/skuTotal',
+        name: 'sku汇总',
         icon: 'smile',
-        component: './Welcome',
+        component: './dashboard/skuTotal/index',
+      },
+      {
+        path: '/dashboard/saleRank',
+        name: '组别销售情况',
+        icon: 'smile',
+        component: './dashboard/saleRank/index',
       },
       {
         component: './404',
@@ -108,10 +77,22 @@
     ],
   },
   {
-    name: 'list.table-list',
-    icon: 'table',
-    path: '/list',
-    component: './TableList',
+    path: '/welcome',
+    name: '周转表',
+    icon: 'TableOutlined',
+    component: './Table',
+  },
+  {
+    path: '/inventory',
+    name: '库存分布表',
+    icon: 'smile',
+    component: './inventory',
+  },
+  {
+    path: '/todo',
+    icon: 'HeatMapOutlined',
+    name: 'todo',
+    component: './Todo',
   },
   {
     path: '/',

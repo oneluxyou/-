@@ -77,7 +77,7 @@ const saleRank = () => {
                         <Col span={7} offset={1} style={{ minWidth: "350px" }}>
                             <Card style={{ borderRadius: "15px" }}>
                                 <div style={{ textAlign: "center" }}>
-                                    <div style={{ fontFamily: "微软雅黑", fontSize: 24 }}>本月即时销售额</div>
+                                    <div style={{ fontFamily: "微软雅黑", fontSize: 24 }}>销售额</div>
                                     <div style={{ fontFamily: "华文细黑", fontSize: 30 }}>￥1230303.26</div>
                                 </div>
                                 <hr />
@@ -87,7 +87,7 @@ const saleRank = () => {
                         <Col span={7} offset={1} style={{ minWidth: "350px" }}>
                             <Card style={{ borderRadius: "15px" }}>
                                 <div style={{ textAlign: "center" }}>
-                                    <div style={{ fontFamily: "微软雅黑", fontSize: 24 }}>本月及时销售额</div>
+                                    <div style={{ fontFamily: "微软雅黑", fontSize: 24 }}>销售额</div>
                                     <div style={{ fontFamily: "华文细黑", fontSize: 30 }}>￥1230303.26</div>
                                 </div>
                                 <hr />
@@ -97,7 +97,7 @@ const saleRank = () => {
                         <Col span={7} offset={1} style={{ minWidth: "350px" }}>
                             <Card style={{ borderRadius: "15px" }}>
                                 <div style={{ textAlign: "center" }}>
-                                    <div style={{ fontFamily: "微软雅黑", fontSize: 24 }}>本月及时销售额</div>
+                                    <div style={{ fontFamily: "微软雅黑", fontSize: 24 }}>销售额</div>
                                     <div style={{ fontFamily: "华文细黑", fontSize: 30 }}>￥1230303.26</div>
                                 </div>
                                 <hr />
@@ -107,6 +107,9 @@ const saleRank = () => {
                     </Row>
                 </TabPane>
                 <TabPane tab="销售" key="2">
+                    销售
+                </TabPane>
+                <TabPane tab="售后" key="2">
                     销售
                 </TabPane>
             </Tabs>

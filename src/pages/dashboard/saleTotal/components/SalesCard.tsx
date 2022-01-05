@@ -99,7 +99,7 @@ const SalesCard = ({
 
   const operations =
     < div >
-      <Button style={{ marginRight: 10 }}><Tooltip title={date}><a href="http://www.onelux.club:5000/saleTotalExcel"><FileExcelOutlined />导出Excel表格</a></Tooltip></Button>
+      <Button style={{ marginRight: 10 }}><Tooltip title={date}><a href="/api/saleTotalExcel"><FileExcelOutlined />导出Excel表格</a></Tooltip></Button>
     </div >
   // const data = [
   //   {

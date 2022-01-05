@@ -10,7 +10,7 @@ const App: React.FC = () => {
 
   const onTableChange = () => { };
   const { data } = useRequest({
-    url: 'http://www.onelux.club:5000/zhouzhuan/columns',
+    url: '/api/zhouzhuan/columns',
     method: 'get',
   });
   const actionRef = useRef<ActionType>();

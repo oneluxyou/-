@@ -277,7 +277,7 @@ const TableList: React.FC = () => {
           });
 
           if (sku_in == true) {
-            return request(`http://www.onelux.club:5000/`, {
+            return request(`/api/afterinsert`, {
               method: 'POST',
               data: { ...values },
               requestType: 'form',
@@ -392,6 +392,8 @@ const TableList: React.FC = () => {
                   '启珊': '启珊',
                   '驰甬': '驰甬',
                   '杉绮': '杉绮',
+                  '治润': '治润',
+                  'Central_Power_International_Limited': 'Central_Power_International_Limited',
                 }}
               />
             </ProForm.Item>
@@ -548,6 +550,7 @@ const TableList: React.FC = () => {
         columns={column}
         actionRef={actionRef}
         onChange={onTableChange}
+        scroll={{ x: 1500, y: 300 }}
 
 
         request={async (params = {}) => get_after(params)}

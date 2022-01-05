@@ -7,19 +7,24 @@ import OfflineData from './components/skuModel';
 // import OfflineData from './components/skuModel'
 const SkuTotal = () => {
     // 表单数据
+    // 表单信息
     const [form] = Form.useForm();
+    // 动态表单
     const [dataT, setdataT] = useState([]) as any;
+    // 后端传过来的表单数据
     const [dataE, setdataE] = useState([]) as any;
+    // 设置折线图数据
     const [sku, setsku] = useState() as any;
     const [skuName, setskuName] = useState() as any;
     const [lineData, setlineData] = useState() as any;
     const [expand, setExpand] = useState(false);
+    // 属性参数
     const attribute_value: string[] = ['成本单价', '销量', '平均售价', '销售额', '推广费', '损耗', '毛利润', '净毛利润']
     const attribute_per: string[] = ['成本占比', '损耗占比', '推广占比', '毛利润率', '净毛利润率', '销量贡献率', '销售额贡献率', '推广费贡献率', '售后贡献率', '净毛利贡献率']
     const total_attribute = ['sku', '品名'].concat(attribute_value).concat(attribute_per).concat(['运营', '运维'])
     let first_data_temp: string | any[] = [];
     const [first_data, setfirst_data] = useState() as any;
-    // 个人信息数据
+    // 个人信息数据，input历史记录
     const [num_sum, setnum_sum] = useState([]) as any;
     const [money_sum, setmoney_sum] = useState([]) as any;
     const [promotion_sum, setpromotion_sum] = useState([]) as any;
@@ -73,16 +78,19 @@ const SkuTotal = () => {
                             message: '请输入店铺!',
                         },
                     ]}
+                    initialValue={"总"}
                 >
                     <Select
                         options={[
-                            { label: '赫曼', value: '赫曼' },
-                            { label: '信盒', value: '信盒' },
-                            { label: '宫本', value: '宫本' },
-                            { label: '森月', value: '森月' },
-                            { label: '维禄', value: '维禄' },
-                            { label: '简砾', value: '简砾' },
-                            { label: '哒唛旺', value: '哒唛旺' },
+                            { label: 'amazon赫曼', value: 'amazon赫曼' },
+                            { label: 'amazon信盒', value: 'amazon信盒' },
+                            { label: 'amazon宫本', value: 'amazon宫本' },
+                            { label: 'amazon森月', value: 'amazon森月' },
+                            { label: 'amazon维禄', value: 'amazon维禄' },
+                            { label: 'amazon简砾', value: 'amazon简砾' },
+                            { label: 'amazon哒唛旺', value: 'amazon哒唛旺' },
+                            { label: 'amazonCPower', value: 'amazoncpower' },
+                            { label: 'amazon治润', value: 'amazon治润' },
                             { label: 'Walmart_优瑞斯特', value: 'walmart优瑞斯特' },
                             { label: 'Walmart_赫曼', value: 'walmart赫曼' },
                             { label: 'Walmart_信盒', value: 'walmart信盒' },
@@ -94,12 +102,11 @@ const SkuTotal = () => {
                             { label: 'eBay_雅秦', value: 'ebay雅秦' },
                             { label: '所有店铺', value: '总' },
                         ]}
-                        defaultValue="总"
                         placeholder="请输入店铺"
                     />
 
                 </Form.Item>
-            </Col>,
+            </Col >,
             <Col span={6} key={2}>
                 <Form.Item
                     name={`开始时间`}
@@ -221,7 +228,7 @@ const SkuTotal = () => {
             onClick={async () => {
                 setsku(text);
                 setskuName(record.品名);
-                const result = request(`http://www.onelux.club:5000/sku/sale/item/info`, {
+                const result = request(`/api/sku/sale/item/info`, {
                     method: 'POST',
                     data: { 'sku': text },
                     requestType: 'form',
@@ -476,10 +483,16 @@ const SkuTotal = () => {
         title: '运营',
         dataIndex: '运营',
         width: 100,
-    }, {
+    },
+    {
         title: '运维',
         dataIndex: '运维',
         width: 100,
+    },
+    {
+        title: '组别',
+        dataIndex: '组别',
+        width: 120,
     }
     ];
     const [columns, setcolumns] = useState(temp_columns) as any;
@@ -491,7 +504,7 @@ const SkuTotal = () => {
         if (values['结束时间'] != null) {
             values['结束时间'] = values['结束时间'].format("YYYY-MM-DD");
         }
-        const result = request(`http://www.onelux.club:5000/sku/sale/total`, {
+        const result = request(`/api/sku/sale/total`, {
             method: 'POST',
             data: { ...values },
             requestType: 'form',
@@ -610,7 +623,7 @@ const SkuTotal = () => {
                 </Form>
             </Card>
             <Card>
-                <p style={{ display: "none" }} className="detail">销量总计:　{num_sum}　　　销售额总计:　{money_sum}　　　推广费用总计:　{promotion_sum}　　　售后费用总计:　{after_sale_sum}　　　净毛利润率:　{gross_profit_sum}</p>
+                <p style={{ display: "none" }} className="detail">销量总计:　{num_sum}　　　销售额总计:　{money_sum}　　　推广费用总计:　{promotion_sum}　　　售后费用总计:　{after_sale_sum}　　　净毛利润:　{gross_profit_sum}</p>
                 <Row style={{ marginBottom: 5 }}>
                     <Col span={12}>
                         <span>列选择器：</span>

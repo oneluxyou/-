@@ -9,7 +9,7 @@ import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProForm, { ProFormSelect } from '@ant-design/pro-form';
 import type { ProFormInstance } from '@ant-design/pro-form';
 import Edit from './components/Edit';
-import { useRequest } from 'umi';
+import { useRequest, useAccess, Access } from 'umi';
 
 /**
  * 更新节点
@@ -18,8 +18,9 @@ import { useRequest } from 'umi';
  */
 
 const TableList: React.FC = () => {
+  const access = useAccess();
   const { data } = useRequest({
-    url: 'http://www.onelux.club:5000/sku/static',
+    url: '/api/sku/static',
     method: 'get',
   });
   //编辑part
@@ -101,6 +102,9 @@ const TableList: React.FC = () => {
         amazon森月: 'Amazon-森月',
         amazon维禄: 'Amazon-维禄',
         amazon玲琅: 'Amazon-玲琅',
+        amazon治润: 'Amazon-治润',
+        amazon驰甬: 'Amazon-驰甬',
+        amazoncpower: 'Central_Power_International_Limited',
         amazon: 'Amazon',
         wayfair信盒: 'Wayfair-信盒',
         wayfair维禄: 'Wayfair-维禄',
@@ -109,7 +113,6 @@ const TableList: React.FC = () => {
         ebay治润: 'eBay-治润',
         ebay雅秦: 'eBay-雅秦',
         Nextfur_Shopify: 'Nextfur-Shopify',
-        Central_Power_International_Limited: 'Central Power International Limited',
       },
     },
     {
@@ -129,14 +132,14 @@ const TableList: React.FC = () => {
     {
       title: '开始时间',
       dataIndex: '开始时间',
-      hideInSearch: true,
+      // hideInSearch: true,
       key: '开始时间',
       tooltip: '自动生成(美国时间)',
     },
     {
       title: '结束时间',
       dataIndex: '结束时间',
-      hideInSearch: true,
+      // hideInSearch: true,
       key: '结束时间',
       tooltip: '自动生成(美国时间)',
     },
@@ -267,7 +270,7 @@ const TableList: React.FC = () => {
   const [yunwei, setyunwei] = useState(temp_dict[4]) as any;
   return (
     <PageContainer>
-      <ProForm<{
+      <Access accessible={access.MatchManager()}>        <ProForm<{
         name: string;
         company: string;
       }>
@@ -289,7 +292,7 @@ const TableList: React.FC = () => {
 
           if (sku_in == true) {
             values['店铺'] = JSON.stringify(values['店铺']);
-            return request(`http://www.onelux.club:5000/sku/insert`, {
+            return request(`/api/sku/insert`, {
               method: 'POST',
               data: { ...values },
               requestType: 'form',
@@ -414,6 +417,9 @@ const TableList: React.FC = () => {
                   amazon森月: 'Amazon-森月',
                   amazon维禄: 'Amazon-维禄',
                   amazon玲琅: 'Amazon-玲琅',
+                  amazon治润: 'Amazon-治润',
+                  amazon驰甬: 'Amazon-驰甬',
+                  amazoncpower: 'Central_Power_International_Limited',
                   amazon: 'Amazon',
                   wayfair信盒: 'Wayfair-信盒',
                   wayfair维禄: 'Wayfair-维禄',
@@ -477,7 +483,7 @@ const TableList: React.FC = () => {
             </ProForm.Item>
           </Col>
         </Row>
-      </ProForm>
+      </ProForm></Access>
       <br />
       <ProTable
         search={{
@@ -490,7 +496,7 @@ const TableList: React.FC = () => {
         onChange={onTableChange}
         request={async (params = {}) => {
           console.log(params);
-          const result = request('http://www.onelux.club:5000/skuinfo', {
+          const result = request('/api/skuinfo', {
             method: 'POST',
             data: { ...params },
             requestType: 'form',
@@ -513,18 +519,22 @@ const TableList: React.FC = () => {
           ],
         }}
       />
-      {!isModalVisibleEdit ? (
-        ''
-      ) : (
-        <Edit
-          isModalVisible={isModalVisibleEdit}
-          isShowModal={isShowModalEdit}
-          actionRef={actionRef}
-          editId={editId}
-          skuName={data.sku_name}
-        />
-      )}
-    </PageContainer>
+      {
+        !isModalVisibleEdit ? (
+          ''
+        ) : (
+          <Access accessible={access.MatchManager()} >
+            <Edit
+              isModalVisible={isModalVisibleEdit}
+              isShowModal={isShowModalEdit}
+              actionRef={actionRef}
+              editId={editId}
+              skuName={data.sku_name}
+            />
+          </Access>
+        )
+      }
+    </PageContainer >
   );
 };
 
