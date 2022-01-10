@@ -16,6 +16,7 @@ import type { ProFormInstance } from '@ant-design/pro-form';
 import Edit from './components/Edit'
 import { get_after } from "@/services/myapi";
 import { useRequest } from 'umi';
+import { useModel } from 'umi';
 
 const waitTime = (time: number = 100) => {
   return new Promise((resolve) => {
@@ -48,8 +49,7 @@ const TableList: React.FC = () => {
   }
   const [editId, setEditId] = useState(false)
   const actionRef = useRef<ActionType>();
-  const formRef = useRef<ProFormInstance>()
-
+  const formRef = useRef<ProFormInstance>();
 
   const onTableChange = () => { };
   //表格part
@@ -102,7 +102,8 @@ const TableList: React.FC = () => {
         'Refund': { text: 'Refund' },
         'Used': { text: 'Used' },
         'Refund and Replacement': { text: 'Refund and Replacement' },
-        'Delivery Consultation': { text: 'Delivery Consultation' }
+        'Used and Replacement': { text: 'Used and Replacement' },
+        'Delivery Consultation': { text: 'Delivery Consultation' },
       }
     },
     {
@@ -249,7 +250,7 @@ const TableList: React.FC = () => {
       }
     }
   }
-
+  const { initialState } = useModel('@@initialState');
   const [dengji, setdengji] = useState(temp_dict[0]) as any;
   const [osku, setosku] = useState(temp_dict[1]) as any;
   const [shouhou, setshouhou] = useState(temp_dict[2]) as any;
@@ -263,6 +264,9 @@ const TableList: React.FC = () => {
       >
         autoComplete="on"
         formRef={formRef}
+        initialValues={{
+          '登记人': initialState.currentUser?.name
+        }}
         onFinish={async (values, ...rest) => {
           let sku_in = true;
           let temp_sku = values['SKU'].replace('，', ',');
@@ -283,41 +287,22 @@ const TableList: React.FC = () => {
               requestType: 'form',
             }).then(res => {
               //自行根据条件清除
-              console.log(res)
-              if (res === 'OK') {
-                message.success('提交成功');
-                for (const key in item_dict) {
-                  temp_dict[key] = new Array();
-                  if (item_dict[key] in storage) {
-                    temp_data = eval(storage[item_dict[key]]).split('|');
-                    for (const key2 in temp_data) {
-                      if (Object.prototype.hasOwnProperty.call(temp_data, key2)) {
-                        const element = temp_data[key2];
-                        temp_dict[key].push(renderItem(element, parseInt(key2), item_dict[key]));
-                      }
+              console.log(res);
+              message.success('提交成功');
+              for (const key in item_dict) {
+                temp_dict[key] = new Array();
+                if (item_dict[key] in storage) {
+                  temp_data = eval(storage[item_dict[key]]).split('|');
+                  for (const key2 in temp_data) {
+                    if (Object.prototype.hasOwnProperty.call(temp_data, key2)) {
+                      const element = temp_data[key2];
+                      temp_dict[key].push(renderItem(element, parseInt(key2), item_dict[key]));
                     }
-                    if (temp_data.indexOf(values[form_dict[key]]) == -1) {
-                      temp_data.push(values[form_dict[key]]);
-                      temp_dict[key].push(renderItem(values[form_dict[key]], temp_data.length - 1, item_dict[key]));
-                      console.log('提交后', temp_data)
-                      let temp_storage = temp_data.join('|');
-                      temp_storage = JSON.stringify(temp_storage);
-                      storage[item_dict[key]] = temp_storage;
-                      //自行根据条件清除
-                      if (parseInt(key) == 0) {
-                        setdengji(temp_dict[0]);
-                      } else if (parseInt(key) == 1) {
-                        setosku(temp_dict[1]);
-                      } else if (parseInt(key) == 2) {
-                        setshouhou(temp_dict[2]);
-                      } else if (parseInt(key) == 3) {
-                        setbeizhu(temp_dict[3]);
-                      }
-                    }
-                  } else {
-                    temp_data = []
+                  }
+                  if (temp_data.indexOf(values[form_dict[key]]) == -1) {
                     temp_data.push(values[form_dict[key]]);
                     temp_dict[key].push(renderItem(values[form_dict[key]], temp_data.length - 1, item_dict[key]));
+                    console.log('提交后', temp_data)
                     let temp_storage = temp_data.join('|');
                     temp_storage = JSON.stringify(temp_storage);
                     storage[item_dict[key]] = temp_storage;
@@ -332,17 +317,30 @@ const TableList: React.FC = () => {
                       setbeizhu(temp_dict[3]);
                     }
                   }
+                } else {
+                  temp_data = []
+                  temp_data.push(values[form_dict[key]]);
+                  temp_dict[key].push(renderItem(values[form_dict[key]], temp_data.length - 1, item_dict[key]));
+                  let temp_storage = temp_data.join('|');
+                  temp_storage = JSON.stringify(temp_storage);
+                  storage[item_dict[key]] = temp_storage;
+                  //自行根据条件清除
+                  if (parseInt(key) == 0) {
+                    setdengji(temp_dict[0]);
+                  } else if (parseInt(key) == 1) {
+                    setosku(temp_dict[1]);
+                  } else if (parseInt(key) == 2) {
+                    setshouhou(temp_dict[2]);
+                  } else if (parseInt(key) == 3) {
+                    setbeizhu(temp_dict[3]);
+                  }
                 }
-              }
-              else {
-                message.error('订单号已存在')
               }
               formRef.current?.resetFields();
             });
           }
         }
         }
-
 
       >
         <Row>
@@ -351,7 +349,7 @@ const TableList: React.FC = () => {
               name="登记人"
               label="登记人"
               tooltip="请勿输入渠道SKU/订单号/包裹号"
-              rules={[{ required: true, message: '请输入名称!' }]}
+              rules={[{ required: true, message: '请输入登记人!' }]}
             >
               <AutoComplete
                 placeholder="请输入名称"
@@ -403,7 +401,6 @@ const TableList: React.FC = () => {
               name="订单号"
               label="订单号"
               rules={[{ required: true, message: '请输入' }]}
-              tooltip="例如USAN1023801-1,USAN1023801-2 (多个sku用,隔开)，捆绑SKU请拆成对应的SKU"
             >
               <AutoComplete
                 placeholder="请输入订单号!"
@@ -415,10 +412,10 @@ const TableList: React.FC = () => {
               name="SKU"
               label="SKU"
               rules={[{ required: true, message: '两箱包的请输入两个公司SKU' }, { pattern: /[^,||^，]$/, message: '最后一位不能为,' }]}
-              tooltip="请勿输入渠道SKU/订单号/包裹号"
+              tooltip="例如USAN1023801-1,USAN1023801-2 (多个sku用,隔开)，捆绑SKU请拆成对应的SKU"
             >
               <AutoComplete
-                placeholder="两箱包形如'USAN1018800-5,USAN1018800-6'"
+                placeholder="若为AB箱,A箱有问题请填A箱,B箱有问题请填B箱"
                 options={osku}
               />
             </ProForm.Item>
@@ -436,12 +433,13 @@ const TableList: React.FC = () => {
                 placeholder="请输入处理方式"
                 valueEnum={{
                   'Wait Reply': 'Wait Reply',
-                  'Cancel Order': 'Cancel Order',
-                  'Closed': 'Closed',
+                  // 'Cancel Order': 'Cancel Order',
+                  // 'Closed': 'Closed',
                   'Replacement': 'Replacement',
                   'Refund': 'Refund',
                   'Used': 'Used',
                   'Refund and Replacement': 'Refund and Replacement',
+                  'Used and Replacement': 'Used and Replacement',
                   'Delivery Consultation': 'Delivery Consultation',
                 }}
 
@@ -514,6 +512,7 @@ const TableList: React.FC = () => {
                   '卖家承担-上门取件': '卖家承担-上门取件',
                   '卖家承担-退货标签': '卖家承担-退货标签',
                   '拦截': '拦截',
+                  '拒收': '拒收',
                 }}
               />
             </ProForm.Item>
@@ -524,6 +523,7 @@ const TableList: React.FC = () => {
             >
               <AutoComplete
                 options={shouhou}
+                placeholder="售后原因请填写详细！"
               />
             </ProForm.Item>
           </Col>

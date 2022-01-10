@@ -112,7 +112,7 @@ const TableList: React.FC = () => {
         ebay玲琅: 'eBay-玲琅',
         ebay治润: 'eBay-治润',
         ebay雅秦: 'eBay-雅秦',
-        Nextfur_Shopify: 'Nextfur-Shopify',
+        shopifynextfur: 'Nextfur-Shopify',
       },
     },
     {
@@ -130,14 +130,14 @@ const TableList: React.FC = () => {
       tooltip: '自动生成',
     },
     {
-      title: '开始时间',
+      title: '开始时间(美国时间)',
       dataIndex: '开始时间',
       // hideInSearch: true,
       key: '开始时间',
       tooltip: '自动生成(美国时间)',
     },
     {
-      title: '结束时间',
+      title: '结束时间(美国时间)',
       dataIndex: '结束时间',
       // hideInSearch: true,
       key: '结束时间',
@@ -426,7 +426,7 @@ const TableList: React.FC = () => {
                   ebay玲琅: 'eBay-玲琅',
                   ebay治润: 'eBay-治润',
                   ebay雅秦: 'eBay-雅秦',
-                  Nextfur_Shopify: 'Nextfur-Shopify',
+                  Nextfur_Shopify: 'shopifynextfur',
                 }}
                 rules={[{ required: true, message: '请输入店铺!' }]}
               />

@@ -139,12 +139,13 @@ const Edit = (props) => {
                 placeholder="请输入处理方式"
                 valueEnum={{
                   'Wait Reply': 'Wait Reply',
-                  'Cancel Order': 'Cancel Order',
-                  'Closed': 'Closed',
+                  // 'Cancel Order': 'Cancel Order',
+                  // 'Closed': 'Closed',
                   'Replacement': 'Replacement',
                   'Refund': 'Refund',
                   'Used': 'Used',
                   'Refund and Replacement': 'Refund and Replacement',
+                  'Used and Replacement': 'Used and Replacement',
                   'Delivery Consultation': 'Delivery Consultation',
                 }}
                 rules={[{ required: true, message: '请输入处理方式!' }]}
@@ -197,6 +198,7 @@ const Edit = (props) => {
                   '卖家承担-上门取件': '卖家承担-上门取件',
                   '卖家承担-退货标签': '卖家承担-退货标签',
                   '拦截': '拦截',
+                  '拒收': '拒收',
                 }}
               />
               <ProFormText width="md" name="售后反馈" label="售后反馈" />

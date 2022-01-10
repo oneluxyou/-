@@ -20,8 +20,8 @@ const SkuTotal = () => {
     const [expand, setExpand] = useState(false);
     // 属性参数
     const attribute_value: string[] = ['成本单价', '销量', '平均售价', '销售额', '推广费', '损耗', '毛利润', '净毛利润']
-    const attribute_per: string[] = ['成本占比', '损耗占比', '推广占比', '毛利润率', '净毛利润率', '销量贡献率', '销售额贡献率', '推广费贡献率', '售后贡献率', '净毛利贡献率']
-    const total_attribute = ['sku', '品名'].concat(attribute_value).concat(attribute_per).concat(['运营', '运维'])
+    const attribute_per: string[] = ['成本占比', '损耗占比', '推广占比', '毛利润率', '净毛利润率']
+    const total_attribute = ['sku', '品名'].concat(attribute_value).concat(attribute_per).concat(['运营', '运维', '组别', '店铺'])
     let first_data_temp: string | any[] = [];
     const [first_data, setfirst_data] = useState() as any;
     // 个人信息数据，input历史记录
@@ -100,6 +100,7 @@ const SkuTotal = () => {
                             { label: 'eBay_玲琅', value: 'ebay玲琅' },
                             { label: 'eBay_治润', value: 'ebay治润' },
                             { label: 'eBay_雅秦', value: 'ebay雅秦' },
+                            { label: 'Nextfur_Shopify', value: 'shopifynextfur' },
                             { label: '所有店铺', value: '总' },
                         ]}
                         placeholder="请输入店铺"
@@ -224,13 +225,13 @@ const SkuTotal = () => {
             </span>
         ),
         dataIndex: 'sku',
-        render: (text: string, record: { 品名: any; }) => <a type="link"
+        render: (text: string, record: { 品名: any, 店铺: any; }) => <a type="link"
             onClick={async () => {
                 setsku(text);
                 setskuName(record.品名);
                 const result = request(`/api/sku/sale/item/info`, {
                     method: 'POST',
-                    data: { 'sku': text },
+                    data: { 'sku': text, 'store': record.店铺 },
                     requestType: 'form',
                 });
                 if (await result) {
@@ -493,6 +494,11 @@ const SkuTotal = () => {
         title: '组别',
         dataIndex: '组别',
         width: 120,
+    },
+    {
+        title: '店铺',
+        dataIndex: '店铺',
+        width: 120,
     }
     ];
     const [columns, setcolumns] = useState(temp_columns) as any;
@@ -515,6 +521,7 @@ const SkuTotal = () => {
                 const detail = document.getElementsByClassName("detail")[0] as HTMLElement;
                 detail.style.display = "block";
                 message.success('提交成功');
+                console.log(resp_data);
                 // 表格数据
                 setdataT(resp_data.sku_sale_table);
                 setdataE(resp_data.sku_sale_table);
@@ -616,7 +623,7 @@ const SkuTotal = () => {
                                 setExpand(!expand);
                             }}
                         >
-                            {expand ? <UpOutlined /> : <DownOutlined />} 高级搜索
+                            {expand ? <><UpOutlined />隐藏选项</> : <><DownOutlined />下拉选项</>}
                         </a>
                     </Col>
 
