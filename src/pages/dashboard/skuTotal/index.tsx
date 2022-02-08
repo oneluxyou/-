@@ -21,7 +21,7 @@ const SkuTotal = () => {
     // 属性参数
     const attribute_value: string[] = ['成本单价', '销量', '平均售价', '销售额', '推广费', '损耗', '毛利润', '净毛利润']
     const attribute_per: string[] = ['成本占比', '损耗占比', '推广占比', '毛利润率', '净毛利润率']
-    const total_attribute = ['sku', '品名'].concat(attribute_value).concat(attribute_per).concat(['运营', '运维', '组别', '店铺'])
+    const total_attribute = ['sku', '品名'].concat(attribute_value).concat(attribute_per).concat(['销量贡献值(%)', '销售额贡献值(%)', '推广费贡献值(%)', '售后贡献值(%)', '净毛利贡献值(%)', '运营', '运维', '组别', '店铺'])
     let first_data_temp: string | any[] = [];
     const [first_data, setfirst_data] = useState() as any;
     // 个人信息数据，input历史记录
@@ -29,6 +29,7 @@ const SkuTotal = () => {
     const [money_sum, setmoney_sum] = useState([]) as any;
     const [promotion_sum, setpromotion_sum] = useState([]) as any;
     const [after_sale_sum, setafter_sale_sum] = useState([]) as any;
+    const [profit_sum, setprofit_sum] = useState([]) as any;
     const [gross_profit_sum, setgross_profit_sum] = useState([]) as any;
     // 表格列选择
     const [selectedRowKeys, setselectedRowKeys] = useState() as any;
@@ -101,7 +102,8 @@ const SkuTotal = () => {
                             { label: 'eBay_治润', value: 'ebay治润' },
                             { label: 'eBay_雅秦', value: 'ebay雅秦' },
                             { label: 'Nextfur_Shopify', value: 'shopifynextfur' },
-                            { label: '所有店铺', value: '总' },
+                            { label: '所有店铺详情', value: '总' },
+                            { label: '所有店铺汇总', value: 'sku总' }
                         ]}
                         placeholder="请输入店铺"
                     />
@@ -254,12 +256,17 @@ const SkuTotal = () => {
         </a>,
         fixed: 'left',
         width: 150,
+        ellipsis: true,
+        copyable: true,
+        tip: '标题过长会自动收缩',
     },
     {
         title: '品名',
         dataIndex: '品名',
         fixed: 'left',
         width: 180,
+        ellipsis: true,
+        copyable: true,
     },
     {
         title: '成本单价',
@@ -303,11 +310,11 @@ const SkuTotal = () => {
         title: () => (
             <span>
                 毛利润
-                <Tooltip
+                {/* <Tooltip
                     title={'=0.85 * 销售额 - 销售总成本'}
                 >
                     <QuestionCircleOutlined />
-                </Tooltip>
+                </Tooltip> */}
             </span>
         ),
         dataIndex: '毛利润',
@@ -318,15 +325,14 @@ const SkuTotal = () => {
         title: () => (
             <span>
                 净毛利润
-                <Tooltip
+                {/* <Tooltip
                     title={'=0.85*销售额 - 销售总成本 - 推广费-售后'}
                 >
                     <QuestionCircleOutlined />
-                </Tooltip>
+                </Tooltip> */}
             </span>
         ),
         dataIndex: '净毛利润',
-        tooltip: '=0.85 * 销售额 - 销售总成本 - 推广费 - 售后',
         render: (text: number) => <span>{text.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</span>,
         width: 110,
     },
@@ -380,7 +386,7 @@ const SkuTotal = () => {
             <span>
                 毛利润率(%)
                 <Tooltip
-                    title={'=毛利润率 / 销售额'}
+                    title={'=毛利润 / 销售额'}
                 >
                     <QuestionCircleOutlined />
                 </Tooltip>
@@ -395,7 +401,7 @@ const SkuTotal = () => {
             <span>
                 净毛利润率(%)
                 <Tooltip
-                    title={'=净毛利润率 / 销售额'}
+                    title={'=净毛利润 / 销售额'}
                 >
                     <QuestionCircleOutlined />
                 </Tooltip>
@@ -484,21 +490,29 @@ const SkuTotal = () => {
         title: '运营',
         dataIndex: '运营',
         width: 100,
+        ellipsis: true,
+        copyable: true,
     },
     {
         title: '运维',
         dataIndex: '运维',
         width: 100,
+        ellipsis: true,
+        copyable: true,
     },
     {
         title: '组别',
         dataIndex: '组别',
         width: 120,
+        ellipsis: true,
+        copyable: true,
     },
     {
         title: '店铺',
         dataIndex: '店铺',
         width: 120,
+        ellipsis: true,
+        copyable: true,
     }
     ];
     const [columns, setcolumns] = useState(temp_columns) as any;
@@ -530,6 +544,7 @@ const SkuTotal = () => {
                 setmoney_sum(resp_data.money_sum);
                 setpromotion_sum(resp_data.promotion_sum);
                 setafter_sale_sum(resp_data.after_sale_sum);
+                setprofit_sum(resp_data.profit_sum)
                 setgross_profit_sum(resp_data.gross_profit_sum);
             }
             else {
@@ -568,7 +583,7 @@ const SkuTotal = () => {
         for (let i = 0; i < excel_datas.length; i++) {
             for (const key in attribute) {
                 if (Object.prototype.hasOwnProperty.call(excel_datas[i], attribute[key])) {
-                    str += `${excel_datas[i][attribute[key]] + '\t'},`;
+                    str += `${excel_datas[i][attribute[key]]},`;
                 }
             }
             str += '\n';
@@ -584,12 +599,13 @@ const SkuTotal = () => {
     };
     return (
         <>
-            <Card>
+            <div style={{ backgroundColor: "white", marginBottom: 5, paddingTop: 2, paddingLeft: 10 }}>
                 <Form
                     form={form}
                     name="advanced_search"
                     className="ant-advanced-search-form"
                     onFinish={onFinish}
+                    size='small'
                 >
                     <Row gutter={24}>
                         {getFields()}
@@ -628,13 +644,13 @@ const SkuTotal = () => {
                     </Col>
 
                 </Form>
-            </Card>
-            <Card>
-                <p style={{ display: "none" }} className="detail">销量总计:　{num_sum}　　　销售额总计:　{money_sum}　　　推广费用总计:　{promotion_sum}　　　售后费用总计:　{after_sale_sum}　　　净毛利润:　{gross_profit_sum}</p>
+            </div>
+            <div style={{ backgroundColor: "white", paddingLeft: 10, paddingRight: 10 }}>
+                <p style={{ display: "none" }} className="detail">销量总计:　{num_sum}　　　销售额总计:　{money_sum}　　　推广费用总计:　{promotion_sum}　　　售后费用总计:　{after_sale_sum}　　　毛利润:　{profit_sum}　　　净毛利润:　{gross_profit_sum}</p>
                 <Row style={{ marginBottom: 5 }}>
                     <Col span={12}>
                         <span>列选择器：</span>
-                        <Select style={{ width: 500 }} mode="multiple" defaultValue={['sku', '品名']} options={Option} onChange={ColChange} />
+                        <Select style={{ width: 400, paddingLeft: 5 }} mode="multiple" defaultValue={['sku', '品名']} options={Option} onChange={ColChange} />
                     </Col>
                     <Col
                         span={12}
@@ -648,13 +664,14 @@ const SkuTotal = () => {
                     </Col>
                 </Row>
                 <Table
+                    size='small'
                     columns={columns}
                     scroll={{ x: 1300, y: 500 }}
                     dataSource={dataT}
                     rowSelection={rowSelection}
                     pagination={{
-                        defaultPageSize: 10,
-                        pageSizeOptions: ["10", "20", "50", "100"],
+                        defaultPageSize: 5,
+                        pageSizeOptions: ["5", "10", "20", "50", "100"],
                         showSizeChanger: true,
                         showQuickJumper: true,
                         showTotal: (total) => {
@@ -662,7 +679,7 @@ const SkuTotal = () => {
                         }
                     }}
                 />
-            </Card>
+            </div>
             <Modal title={<span>{sku}的具体数据: <br /> {skuName} </span>} visible={isModalVisible} onOk={handleOk} onCancel={handleCancel} width={1200}>
                 <OfflineData
                     offlineData={eval(lineData)}

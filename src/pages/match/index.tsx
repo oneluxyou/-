@@ -35,7 +35,7 @@ const TableList: React.FC = () => {
     setEditId(id);
   };
 
-  const onTableChange = () => { };
+  const onTableChange = (value: any) => { console.log(value) };
   //表格part、
   const column: ProColumns[] = [
     {
@@ -132,12 +132,12 @@ const TableList: React.FC = () => {
     {
       title: '开始时间(美国时间)',
       dataIndex: '开始时间',
-      // hideInSearch: true,
+      hideInSearch: true,
       key: '开始时间',
       tooltip: '自动生成(美国时间)',
     },
     {
-      title: '结束时间(美国时间)',
+      title: '结束时间',
       dataIndex: '结束时间',
       // hideInSearch: true,
       key: '结束时间',
@@ -180,7 +180,7 @@ const TableList: React.FC = () => {
         const temp_dict = excel_datas[i].公司SKU.split(',');
         excel_datas[i].公司SKU = temp_dict.join('a');
         if (Object.prototype.hasOwnProperty.call(excel_datas[i], key)) {
-          str += `${excel_datas[i][key] + '\t'},`;
+          str += `${excel_datas[i][key]},`;
         }
       }
       str += '\n';
@@ -274,6 +274,7 @@ const TableList: React.FC = () => {
         name: string;
         company: string;
       }>
+        size="small"
         autoComplete="on"
         formRef={formRef}
         onFinish={async (values) => {
@@ -486,16 +487,16 @@ const TableList: React.FC = () => {
       </ProForm></Access>
       <br />
       <ProTable
+        size="small"
         search={{
           labelWidth: 'auto',
-          span: 5,
           defaultCollapsed: false,
+          span: 6
         }}
         columns={column}
         actionRef={actionRef}
         onChange={onTableChange}
         request={async (params = {}) => {
-          console.log(params);
           const result = request('/api/skuinfo', {
             method: 'POST',
             data: { ...params },

@@ -95,15 +95,13 @@ const TableList: React.FC = () => {
       onFilter: true,
       valueType: 'select',
       valueEnum: {
-        'Wait Reply': { text: 'Wait Reply' },
-        'Cancel Order': { text: 'Cancel Order' },
-        'Closed': { text: 'Closed' },
-        'Replacement': { text: 'Replacement' },
         'Refund': { text: 'Refund' },
-        'Used': { text: 'Used' },
+        'Replacement': { text: 'Replacement' },
         'Refund and Replacement': { text: 'Refund and Replacement' },
-        'Used and Replacement': { text: 'Used and Replacement' },
         'Delivery Consultation': { text: 'Delivery Consultation' },
+        'Wait Reply': { text: 'Wait Reply' },
+        'Return': { text: 'Return' },
+        'Return and Replacement': { text: 'Return and Replacement' },
       }
     },
     {
@@ -124,10 +122,11 @@ const TableList: React.FC = () => {
         'RP-国外配件': { text: 'RP-国外配件' },
         'RP-国外退件': { text: 'RP-国外退件' },
         'RP-国内补寄配件': { text: 'RP-国内补寄配件' },
+        'RP-电子说明书': { text: 'RP-电子说明书' },
       }
     },
     {
-      title: 'Used',
+      title: '物流操作',
       dataIndex: 'Used',
       hideInSearch: true,
       filters: true,
@@ -138,6 +137,8 @@ const TableList: React.FC = () => {
         '卖家承担-上门取件': { text: '卖家承担-上门取件' },
         '卖家承担-退货标签': { text: '卖家承担-退货标签' },
         '拦截': { text: '拦截' },
+        '拒收': { text: '拒收' },
+        '修改地址': { text: '修改地址' }
       }
     },
     {
@@ -432,15 +433,15 @@ const TableList: React.FC = () => {
                 width="md"
                 placeholder="请输入处理方式"
                 valueEnum={{
+                  'Refund': 'Refund',
+                  'Replacement': 'Replacement',
+                  'Refund and Replacement': 'Refund and Replacement',
+                  'Delivery Consultation': 'Delivery Consultation',
                   'Wait Reply': 'Wait Reply',
                   // 'Cancel Order': 'Cancel Order',
                   // 'Closed': 'Closed',
-                  'Replacement': 'Replacement',
-                  'Refund': 'Refund',
-                  'Used': 'Used',
-                  'Refund and Replacement': 'Refund and Replacement',
-                  'Used and Replacement': 'Used and Replacement',
-                  'Delivery Consultation': 'Delivery Consultation',
+                  'Return': 'Return',
+                  'Return and Replacement': 'Return and Replacement',
                 }}
 
               />
@@ -494,6 +495,7 @@ const TableList: React.FC = () => {
                   'RP-国外配件': 'RP-国外配件',
                   'RP-国外退件': 'RP-国外退件',
                   'RP-国内补寄配件': 'RP-国内补寄配件',
+                  'RP-电子说明书': 'RP-电子说明书',
                 }}
               />
             </ProForm.Item>
@@ -503,7 +505,7 @@ const TableList: React.FC = () => {
           <Col span={5}>
             <ProForm.Item
               name="Used"
-              label="退件"
+              label="物流操作"
             >
               <ProFormSelect
                 width="md"
@@ -513,6 +515,7 @@ const TableList: React.FC = () => {
                   '卖家承担-退货标签': '卖家承担-退货标签',
                   '拦截': '拦截',
                   '拒收': '拒收',
+                  '修改地址': '修改地址'
                 }}
               />
             </ProForm.Item>

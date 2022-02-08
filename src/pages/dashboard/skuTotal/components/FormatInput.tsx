@@ -12,7 +12,9 @@ class NumericInput extends React.Component {
     onBlur = () => {
         const { value, onBlur, onChange } = this.props;
         let valueTemp = value;
-        onChange(valueTemp.replace(/\s/g, ","));
+        if (valueTemp) {
+            onChange(valueTemp.replace(/\s/g, ","));
+        }
         if (onBlur) {
             onBlur();
         }

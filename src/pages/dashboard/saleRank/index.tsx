@@ -51,38 +51,40 @@ const SaleRank: FC<any> = () => {
             <Tooltip title={"最新结束日期:　" + data?.enddate || ''}>
                 <QuestionCircleOutlined />
             </Tooltip>
-            <div style={{ textAlign: "center", color: "#EE7700", fontSize: 16 }}>
+            {/* <div style={{ textAlign: "center", color: "#EE7700", fontSize: 16 }}>
                 <p><SoundOutlined />　数据处理按照匹配表记录处理，每周二更新上周数据</p>
-                <p>ebay、wayfair的广告还未纳入,部分产品的成本单价未确定，毛利润和净毛利润的数据会有所偏高</p>
-            </div>
+                <p>推广费目前只包含sp和sd广告。ebay、wayfair的广告还未纳入，部分产品的成本单价未确定，毛利润和净毛利润的数据会有所偏高</p>
+            </div> */}
             <Tabs>
                 {(Tdata ? JSON.parse(Tdata).sale : data?.sale)?.map((item: any) => (
                     < TabPane tab={item.index} key={item.index}>
-                        <Row gutter={[16, 16]}>
+                        <Row gutter={[4, 4]}>
                             {attribute?.map((attr) => (
-                                <Col span={7} offset={1} style={{ minWidth: "350px" }}>
+                                <Col span={6} style={{ minWidth: "300px", marginLeft: 10 }}>
                                     <Card style={{ borderRadius: "15px" }}>
                                         <div style={{ textAlign: "center" }}>
                                             <div style={{ fontFamily: "微软雅黑", fontSize: 24 }}>{attr}</div>
                                             <div style={{ fontFamily: "华文细黑", fontSize: 30 }}>{item?.[attr + 'total'] + (attr == '销量' ? '' : '￥')}</div>
                                         </div>
                                         <hr />
-                                        <Table columns={[
-                                            {
-                                                title: '排名',
-                                                dataIndex: 'rank',
-                                                width: 50,
-                                            },
-                                            {
-                                                title: item.index,
-                                                dataIndex: item.index,
-                                            },
-                                            {
-                                                title: attr == '销量' ? attr : attr + '(￥)',
-                                                dataIndex: attr,
-                                                render: (text) => <span>{text.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</span>,
-                                            },
-                                        ]} dataSource={item?.[attr]} pagination={false} scroll={{ y: 300 }} />
+                                        <Table
+                                            size="small"
+                                            columns={[
+                                                {
+                                                    title: '排名',
+                                                    dataIndex: 'rank',
+                                                    width: 40,
+                                                },
+                                                {
+                                                    title: item.index,
+                                                    dataIndex: item.index,
+                                                },
+                                                {
+                                                    title: attr == '销量' ? attr : attr + '(￥)',
+                                                    dataIndex: attr,
+                                                    render: (text) => <span>{text.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</span>,
+                                                },
+                                            ]} dataSource={item?.[attr]} pagination={false} scroll={{ y: 300 }} />
                                     </Card>
                                 </Col>
                             ))}

@@ -18,7 +18,7 @@ const Edit = (props) => {
     //发请求取售后详情
     if (editId !== undefined) {
       const response = await edit_after(editId)
-
+      console.log(response)
       setInitialValues({
         id: response.id,
         登记人: response.登记人,
@@ -29,7 +29,7 @@ const Edit = (props) => {
         Refund: response.Refund,
         原因: response.原因,
         Replacement: response.Replacement,
-        退件: response.退件,
+        Used: response.Used,
         售后反馈: response.售后反馈,
         备注: response.备注,
       })
@@ -138,15 +138,16 @@ const Edit = (props) => {
                 label="处理方式"
                 placeholder="请输入处理方式"
                 valueEnum={{
+                  'Refund': 'Refund',
+                  'Replacement': 'Replacement',
+                  'Refund and Replacement': 'Refund and Replacement',
+                  'Delivery Consultation': 'Delivery Consultation',
                   'Wait Reply': 'Wait Reply',
                   // 'Cancel Order': 'Cancel Order',
                   // 'Closed': 'Closed',
-                  'Replacement': 'Replacement',
-                  'Refund': 'Refund',
-                  'Used': 'Used',
-                  'Refund and Replacement': 'Refund and Replacement',
-                  'Used and Replacement': 'Used and Replacement',
-                  'Delivery Consultation': 'Delivery Consultation',
+                  'Return': 'Return',
+                  'Return and Replacement': 'Return and Replacement',
+
                 }}
                 rules={[{ required: true, message: '请输入处理方式!' }]}
               />
@@ -187,18 +188,20 @@ const Edit = (props) => {
                   'RP-国外配件': 'RP-国外配件',
                   'RP-国外退件': 'RP-国外退件',
                   'RP-国内补寄配件': 'RP-国内补寄配件',
+                  'RP-电子说明书': 'RP-电子说明书',
                 }}
               />
               <ProFormSelect
                 width="md"
                 name="Used"
-                label="退件"
+                label="物流操作"
                 valueEnum={{
                   '买家承担': '买家承担',
                   '卖家承担-上门取件': '卖家承担-上门取件',
                   '卖家承担-退货标签': '卖家承担-退货标签',
                   '拦截': '拦截',
                   '拒收': '拒收',
+                  '修改地址': '修改地址'
                 }}
               />
               <ProFormText width="md" name="售后反馈" label="售后反馈" />

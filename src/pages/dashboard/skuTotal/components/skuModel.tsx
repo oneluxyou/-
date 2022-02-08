@@ -136,7 +136,7 @@ const OfflineData = ({
                     position: 'top-center'
                 }}
                 slider={{
-                    start: 0.85,
+                    start: 0,
                     end: 1,
                 }}
             />
