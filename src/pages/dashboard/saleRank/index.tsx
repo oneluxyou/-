@@ -8,14 +8,22 @@ const SaleRank: FC<any> = () => {
     const { TabPane } = Tabs;
     const dateFormat = 'YYYY-MM-DD';
     const { RangePicker } = DatePicker;
-    const attribute = ['销量', '销售额', '推广', '损耗', '毛利润', '净毛利润'];
+    const attribute = ['销量', '销售额', '推广', '损耗', '净毛利润'];
     const { data } = useRequest({
         url: '/api/rankTotal',
         method: 'post',
     });
     const [Tdata, setTdata] = useState() as any;
     const onChange = async (date: any) => {
-        const values = { '开始时间': date[0].format('YYYY-MM-DD'), '结束时间': date[1].format('YYYY-MM-DD') }
+        let values;
+        if (date) {
+            values = { '开始时间': date[0].format('YYYY-MM-DD'), '结束时间': date[1].format('YYYY-MM-DD') }
+        } else {
+            values = {
+                '开始时间': '2022-01-01', '结束时间': data?.enddate
+            }
+        }
+
         const result = request(`/api/rankTotal`, {
             method: 'POST',
             data: { ...values },

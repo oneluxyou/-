@@ -433,15 +433,15 @@ const TableList: React.FC = () => {
                 width="md"
                 placeholder="请输入处理方式"
                 valueEnum={{
-                  'Refund': 'Refund',
-                  'Replacement': 'Replacement',
-                  'Refund and Replacement': 'Refund and Replacement',
-                  'Delivery Consultation': 'Delivery Consultation',
-                  'Wait Reply': 'Wait Reply',
+                  'Refund': 'Refund(退款，无退货行为)',
+                  'Replacement': 'Replacement（补发件，无退货行为）',
+                  'Refund and Replacement': 'Refund and Replacement（退部分款与补发件同时存在，无退货行为）',
+                  'Delivery Consultation': 'Delivery Consultation（快递咨询）',
+                  'Wait Reply': 'Wait Reply（等待回复）',
                   // 'Cancel Order': 'Cancel Order',
                   // 'Closed': 'Closed',
-                  'Return': 'Return',
-                  'Return and Replacement': 'Return and Replacement',
+                  'Return': 'Return（有退货行为，无发件行为）',
+                  'Return and Replacement': 'Return and Replacement（有退货行为，有发件行为）',
                 }}
 
               />

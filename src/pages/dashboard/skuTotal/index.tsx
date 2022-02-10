@@ -91,6 +91,7 @@ const SkuTotal = () => {
                             { label: 'amazon简砾', value: 'amazon简砾' },
                             { label: 'amazon哒唛旺', value: 'amazon哒唛旺' },
                             { label: 'amazonCPower', value: 'amazoncpower' },
+                            { label: 'amazon玲琅', value: 'amazon玲琅' },
                             { label: 'amazon治润', value: 'amazon治润' },
                             { label: 'Walmart_优瑞斯特', value: 'walmart优瑞斯特' },
                             { label: 'Walmart_赫曼', value: 'walmart赫曼' },
@@ -581,6 +582,7 @@ const SkuTotal = () => {
         let str = attribute.join(",") + '\n';
         // 增加\t为了不让表格显示科学计数法或者其他格式
         for (let i = 0; i < excel_datas.length; i++) {
+            excel_datas[i]['sku'] = excel_datas[i]['sku'].replace(new RegExp(",", ("gm")), "|")
             for (const key in attribute) {
                 if (Object.prototype.hasOwnProperty.call(excel_datas[i], attribute[key])) {
                     str += `${excel_datas[i][attribute[key]]},`;
