@@ -19,6 +19,7 @@ const SkuTotal = () => {
     const [lineData, setlineData] = useState() as any;
     const [expand, setExpand] = useState(false);
     // 属性参数
+    const attribute_sort: string[] = ['运营', '运维', '组别']
     const attribute_value: string[] = ['成本单价', '销量', '平均售价', '销售额', '推广费', '损耗', '毛利润', '净毛利润']
     const attribute_per: string[] = ['成本占比', '损耗占比', '推广占比', '毛利润率', '净毛利润率']
     const total_attribute = ['sku', '品名'].concat(attribute_value).concat(attribute_per).concat(['销量贡献值(%)', '销售额贡献值(%)', '推广费贡献值(%)', '售后贡献值(%)', '净毛利贡献值(%)', '运营', '运维', '组别', '店铺'])
@@ -133,6 +134,23 @@ const SkuTotal = () => {
         ];
         let i;
         if (expand) {
+            for (i = 0; i < attribute_sort.length; i++) {
+                if (i == 0) {
+                    children.push(
+                        <Col span={24} style={{ marginBottom: 10, marginTop: -10 }} key={"tip"}><strong>人员组别</strong></Col>
+                    )
+                }
+                children.push(
+                    <Col span={6} key={attribute_sort[i]}>
+                        <Form.Item
+                            label={attribute_sort[i]}
+                            name={attribute_sort[i]}
+                        >
+                            <Input style={{ width: 100 }} name={attribute_sort[i]} />
+                        </Form.Item>
+                    </Col >,
+                )
+            }
             for (i = 0; i < attribute_value.length; i++) {
                 if (i == 0) {
                     children.push(
@@ -583,6 +601,9 @@ const SkuTotal = () => {
         // 增加\t为了不让表格显示科学计数法或者其他格式
         for (let i = 0; i < excel_datas.length; i++) {
             excel_datas[i]['sku'] = excel_datas[i]['sku'].replace(new RegExp(",", ("gm")), "|")
+            excel_datas[i]['运营'] = excel_datas[i]['运营'].replace(new RegExp(",", ("gm")), "|")
+            excel_datas[i]['运维'] = excel_datas[i]['运维'].replace(new RegExp(",", ("gm")), "|")
+            excel_datas[i]['组别'] = excel_datas[i]['组别'].replace(new RegExp(",", ("gm")), "|")
             for (const key in attribute) {
                 if (Object.prototype.hasOwnProperty.call(excel_datas[i], attribute[key])) {
                     str += `${excel_datas[i][attribute[key]]},`;
