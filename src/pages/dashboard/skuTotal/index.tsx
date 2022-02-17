@@ -20,9 +20,9 @@ const SkuTotal = () => {
     const [expand, setExpand] = useState(false);
     // 属性参数
     const attribute_sort: string[] = ['运营', '运维', '组别']
-    const attribute_value: string[] = ['成本单价', '销量', '平均售价', '销售额', '推广费', '损耗', '毛利润', '净毛利润']
-    const attribute_per: string[] = ['成本占比', '损耗占比', '推广占比', '毛利润率', '净毛利润率']
-    const total_attribute = ['sku', '品名'].concat(attribute_value).concat(attribute_per).concat(['销量贡献值(%)', '销售额贡献值(%)', '推广费贡献值(%)', '售后贡献值(%)', '净毛利贡献值(%)', '运营', '运维', '组别', '店铺'])
+    const attribute_value: string[] = ['成本单价', '销量', '平均售价', '交易额', '损耗', '广告', '净毛利润']
+    const attribute_per: string[] = ['成本占比', '损耗占比', '广告占比', '净毛利润率']
+    const total_attribute = ['sku', '品名'].concat(attribute_value).concat(attribute_per).concat(['销量贡献率', '交易额贡献率', '广告贡献率', '售后贡献率', '净毛利贡献率', '运营', '运维', '组别', '店铺'])
     let first_data_temp: string | any[] = [];
     const [first_data, setfirst_data] = useState() as any;
     // 个人信息数据，input历史记录
@@ -307,18 +307,18 @@ const SkuTotal = () => {
         width: 120,
     },
     {
-        title: '销售额',
-        dataIndex: '销售额',
-        sorter: (a: { 销售额: number; }, b: { 销售额: number; }) => a.销售额 - b.销售额,
+        title: '交易额',
+        dataIndex: '交易额',
+        sorter: (a: { 交易额: number; }, b: { 交易额: number; }) => a.交易额 - b.交易额,
         render: (text: number) => <span>{text.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</span>,
         width: 100,
     },
-    {
-        title: '推广费',
-        dataIndex: '推广费',
-        render: (text: number) => <span> {text.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</span>,
-        width: 100,
-    },
+    // {
+    //     title: '推广费',
+    //     dataIndex: '推广费',
+    //     render: (text: number) => <span> {text.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</span>,
+    //     width: 100,
+    // },
     {
         title: '损耗',
         dataIndex: '损耗',
@@ -328,15 +328,15 @@ const SkuTotal = () => {
     {
         title: () => (
             <span>
-                毛利润
+                广告
                 {/* <Tooltip
-                    title={'=0.85 * 销售额 - 销售总成本'}
+                    title={'=广告 / 销售额'}
                 >
                     <QuestionCircleOutlined />
                 </Tooltip> */}
             </span>
         ),
-        dataIndex: '毛利润',
+        dataIndex: '广告',
         render: (text: number) => <span>{text.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</span>,
         width: 100,
     },
@@ -385,33 +385,33 @@ const SkuTotal = () => {
         render: (text: number) => <span>{text.toFixed(4).toString()}%</span>,
         width: 125,
     },
+    // {
+    //     title: () => (
+    //         <span>
+    //             推广占比(%)
+    //             <Tooltip
+    //                 title={'=推广费 / 销售额'}
+    //             >
+    //                 <QuestionCircleOutlined />
+    //             </Tooltip>
+    //         </span>
+    //     ),
+    //     dataIndex: '推广占比',
+    //     render: (text: number) => <span>{text.toFixed(4).toString()}%</span>,
+    //     width: 125,
+    // },
     {
         title: () => (
             <span>
-                推广占比(%)
+                广告占比(%)
                 <Tooltip
-                    title={'=推广费 / 销售额'}
+                    title={'=广告 / 销售额'}
                 >
                     <QuestionCircleOutlined />
                 </Tooltip>
             </span>
         ),
-        dataIndex: '推广占比',
-        render: (text: number) => <span>{text.toFixed(4).toString()}%</span>,
-        width: 125,
-    },
-    {
-        title: () => (
-            <span>
-                毛利润率(%)
-                <Tooltip
-                    title={'=毛利润 / 销售额'}
-                >
-                    <QuestionCircleOutlined />
-                </Tooltip>
-            </span>
-        ),
-        dataIndex: '毛利润率',
+        dataIndex: '广告占比',
         render: (text: number) => <span>{text.toFixed(4).toString()}%</span>,
         width: 135,
     },
@@ -448,30 +448,30 @@ const SkuTotal = () => {
     {
         title: () => (
             <span>
-                销售额贡献值(%)
+                交易额贡献值(%)
                 <Tooltip
-                    title={'=销售额 / 所有sku销售额'}
+                    title={'=交易额 / 所有sku交易额'}
                 >
                     <QuestionCircleOutlined />
                 </Tooltip>
             </span>
         ),
-        dataIndex: '销售额贡献率',
+        dataIndex: '交易额贡献率',
         render: (text: number) => <span>{text.toFixed(4).toString()}%</span>,
         width: 170,
     },
     {
         title: () => (
             <span>
-                推广费贡献值(%)
+                广告贡献值(%)
                 <Tooltip
-                    title={'=推广费 / 所有sku推广费'}
+                    title={'=广告费 / 所有sku推广费'}
                 >
                     <QuestionCircleOutlined />
                 </Tooltip>
             </span>
         ),
-        dataIndex: '推广费贡献率',
+        dataIndex: '广告贡献率',
         render: (text: number) => <span>{text.toFixed(4).toString()}%</span>,
         width: 170,
     },
@@ -596,6 +596,7 @@ const SkuTotal = () => {
     // 导出报表
     const downloadExcel = () => {
         const excel_datas = dataE;
+        console.log(attribute);
         // 列标题，逗号隔开，每一个逗号就是隔开一个单元格
         let str = attribute.join(",") + '\n';
         // 增加\t为了不让表格显示科学计数法或者其他格式
@@ -669,7 +670,7 @@ const SkuTotal = () => {
                 </Form>
             </div>
             <div style={{ backgroundColor: "white", paddingLeft: 10, paddingRight: 10 }}>
-                <p style={{ display: "none" }} className="detail">销量总计:　{num_sum}　　　销售额总计:　{money_sum}　　　推广费用总计:　{promotion_sum}　　　售后费用总计:　{after_sale_sum}　　　毛利润:　{profit_sum}　　　净毛利润:　{gross_profit_sum}</p>
+                <p style={{ display: "none" }} className="detail">销量总计:　{num_sum}　　　交易额总计:　{money_sum}　　　广告费用总计:　{promotion_sum}　　　售后费用总计:　{after_sale_sum}　　　毛利润:　{profit_sum}　　　净毛利润:　{gross_profit_sum}</p>
                 <Row style={{ marginBottom: 5 }}>
                     <Col span={12}>
                         <span>列选择器：</span>

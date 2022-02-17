@@ -36,18 +36,6 @@ export async function edit_after(editId: any) {
 }
 
 /*
- *获取按照订单搜索的售后
- */
-export async function get_after(params: any) {
-  console.log(params);
-  return request('/api/aftersale', {
-    method: 'POST',
-    data: { ...params },
-    requestType: 'form',
-  });
-}
-
-/*
 周转的data数据
  */
 export async function get_zhouzhuan_data(params: any) {

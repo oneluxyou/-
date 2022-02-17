@@ -8,7 +8,7 @@ const SaleRank: FC<any> = () => {
     const { TabPane } = Tabs;
     const dateFormat = 'YYYY-MM-DD';
     const { RangePicker } = DatePicker;
-    const attribute = ['销量', '销售额', '推广', '损耗', '净毛利润'];
+    const attribute = ['销量', '交易额', '成本', '广告', '损耗', '净毛利润'];
     const { data } = useRequest({
         url: '/api/rankTotal',
         method: 'post',
@@ -48,6 +48,13 @@ const SaleRank: FC<any> = () => {
     //     console.log('From: ', dateStrings[0], ', to: ', dateStrings[1]);
 
     // }
+    // 添加对应的符号
+    const symbol = {
+        '销量': '销量',
+        '交易额': '交易额(￥)',
+        '成本': '成本(￥)',
+        '广告': '广告(￥)', '损耗': '损耗(￥)', '净毛利润': '净毛利润(￥)',
+    }
     return (
         <>
             <span>时间:　</span>
@@ -59,20 +66,20 @@ const SaleRank: FC<any> = () => {
             <Tooltip title={"最新结束日期:　" + data?.enddate || ''}>
                 <QuestionCircleOutlined />
             </Tooltip>
-            {/* <div style={{ textAlign: "center", color: "#EE7700", fontSize: 16 }}>
-                <p><SoundOutlined />　数据处理按照匹配表记录处理，每周二更新上周数据</p>
-                <p>推广费目前只包含sp和sd广告。ebay、wayfair的广告还未纳入，部分产品的成本单价未确定，毛利润和净毛利润的数据会有所偏高</p>
-            </div> */}
+            <div style={{ textAlign: "center", color: "#EE7700", fontSize: 16 }}>
+                <p><SoundOutlined />　最新更改:</p>
+                <p>销售额、广告数据重复已修正(宫本和赫曼2月5号-2月9号的销售额广告计算重复)</p>
+            </div>
             <Tabs>
                 {(Tdata ? JSON.parse(Tdata).sale : data?.sale)?.map((item: any) => (
                     < TabPane tab={item.index} key={item.index}>
                         <Row gutter={[4, 4]}>
                             {attribute?.map((attr) => (
-                                <Col span={6} style={{ minWidth: "300px", marginLeft: 10 }}>
+                                <Col span={7} style={{ minWidth: "300px", marginLeft: 10 }}>
                                     <Card style={{ borderRadius: "15px" }}>
                                         <div style={{ textAlign: "center" }}>
                                             <div style={{ fontFamily: "微软雅黑", fontSize: 24 }}>{attr}</div>
-                                            <div style={{ fontFamily: "华文细黑", fontSize: 30 }}>{item?.[attr + 'total'] + (attr == '销量' ? '' : '￥')}</div>
+                                            <div style={{ fontFamily: "华文细黑", fontSize: 30 }}>{item?.[attr + 'total'] + (attr == '销量' ? '' : (attr == '推广占比') || (attr == '损耗占比') || (attr == '广告占比') || (attr == '成本占比') ? '%' : '￥')}</div>
                                         </div>
                                         <hr />
                                         <Table
@@ -88,7 +95,7 @@ const SaleRank: FC<any> = () => {
                                                     dataIndex: item.index,
                                                 },
                                                 {
-                                                    title: attr == '销量' ? attr : attr + '(￥)',
+                                                    title: symbol[attr],
                                                     dataIndex: attr,
                                                     render: (text) => <span>{text.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</span>,
                                                 },
