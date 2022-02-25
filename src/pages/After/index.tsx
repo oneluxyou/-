@@ -14,19 +14,8 @@ import ProForm, {
 } from '@ant-design/pro-form';
 import type { ProFormInstance } from '@ant-design/pro-form';
 import Edit from './components/Edit'
-
-import { get_after } from "@/services/myapi";
-import { useRequest } from 'umi';
-import { useModel } from 'umi';
-import { values } from 'lodash';
-
-const waitTime = (time: number = 100) => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(true);
-    }, time);
-  });
-};
+import styles from './index.less'
+import { useRequest, useModel } from 'umi';
 
 //表单part
 
@@ -74,6 +63,7 @@ const TableList: React.FC = () => {
           status: 'error',
         },
       },
+      width: 75
     },
     {
       title: '登记日期',
@@ -81,12 +71,15 @@ const TableList: React.FC = () => {
       hideInSearch: true,
       sorter: (a, b) => a.id - b.id,
       //数据库格式问题
+      width: 90
     },
     {
       title: '登记人',
       dataIndex: '登记人',
       filters: true,
       onFilter: true,
+      width: 70,
+      ellipsis: true,
     },
     {
       title: '店铺',
@@ -94,6 +87,8 @@ const TableList: React.FC = () => {
       hideInSearch: true,
       filters: true,
       onFilter: true,
+      width: 80,
+      ellipsis: true,
       valueEnum: {
         '赫曼': '赫曼',
         '信盒': '信盒',
@@ -126,46 +121,50 @@ const TableList: React.FC = () => {
     {
       title: '订单号',
       dataIndex: '订单号',
-      copyable: true,
-      ellipsis: true,
+      width: 100,
       tip: '订单号过长会自动收缩',
     },
     {
       title: 'SKU',
       dataIndex: 'SKU',
-      copyable: true,
-      ellipsis: true,
+      width: 100,
+    },
+    {
+      title: '数量',
+      dataIndex: 'sku数量',
+      hideInSearch: true,
+      width: 50,
     },
     {
       title: '顾客反馈',
       dataIndex: '顾客反馈',
       hideInSearch: true,
-      copyable: true,
-      ellipsis: true,
+      width: 100,
     },
     {
       title: '客服操作',
       dataIndex: '客服操作',
       hideInSearch: true,
-      copyable: true,
-      ellipsis: true,
+      width: 100,
     },
     {
-      title: 'Refund',
+      title: '退款',
       dataIndex: 'Refund',
+      width: 60,
       hideInSearch: true,
       sorter: (a, b) => a.Refund - b.Refund,
     },
     {
       title: '备注',
       dataIndex: '备注',
-      ellipsis: true,
+      width: 100,
       tip: '备注过长会自动收缩',
       hideInSearch: true,
     },
     {
       title: '操作',
       valueType: 'option',
+      width: 50,
       fixed: 'right',
 
       render: (text, record, _, action) => [
@@ -248,18 +247,25 @@ const TableList: React.FC = () => {
   // 联动添加
   const [peijian, setpeijian] = useState([]) as any;
   const [detailitem, setdetailitem] = useState([]) as any;
+  const [peijianchina, setpeijianchina] = useState([]) as any;
   const [yuanying, setyuanying] = useState([]) as any;
   const [detailreason, setdetailreason] = useState([]) as any;
+  const [yuanyinchina, setyuanyinchina] = useState([]) as any;
+  // 退款显示
   const [refund, setrefund] = useState(0) as any;
-  const [renew, setrenew] = useState(0) as any;
+  // 补寄新件显示
+  const [resku, setresku] = useState([]) as any;
+  // 补寄退件翻译显示
+  const [reskuchina, setreskuchina] = useState([]) as any;
+
   // 判断联动是否有一项只选了大类
   const [fankuierror, setfankuierror] = useState(false) as any;
   const [yuanyingerror, setyuanyingerror] = useState(false) as any;
-  const fankuionChange = (value: any) => {
+  const fankuionChange = (value: any, selectOptions: any) => {
     const temp_peijian = [];
     const temp_item = [];
+    const temp_peijianchina = [];
     let temp_fankuierror = false;
-    console.log(value);
     for (const key in value) {
       if (Object.prototype.hasOwnProperty.call(value, key)) {
         const element = value[key];
@@ -268,26 +274,29 @@ const TableList: React.FC = () => {
             (element[0] == '6-0') || (element[0] == '7-0')) {
             temp_peijian.push(element[1]);
             temp_item.push(element[1]);
+            temp_peijianchina.push(selectOptions[key][1]['label']);
           }
         } else {
           temp_fankuierror = true;
+          message.error('不能只选大类');
         }
       }
     }
     setfankuierror(temp_fankuierror);
     setdetailitem(temp_item);
     setpeijian(temp_peijian);
+    setpeijianchina(temp_peijianchina);
   };
   const getfankuipeijianFields = () => {
     const children = [];
     for (let i = 0; i < detailitem.length; i++) {
       children.push(
-        <Col span={5} offset={1} key={peijian[i]}>
+        <Col span={4} key={peijian[i]}>
           <ProForm.Item
-            label={detailitem[i]}
+            label={peijianchina[i]}
             name={peijian[i]}
-            tooltip="输入多个请用逗号隔开，第一位为大写字母，第二位为非0数字，第三位为数字或空"
-            rules={[{ pattern: /(^[A-Z][1-9]{1}$)|(^[A-Z][1-9][0-9]{1}$)|((^[A-Z][1-9]{1}((,[A-Z][1-9]{1})|(,[A-Z][1-9][0-9]{1})){1,}$)|(^[A-Z][1-9][0-9]{1}(((,[A-Z][1-9]{1})$|(,[A-Z][1-9][0-9]{1})){1,}$)))/, message: '请以大写字母+数字+数字的形式输入' }]}
+            tooltip="输入多个请用逗号隔开，第一位为大写字母，第二位为非0数字，第三位为数字或空,例：允许A，A1，A10，不允许1A，A01，a1。特例 编号标贴-B99 螺丝包-L99 排骨条-P99 说明书-S99 五金盒-W99 配件未知-U99"
+            rules={[{ pattern: /(^[A-Z]{1}$)|(^[A-Z][1-9]{1}$)|(^[A-Z][1-9][0-9]{1}$)|((^[A-Z]{1}((,[A-Z]{1})|(,[A-Z][1-9]{1})|(,[A-Z][1-9][0-9]{1})){1,}$)|(^[A-Z][1-9]{1}((,[A-Z]{1})|(,[A-Z][1-9]{1})|(,[A-Z][1-9][0-9]{1})){1,}$)|(^[A-Z][1-9][0-9]{1}(((,[A-Z]{1})|(,[A-Z][1-9]{1})$|(,[A-Z][1-9][0-9]{1})){1,}$)))/, message: '请以大写字母+数字+数字的形式输入' }]}
           >
             <Input
               style={{ width: 150 }}
@@ -300,39 +309,69 @@ const TableList: React.FC = () => {
     }
     return children;
   }
-  const yuanyingChange = (value: any) => {
+  const yuanyingChange = (value: any, selectOptions: any) => {
     const temp_yuanying = [];
     const temp_reason = [];
+    const temp_yuanyinchina = [];
     // 判断是否填写了大类
     let temp_yuanyingerror = false;
     let temp_refund = 0;
-    let temp_renew = '0';
+    let count_0 = 0;
+    let count_1 = 0;
+    let count_2 = 0;
+    let count_3 = 0;
+    const temp_renew = [];
+    const temp_renewchina = [];
     for (const key in value) {
       if (Object.prototype.hasOwnProperty.call(value, key)) {
         const element = value[key];
         if (element.length > 1) {
+          // 判断小类是否有两个
+          if (element[0] == '1-0') {
+            console.log(count_0);
+            count_0 = count_0 + 1;
+            if (count_0 > 1)
+              message.error('退款只能含一个小类');
+          } else if (element[0] == '2-0') {
+            count_1 = count_1 + 1;
+            if (count_1 > 1)
+              message.error('退货只能含一个小类');
+          } else if (element[0] == '4-0') {
+            count_2 = count_2 + 1;
+            if (count_2 > 1)
+              message.error('发货后改地址只能含一个小类');
+          } else if (element[0] == '5-0') {
+            count_3 = count_3 + 1;
+            if (count_3 > 1)
+              message.error('等待进一步操作只能含一个小类');
+          }
           // 判断配件
-          if ((element[1] == '3-4') ||
-            (element[1] == '3-5')) {
+          if ((element[1] == '3-4-0') ||
+            (element[1] == '3-5-0')) {
             temp_yuanying.push(element[1]);
             temp_reason.push(element[1]);
-          }
-          // 判断refund
-          if ((element[1] == '1-1') || (element[1] == '1-2')) {
-            temp_refund = 1;
-          }
-          // 判断补寄新件
-          if ((element[1] == '3-1')) {
-            temp_renew = '3-1';
-          }
+            temp_yuanyinchina.push(selectOptions[key][1]['label']);
+          } else
+            // 判断refund
+            if ((element[1] == '1-1-0') || (element[1] == '1-2-0')) {
+              temp_refund = 1;
+            } else
+              // 判断补寄sku
+              if ((element[1] == '3-1-0') || (element[1] == '3-2-0') || (element[1] == '3-3-0')) {
+                temp_renew.push(element[1]);
+                temp_renewchina.push(selectOptions[key][1]['label']);
+              }
         } else {
           temp_yuanyingerror = true;
+          message.error('不能只选大类');
         }
       }
     }
     setyuanyingerror(temp_yuanyingerror);
+    setyuanyinchina(temp_yuanyinchina);
     setrefund(temp_refund);
-    setrenew(temp_renew);
+    setresku(temp_renew);
+    setreskuchina(temp_renewchina);
     setdetailreason(temp_reason);
     setyuanying(temp_yuanying);
   };
@@ -340,12 +379,12 @@ const TableList: React.FC = () => {
     const children = [];
     for (let i = 0; i < detailreason.length; i++) {
       children.push(
-        <Col span={5} offset={1} key={yuanying[i]}>
+        <Col span={4} key={yuanying[i]}>
           <ProForm.Item
-            label={detailreason[i]}
+            label={yuanyinchina[i]}
             name={yuanying[i]}
-            tooltip="输入多个请用逗号隔开，第一位为大写字母，第二位为非0数字，第三位为数字或空"
-            rules={[{ pattern: /(^[A-Z][1-9]{1}$)|(^[A-Z][1-9][0-9]{1}$)|((^[A-Z][1-9]{1}((,[A-Z][1-9]{1})|(,[A-Z][1-9][0-9]{1})){1,}$)|(^[A-Z][1-9][0-9]{1}(((,[A-Z][1-9]{1})$|(,[A-Z][1-9][0-9]{1})){1,}$)))/, message: '请以大写字母+数字+数字的形式输入' }]}
+            tooltip="输入多个请用逗号隔开，第一位为大写字母，第二位为非0数字，第三位为数字或空,例：允许A，A1，A10，不允许1A，A01，a1。特例 编号标贴-B99 螺丝包-L99 排骨条-P99 说明书-S99 五金盒-W99 配件未知-U99"
+            rules={[{ pattern: /(^[A-Z]{1}$)|(^[A-Z][1-9]{1}$)|(^[A-Z][1-9][0-9]{1}$)|((^[A-Z]{1}((,[A-Z]{1})|(,[A-Z][1-9]{1})|(,[A-Z][1-9][0-9]{1})){1,}$)|(^[A-Z][1-9]{1}((,[A-Z]{1})|(,[A-Z][1-9]{1})|(,[A-Z][1-9][0-9]{1})){1,}$)|(^[A-Z][1-9][0-9]{1}(((,[A-Z]{1})|(,[A-Z][1-9]{1})$|(,[A-Z][1-9][0-9]{1})){1,}$)))/, message: '请以大写字母+数字+数字的形式输入' }]}
           >
             <Input
               style={{ width: 150 }}
@@ -360,46 +399,54 @@ const TableList: React.FC = () => {
     if (refund == 1) {
       temp_refund = 1;
       children.push(
-        <Col span={5} offset={1} key={'Refund'} >
+        <Col span={3} key={"refund"} >
           <ProFormDigit
             width="md"
             name="Refund"
-            label="Refund"
+            label="退款金额"
             placeholder=""
-            initialValue="0"
             tooltip="若无退款,默认输入0"
             rules={[{ required: true, message: '若无退款,请输入0' }]}
           />
         </Col >
       )
     }
-    let temp_renew = 0;
-    if (renew != '0') {
-      temp_renew = 1;
-      children.push(
-        <Col span={5} offset={1} key={'补寄新件'} >
-          <ProForm.Item
-            label='补寄新件'
-            name='补寄新件'
-            tooltip="若为空，则为记录订单号填写的sku"
-            rules={[{ pattern: /[^,||^，]$/, message: '最后一位不能为,' }]}
-          >
-            <Input
-              width="md"
-              placeholder="请填写具体补寄sku"
+    if (resku.length >= 0) {
+      for (let i = 0; i < resku.length; i++) {
+        children.push(
+          <>
+            <Col span={4} key={resku[i]} >
+              <ProForm.Item
+                label={reskuchina[i]}
+                name={resku[i]}
+                tooltip="若为空，则为记录订单号填写的sku"
+                rules={[{ pattern: /[^,||^，]$/, message: '限填一个' }]}
+              >
+                <Input
+                  width="md"
+                  placeholder="请填写具体补寄sku"
 
-            />
-          </ProForm.Item>
-        </Col >
-      )
+                />
+              </ProForm.Item>
+            </Col >
+            <Col span={5} key={resku[i] + '数量'} >
+              <ProFormDigit
+                width="md"
+                name={resku[i] + '数量'}
+                label={reskuchina[i] + '数量'}
+                placeholder=""
+                initialValue={1}
+                tooltip="默认为1"
+                rules={[{ required: true, message: '请输出数量' }]}
+              />
+            </Col >
+          </>
+        )
+      }
     }
     if ((temp_refund == 1) && (refund == 0)) {
       children.pop();
       temp_refund = 0;
-    }
-    if ((temp_renew == 1) && (renew == '0')) {
-      children.pop();
-      temp_renew = 0;
     }
     return children;
   }
@@ -440,25 +487,25 @@ const TableList: React.FC = () => {
       value: '2-0',
       children: [
         {
-          label: '包装SKU和自发货一致',
+          label: '仓库发错',
           value: '2-1-C',
         },
         {
-          label: '包装SKU和自发货不一致',
+          label: '工厂装错',
           value: '2-2-Z',
         },
       ],
     },
     {
-      label: '改地址',
+      label: '物流咨询/改地址',
       value: '3-0',
       children: [
         {
-          label: '未发出',
+          label: '发货后改地址',
           value: '3-1-M',
         },
         {
-          label: '已发出',
+          label: '询问物流',
           value: '3-2-M',
         },
       ],
@@ -493,7 +540,7 @@ const TableList: React.FC = () => {
         },
         {
           label: '价格贵',
-          value: '4-7-F',
+          value: '4-7-X',
         },
         {
           label: '无法安装/不会用',
@@ -554,7 +601,7 @@ const TableList: React.FC = () => {
           value: '5-6-Y',
         },
         {
-          label: '少件',
+          label: '少配件',
           value: '5-7-Y',
         },
       ],
@@ -588,7 +635,7 @@ const TableList: React.FC = () => {
           value: '6-6-Z',
         },
         {
-          label: '少件',
+          label: '少配件',
           value: '6-7-S',
         },
         {
@@ -600,11 +647,11 @@ const TableList: React.FC = () => {
           value: '6-9-Z',
         },
         {
-          label: '走线不均',
+          label: '走线歪斜/纽扣歪斜',
           value: '6-10-Z',
         },
         {
-          label: '孔位错误',
+          label: '孔位错误/缺失',
           value: '6-11-Z',
         },
         {
@@ -616,7 +663,7 @@ const TableList: React.FC = () => {
           value: '6-13-Z',
         },
         {
-          label: '缺少编号',
+          label: '缺少编号/说明书或标签贴错',
           value: '6-14-S',
         },
       ],
@@ -681,11 +728,11 @@ const TableList: React.FC = () => {
       children: [
         {
           label: '退全款',
-          value: '1-1',
+          value: '1-1-0',
         },
         {
           label: '退部分款',
-          value: '1-2',
+          value: '1-2-0',
         },
       ],
     },
@@ -694,40 +741,40 @@ const TableList: React.FC = () => {
       value: '2-0',
       children: [
         {
-          label: '截包退货',
-          value: '2-1',
+          label: '出仓前截回',
+          value: '2-1-0',
         },
         {
-          label: '拦截退货',
-          value: '2-2',
+          label: '半路拦截退货',
+          value: '2-2-0',
         },
         {
           label: '拒收退货',
-          value: '2-3',
+          value: '2-3-0',
         },
         {
           label: '地址不明/错误退货',
-          value: '2-4',
+          value: '2-4-0',
         },
         {
           label: '买家自行退货',
-          value: '2-5',
+          value: '2-5-0',
         },
         {
           label: '买家使用我司Return label退货',
-          value: '2-6',
+          value: '2-6-0',
         },
         {
           label: '买家使用Amazon Return label退货',
-          value: '2-7',
+          value: '2-7-0',
         },
         {
           label: '买家使用仓库Return label退货',
-          value: '2-8',
+          value: '2-8-0',
         },
         {
           label: '买家上门取件退货',
-          value: '2-9',
+          value: '2-9-0',
         },
       ],
     },
@@ -737,59 +784,67 @@ const TableList: React.FC = () => {
       children: [
         {
           label: '海外仓补寄新件',
-          value: '3-1',
+          value: '3-1-0',
         },
         {
           label: '海外仓补寄退件',
-          value: '3-2',
+          value: '3-2-0',
         },
         {
           label: '海外仓补寄破损件',
-          value: '3-3',
+          value: '3-3-0',
         },
         {
           label: '海外仓补寄配件',
-          value: '3-4',
+          value: '3-4-0',
         },
         {
           label: '国内补寄配件',
-          value: '3-5',
+          value: '3-5-0',
         },
         {
           label: '国内补寄电子说明书',
-          value: '3-6',
+          value: '3-6-0',
         },
       ],
     },
     {
-      label: '改地址',
+      label: '发货后改地址',
       value: '4-0',
       children: [
         {
-          label: '发货前改地址',
-          value: '4-1',
+          label: 'label created暂不能修改',
+          value: '4-1-0',
         },
         {
-          label: '发货后改地址',
-          value: '4-2',
+          label: 'in transit已申请修改地址',
+          value: '4-2-0',
+        },
+        {
+          label: '修改失败',
+          value: '4-3-0',
         },
       ],
     },
     {
-      label: '等待进一步处理',
+      label: '其他处理',
       value: '5-0',
       children: [
         {
           label: '等待买家补充信息',
-          value: '5-1',
+          value: '5-1-0',
         },
         {
           label: '等待开发提供方案',
-          value: '5-2',
+          value: '5-2-0',
         },
         {
           label: '目前方案买家不满意',
-          value: '5-3',
+          value: '5-3-0',
+        },
+        {
+          label: '已解决',
+          value: '5-4-0',
         },
       ],
     },
@@ -802,7 +857,7 @@ const TableList: React.FC = () => {
     console.log(excel_datas);
 
     // 列标题，逗号隔开，每一个逗号就是隔开一个单元格
-    let str = `id,登记日期,登记人,店铺,订单号,SKU,订单状态,顾客反馈,客服操作,Refund,备注\n`;
+    let str = `id,登记日期,登记人,店铺,订单号,SKU,数量,订单状态,顾客反馈,客服操作,退款金额,备注\n`;
     // 增加\t为了不让表格显示科学计数法或者其他格式
     for (let i = 0; i < excel_datas.length; i++) {
       // console.log(excel_datas[i])
@@ -811,7 +866,9 @@ const TableList: React.FC = () => {
         const temp_dict_but = excel_datas[i].SKU.split(',');
         excel_datas[i].公司SKU = temp_dict_but.join('a');
         if (Object.prototype.hasOwnProperty.call(excel_datas[i], key)) {
-          str += `${excel_datas[i][key]},`;
+          let temp_str = excel_datas[i][key].toString();
+          temp_str = temp_str.replace(new RegExp(',', ("gm")), '，').replace(new RegExp(/[\r\n]/g, ("gm")), "")
+          str += `${temp_str},`;
         }
       }
       str += '\n';
@@ -840,66 +897,118 @@ const TableList: React.FC = () => {
       temp_values['SKU'] = temp_values['SKU'].replace(new RegExp('，', ("gm")), ',');
       temp_values['SKU'] = temp_values['SKU'].replace(new RegExp(' ', ("gm")), '');
       temp_values['SKU'] = temp_values['SKU'].replace(new RegExp('  ', ("gm")), '');
-      const sku = temp_values['SKU'].split(',');
-      // 判断sku是否含有
-      sku.forEach((element: string) => {
-        if (!data.sku_name.find((item: string) => item == element)) {
-          sku_in = false;
-          message.error('传入的SKU:' + element + '不正确(注:捆绑sku要拆成产品sku)');
-        }
-      });
-      if ('补寄新件' in temp_values) {
-        // 如果不为空，则重新判断是否正确
-        temp_values['补寄新件'] = temp_values['补寄新件'].replace(new RegExp('，', ("gm")), ',');
-        temp_values['补寄新件'] = temp_values['补寄新件'].replace(new RegExp(' ', ("gm")), '');
-        temp_values['补寄新件'] = temp_values['补寄新件'].replace(new RegExp('  ', ("gm")), '');
-        const temp_newsku = temp_values['补寄新件'].split(',');
-        temp_newsku.forEach((element: string) => {
-          if (!data.sku_name.find((item: string) => item == element)) {
-            sku_in = false;
-            message.error('传入的补寄新件SKU:' + element + '不正确(注:捆绑sku要拆成产品sku)');
-          }
-        });
+
+      if (!data.sku_name.find((item: string) => item == temp_values['SKU'])) {
+        sku_in = false;
+        message.error('传入的SKU:' + temp_values['SKU'] + '不正确(注:AB箱填有问题的那箱，不同SKU请分条填写。)');
       }
+      if ('3-1-0' in temp_values) {
+        // 如果不为空，则重新判断是否正确
+        temp_values['3-1-0'] = temp_values['3-1-0'].replace(new RegExp('，', ("gm")), ',');
+        temp_values['3-1-0'] = temp_values['3-1-0'].replace(new RegExp(' ', ("gm")), '');
+        temp_values['3-1-0'] = temp_values['3-1-0'].replace(new RegExp('  ', ("gm")), '');
+        if (!data.sku_name.find((item: string) => item == temp_values['3-1-0'])) {
+          sku_in = false;
+          message.error('传入的补寄新件SKU:' + temp_values['3-1-0'] + '不正确(注:AB箱填有问题的那箱，不同SKU请分条填写。)');
+        }
+      } else {
+        if ('3-1-0数量' in temp_values) {
+          temp_values['3-1-0'] = temp_values['SKU'];
+        }
+      }
+      if ('3-2-0' in temp_values) {
+        // 如果不为空，则重新判断是否正确
+        temp_values['3-2-0'] = temp_values['3-2-0'].replace(new RegExp('，', ("gm")), ',');
+        temp_values['3-2-0'] = temp_values['3-2-0'].replace(new RegExp(' ', ("gm")), '');
+        temp_values['3-2-0'] = temp_values['3-2-0'].replace(new RegExp('  ', ("gm")), '');
+        if (!data.sku_name.find((item: string) => item == temp_values['3-2-0'])) {
+          sku_in = false;
+          message.error('传入的补寄新件SKU:' + temp_values['3-2-0'] + '不正确(注:AB箱填有问题的那箱，不同SKU请分条填写。)');
+        }
+      } else {
+        if ('3-2-0数量' in temp_values) {
+          temp_values['3-2-0'] = temp_values['SKU'];
+        }
+      }
+      if ('3-3-0' in temp_values) {
+        // 如果不为空，则重新判断是否正确
+        temp_values['3-3-0'] = temp_values['3-3-0'].replace(new RegExp('，', ("gm")), ',');
+        temp_values['3-3-0'] = temp_values['3-3-0'].replace(new RegExp(' ', ("gm")), '');
+        temp_values['3-3-0'] = temp_values['3-3-0'].replace(new RegExp('  ', ("gm")), '');
+        if (!data.sku_name.find((item: string) => item == temp_values['3-3-0'])) {
+          sku_in = false;
+          message.error('传入的补寄新件SKU:' + temp_values['3-3-0'] + '不正确(注:AB箱填有问题的那箱，不同SKU请分条填写。)');
+        }
+      } else {
+        if ('3-3-0数量' in temp_values) {
+          temp_values['3-3-0'] = temp_values['SKU'];
+        }
+      }
+      temp_values['guke'] = new Array();
+      temp_values['kefu'] = new Array();
       // 顾客反馈做处理
       for (const key in temp_values['顾客反馈']) {
         if (Object.prototype.hasOwnProperty.call(temp_values['顾客反馈'], key)) {
           const element = temp_values['顾客反馈'][key];
+          temp_values['guke'][key] = temp_values['顾客反馈'][key][1];
           if ((element[0] == '5-0') ||
             (element[0] == '6-0') || (element[0] == '7-0')) {
             if (element[1] in temp_values) {
-              temp_values['顾客反馈'][key][1] += '$' + temp_values[element[1]].replace(',', '#');
+              if (temp_values[element[1]] != '') {
+                temp_values['guke'][key] += '$' + temp_values[element[1]].replace(new RegExp(',', ("gm")), '#');
+              } else {
+                if (temp_values['订单状态'] == '已解决') {
+                  sku_in = false;
+                  message.error('请填写配件');
+                }
+              }
+
+            } else {
+              if (temp_values['订单状态'] == '已解决') {
+                sku_in = false;
+                message.error('请填写配件');
+              }
             }
-          }
-          if (temp_values['顾客反馈'][key].length > 1) {
-            temp_values['顾客反馈'][key].splice(0, 1);
           }
         }
       }
-      temp_values['顾客反馈'] = temp_values['顾客反馈'].join('&');
+      temp_values['guke'] = temp_values['guke'].join('&');
       // 客服操作做处理
       for (const key in temp_values['客服操作']) {
         if (Object.prototype.hasOwnProperty.call(temp_values['客服操作'], key)) {
           const element = temp_values['客服操作'][key];
+          temp_values['kefu'][key] = temp_values['客服操作'][key][1];
           // 判断配件
-          if ((element[1] == '3-4') ||
-            (element[1] == '3-5')) {
+          if ((element[1] == '3-4-0') ||
+            (element[1] == '3-5-0')) {
             if (element[1] in temp_values) {
-              temp_values['客服操作'][key][1] += '$' + temp_values[element[1]].replace(',', '#');
+              if (temp_values[element[1]] != '') {
+                temp_values['kefu'][key] += '$' + temp_values[element[1]].replace(new RegExp(',', ("gm")), '#');
+              } else {
+                if (temp_values['订单状态'] == '已解决') {
+                  sku_in = false;
+                  message.error('请填写配件');
+                }
+              }
+
+            } else {
+              if (temp_values['订单状态'] == '已解决') {
+                sku_in = false;
+                message.error('请填写配件');
+              }
             }
           }
           // 判断补寄新件
-          if ((element[1] == '3-1')) {
-            if ('补寄新件' in temp_values) {
-              temp_values['客服操作'][key][1] += '$' + temp_values['补寄新件'].replace(',', '#');
+          if ((element[1] == '3-1-0') || (element[1] == '3-2-0') || (element[1] == '3-3-0')) {
+            if (element[1] in temp_values) {
+              const temp_element = temp_values[element[1]];
+              const temp_element_num = temp_values[element[1] + '数量'];
+              temp_values['kefu'][key] += '$' + temp_element + 'num' + temp_element_num;
             }
-          }
-          if (temp_values['客服操作'][key].length > 1) {
-            temp_values['客服操作'][key].splice(0, 1);
           }
         }
       }
-      temp_values['客服操作'] = temp_values['客服操作'].join('&');
+      temp_values['kefu'] = temp_values['kefu'].join('&');
       if (sku_in == true) {
         return request(`/api/afterinsert`, {
           method: 'POST',
@@ -958,7 +1067,7 @@ const TableList: React.FC = () => {
           setdetailitem([]);
           setdetailreason([]);
           setrefund(0);
-          setrenew(0);
+          setresku([]);
         });
       }
     }
@@ -968,14 +1077,16 @@ const TableList: React.FC = () => {
     setIsModalVisible(false);
   };
   return (
-    <PageContainer>
+    <>
       <ProForm
         autoComplete="on"
+        size='small'
         formRef={formRef}
         initialValues={{
           '登记人': initialState.currentUser?.name
         }}
         onFinish={async (values, ...rest) => {
+          console.log(values);
           const temp_order_name = order_name?.length > 0 ? order_name : data?.order_name;
           if ((yuanyingerror == true) || (fankuierror == true)) {
             message.error('顾客反馈和客服操作不能只选大类');
@@ -989,66 +1100,117 @@ const TableList: React.FC = () => {
             values['SKU'] = values['SKU'].replace(new RegExp('，', ("gm")), ',');
             values['SKU'] = values['SKU'].replace(new RegExp(' ', ("gm")), '');
             values['SKU'] = values['SKU'].replace(new RegExp('  ', ("gm")), '');
-            const sku = values['SKU'].split(',');
-            // 判断sku是否含有
-            sku.forEach((element: string) => {
-              if (!data.sku_name.find((item: string) => item == element)) {
-                sku_in = false;
-                message.error('传入的SKU:' + element + '不正确(注:捆绑sku要拆成产品sku)');
-              }
-            });
-            if ('补寄新件' in values) {
-              // 如果不为空，则重新判断是否正确
-              values['补寄新件'] = values['补寄新件'].replace(new RegExp('，', ("gm")), ',');
-              values['补寄新件'] = values['补寄新件'].replace(new RegExp(' ', ("gm")), '');
-              values['补寄新件'] = values['补寄新件'].replace(new RegExp('  ', ("gm")), '');
-              const temp_newsku = values['补寄新件'].split(',');
-              temp_newsku.forEach((element: string) => {
-                if (!data.sku_name.find((item: string) => item == element)) {
-                  sku_in = false;
-                  message.error('传入的补寄新件SKU:' + element + '不正确(注:捆绑sku要拆成产品sku)');
-                }
-              });
+
+            if (!data.sku_name.find((item: string) => item == values['SKU'])) {
+              sku_in = false;
+              message.error('传入的SKU:' + values['SKU'] + '不正确(注:AB箱填有问题的那箱，不同SKU请分条填写。)');
             }
+            if ('3-1-0' in values) {
+              // 如果不为空，则重新判断是否正确
+              values['3-1-0'] = values['3-1-0'].replace(new RegExp('，', ("gm")), ',');
+              values['3-1-0'] = values['3-1-0'].replace(new RegExp(' ', ("gm")), '');
+              values['3-1-0'] = values['3-1-0'].replace(new RegExp('  ', ("gm")), '');
+              if (!data.sku_name.find((item) => item == values['3-1-0'])) {
+                sku_in = false;
+                message.error('传入的补寄新件SKU:' + values['3-1-0'] + '不正确(注:AB箱填有问题的那箱，不同SKU请分条填写。)');
+              }
+            } else {
+              if ('3-1-0数量' in values) {
+                values['3-1-0'] = values['SKU'];
+              }
+            }
+            if ('3-2-0' in values) {
+              // 如果不为空，则重新判断是否正确
+              values['3-2-0'] = values['3-2-0'].replace(new RegExp('，', ("gm")), ',');
+              values['3-2-0'] = values['3-2-0'].replace(new RegExp(' ', ("gm")), '');
+              values['3-2-0'] = values['3-2-0'].replace(new RegExp('  ', ("gm")), '');
+              if (!data.sku_name.find((item) => item == values['3-2-0'])) {
+                sku_in = false;
+                message.error('传入的补寄新件SKU:' + values['3-2-0'] + '不正确(注:AB箱填有问题的那箱，不同SKU请分条填写。)');
+              }
+            } else {
+              if ('3-2-0数量' in values) {
+                values['3-2-0'] = values['SKU'];
+              }
+            }
+            if ('3-3-0' in values) {
+              // 如果不为空，则重新判断是否正确
+              values['3-3-0'] = values['3-3-0'].replace(new RegExp('，', ("gm")), ',');
+              values['3-3-0'] = values['3-3-0'].replace(new RegExp(' ', ("gm")), '');
+              values['3-3-0'] = values['3-3-0'].replace(new RegExp('  ', ("gm")), '');
+              if (!data.sku_name.find((item) => item == values['3-3-0'])) {
+                sku_in = false;
+                message.error('传入的补寄新件SKU:' + values['3-3-0'] + '不正确(注:AB箱填有问题的那箱，不同SKU请分条填写。)');
+              }
+            } else {
+              if ('3-3-0数量' in values) {
+                values['3-3-0'] = values['SKU'];
+              }
+            }
+            values['guke'] = new Array();
+            values['kefu'] = new Array();
             // 顾客反馈做处理
             for (const key in values['顾客反馈']) {
               if (Object.prototype.hasOwnProperty.call(values['顾客反馈'], key)) {
                 const element = values['顾客反馈'][key];
+                values['guke'][key] = values['顾客反馈'][key][1];
                 if ((element[0] == '5-0') ||
                   (element[0] == '6-0') || (element[0] == '7-0')) {
                   if (element[1] in values) {
-                    values['顾客反馈'][key][1] += '$' + values[element[1]].replace(',', '#');
+                    if (values[element[1]] != '') {
+                      values['guke'][key] += '$' + values[element[1]].replace(new RegExp(',', ("gm")), '#');
+                    } else {
+                      if (values['订单状态'] == '已解决') {
+                        sku_in = false;
+                        message.error('请填写配件');
+                      }
+                    }
+
+                  } else {
+                    if (values['订单状态'] == '已解决') {
+                      sku_in = false;
+                      message.error('请填写配件');
+                    }
                   }
-                }
-                if (values['顾客反馈'][key].length > 1) {
-                  values['顾客反馈'][key].splice(0, 1);
                 }
               }
             }
-            values['顾客反馈'] = values['顾客反馈'].join('&');
+            values['guke'] = values['guke'].join('&');
             // 客服操作做处理
             for (const key in values['客服操作']) {
               if (Object.prototype.hasOwnProperty.call(values['客服操作'], key)) {
                 const element = values['客服操作'][key];
+                values['kefu'][key] = values['客服操作'][key][1];
                 // 判断配件
-                if ((element[1] == '3-4') ||
-                  (element[1] == '3-5')) {
+                if ((element[1] == '3-4-0') ||
+                  (element[1] == '3-5-0')) {
                   if (element[1] in values) {
-                    values['客服操作'][key][1] += '$' + values[element[1]].replace(',', '#');
+                    if (values[element[1]] != '') {
+                      values['kefu'][key] += '$' + values[element[1]].replace(new RegExp(',', ("gm")), '#');
+                    } else {
+                      if (values['订单状态'] == '已解决') {
+                        sku_in = false;
+                        message.error('请填写配件');
+                      }
+                    }
+                  } else {
+                    if (values['订单状态'] == '已解决') {
+                      sku_in = false;
+                      message.error('请填写配件');
+                    }
                   }
                 }
                 // 判断补寄新件
-                if ((element[1] == '3-1')) {
-                  if ('补寄新件' in values) {
-                    values['客服操作'][key][1] += '$' + values['补寄新件'].replace(',', '#');
+                if ((element[1] == '3-1-0') || (element[1] == '3-2-0') || (element[1] == '3-3-0')) {
+                  if (element[1] in values) {
+                    const temp_element = values[element[1]];
+                    const temp_element_num = values[element[1] + '数量'];
+                    values['kefu'][key] += '$' + temp_element + 'num' + temp_element_num;
                   }
-                }
-                if (values['客服操作'][key].length > 1) {
-                  values['客服操作'][key].splice(0, 1);
                 }
               }
             }
-            values['客服操作'] = values['客服操作'].join('&');
+            values['kefu'] = values['kefu'].join('&');
             if (sku_in == true) {
               return request(`/api/afterinsert`, {
                 method: 'POST',
@@ -1057,23 +1219,42 @@ const TableList: React.FC = () => {
               }).then(res => {
                 //自行根据条件清除
                 console.log(res);
-                setorder_name(res);
-                message.success('提交成功');
-                // 储存历史记录
-                for (const key in item_dict) {
-                  temp_dict[key] = new Array();
-                  if (item_dict[key] in storage) {
-                    temp_data = eval(storage[item_dict[key]]).split('|');
-                    for (const key2 in temp_data) {
-                      if (Object.prototype.hasOwnProperty.call(temp_data, key2)) {
-                        const element = temp_data[key2];
-                        temp_dict[key].push(renderItem(element, parseInt(key2), item_dict[key]));
+                if (res == '请重新登录') {
+                  message.error('提交异常,请重新登录账号');
+                } else {
+                  setorder_name(res);
+                  message.success('提交成功');
+                  // 储存历史记录
+                  for (const key in item_dict) {
+                    temp_dict[key] = new Array();
+                    if (item_dict[key] in storage) {
+                      temp_data = eval(storage[item_dict[key]]).split('|');
+                      for (const key2 in temp_data) {
+                        if (Object.prototype.hasOwnProperty.call(temp_data, key2)) {
+                          const element = temp_data[key2];
+                          temp_dict[key].push(renderItem(element, parseInt(key2), item_dict[key]));
+                        }
                       }
-                    }
-                    if (temp_data.indexOf(values[form_dict[key]]) == -1) {
+                      if (temp_data.indexOf(values[form_dict[key]]) == -1) {
+                        temp_data.push(values[form_dict[key]]);
+                        temp_dict[key].push(renderItem(values[form_dict[key]], temp_data.length - 1, item_dict[key]));
+                        console.log('提交后', temp_data)
+                        let temp_storage = temp_data.join('|');
+                        temp_storage = JSON.stringify(temp_storage);
+                        storage[item_dict[key]] = temp_storage;
+                        //自行根据条件清除
+                        if (parseInt(key) == 0) {
+                          setdengji(temp_dict[0]);
+                        } else if (parseInt(key) == 1) {
+                          setosku(temp_dict[1]);
+                        } else if (parseInt(key) == 3) {
+                          setbeizhu(temp_dict[2]);
+                        }
+                      }
+                    } else {
+                      temp_data = []
                       temp_data.push(values[form_dict[key]]);
                       temp_dict[key].push(renderItem(values[form_dict[key]], temp_data.length - 1, item_dict[key]));
-                      console.log('提交后', temp_data)
                       let temp_storage = temp_data.join('|');
                       temp_storage = JSON.stringify(temp_storage);
                       storage[item_dict[key]] = temp_storage;
@@ -1086,28 +1267,13 @@ const TableList: React.FC = () => {
                         setbeizhu(temp_dict[2]);
                       }
                     }
-                  } else {
-                    temp_data = []
-                    temp_data.push(values[form_dict[key]]);
-                    temp_dict[key].push(renderItem(values[form_dict[key]], temp_data.length - 1, item_dict[key]));
-                    let temp_storage = temp_data.join('|');
-                    temp_storage = JSON.stringify(temp_storage);
-                    storage[item_dict[key]] = temp_storage;
-                    //自行根据条件清除
-                    if (parseInt(key) == 0) {
-                      setdengji(temp_dict[0]);
-                    } else if (parseInt(key) == 1) {
-                      setosku(temp_dict[1]);
-                    } else if (parseInt(key) == 3) {
-                      setbeizhu(temp_dict[2]);
-                    }
                   }
+                  formRef.current?.resetFields();
+                  setdetailitem([]);
+                  setdetailreason([]);
+                  setrefund(0);
+                  setresku([]);
                 }
-                formRef.current?.resetFields();
-                setdetailitem([]);
-                setdetailreason([]);
-                setrefund(0);
-                setrenew(0);
               });
             }
           }
@@ -1116,7 +1282,7 @@ const TableList: React.FC = () => {
         }
 
       >
-        <Row>
+        <Row gutter={[32, 16]}>
           <Col span={3}>
             <ProForm.Item
               name="登记人"
@@ -1130,7 +1296,7 @@ const TableList: React.FC = () => {
               />
             </ProForm.Item>
           </Col>
-          <Col span={3} offset={1}>
+          <Col span={5}>
             <ProForm.Item
               name="店铺"
               label="店铺"
@@ -1138,6 +1304,9 @@ const TableList: React.FC = () => {
             >
               <ProFormSelect
                 width="md"
+                fieldProps={{
+                  listHeight: 450,
+                }}
                 valueEnum={{
                   '赫曼': '赫曼',
                   '信盒': '信盒',
@@ -1169,7 +1338,7 @@ const TableList: React.FC = () => {
               />
             </ProForm.Item>
           </Col>
-          <Col span={5} offset={1}>
+          <Col span={5}>
             <ProForm.Item
               name="订单号"
               label="订单号"
@@ -1180,20 +1349,31 @@ const TableList: React.FC = () => {
               />
             </ProForm.Item>
           </Col>
-          <Col span={5} offset={1}>
+          <Col span={5}>
             <ProForm.Item
               name="SKU"
               label="SKU"
-              rules={[{ required: true, message: '两箱包的请输入两个公司SKU' }, { pattern: /[^,||^，]$/, message: '最后一位不能为,' }]}
-              tooltip="例如USAN1023801-1,USAN1023801-2 (多个sku用,隔开)，捆绑SKU请拆成对应的SKU"
+              rules={[{ required: true, message: 'AB箱填有问题的那箱，不同SKU请分条填写。' }, { pattern: /[^,||^，]$/, message: '限填一件' }]}
+              tooltip="AB箱填有问题的那箱,限填一个"
             >
               <AutoComplete
-                placeholder="若为AB箱,哪箱有问题请填哪箱"
+                placeholder="AB箱填有问题的,限填一个"
                 options={osku}
               />
             </ProForm.Item>
           </Col>
-          <Col span={3} offset={1}>
+          <Col span={3}>
+            <ProFormDigit
+              width="md"
+              name="sku数量"
+              label="数量"
+              placeholder=""
+              initialValue={1}
+              tooltip="默认数量为1"
+              rules={[{ required: true, message: '请输入' }]}
+            />
+          </Col >
+          <Col span={3}>
             <ProForm.Item
               name="订单状态"
               label="订单状态"
@@ -1208,9 +1388,7 @@ const TableList: React.FC = () => {
               />
             </ProForm.Item>
           </Col>
-        </Row>
-        <Row>
-          <Col span={5}>
+          <Col span={4}>
             <ProForm.Item
               name="顾客反馈"
               label="顾客反馈"
@@ -1218,19 +1396,16 @@ const TableList: React.FC = () => {
             >
               <Cascader
                 multiple
-                maxTagCount="responsive"
+                className={styles.fankuicas}
                 onChange={fankuionChange}
-                style={{ width: '100%' }}
                 options={fankuicol}
+                expandTrigger="hover"
               />
-
 
             </ProForm.Item>
           </Col>
           {getfankuipeijianFields()}
-        </Row>
-        <Row>
-          <Col span={5}>
+          <Col span={4}>
             <ProForm.Item
               name="客服操作"
               label="客服操作"
@@ -1242,14 +1417,11 @@ const TableList: React.FC = () => {
                 onChange={yuanyingChange}
                 style={{ width: '100%' }}
                 options={yuanyingcol}
+                expandTrigger="hover"
               />
-
             </ProForm.Item>
           </Col>
           {getyuanyingFields()}
-        </Row>
-
-        <Row>
           <Col span={20}>
             <ProForm.Item
               name="备注" label="备注"
@@ -1258,10 +1430,10 @@ const TableList: React.FC = () => {
                 options={beizhu}
               >
                 <TextArea
-                  placeholder="请填写详细"
+                  placeholder="请填写详细(不得超过255个字)"
                   className="custom"
                   style={{ height: 50 }}
-                  maxLength={150}
+                  showCount={true}
                 />
               </AutoComplete>
             </ProForm.Item>
@@ -1269,8 +1441,8 @@ const TableList: React.FC = () => {
         </Row>
       </ProForm>
       <br />
-
       <ProTable
+        size='small'
         toolbar={{
           actions: [
             <Button key="primary" type="primary" onClick={() => downloadExcel()}>
@@ -1287,7 +1459,7 @@ const TableList: React.FC = () => {
         columns={column}
         actionRef={actionRef}
         onChange={onTableChange}
-        scroll={{ x: 1500, y: 300 }}
+        scroll={{ x: 900, y: 300 }}
         request={async (params = {}) => {
           const result = request('/api/aftersale', {
             method: 'POST',
@@ -1314,10 +1486,10 @@ const TableList: React.FC = () => {
           />
       }
       {/* 订单重复提示 */}
-      <Modal title="Basic Modal" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
+      <Modal title="警示" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
         <p>记录中已含有该订单号，确认是否提交？</p>
       </Modal>
-    </PageContainer >
+    </>
   );
 }
 

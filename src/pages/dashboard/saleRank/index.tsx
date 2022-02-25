@@ -68,7 +68,7 @@ const SaleRank: FC<any> = () => {
             </Tooltip>
             <div style={{ textAlign: "center", color: "#EE7700", fontSize: 16 }}>
                 <p><SoundOutlined />　最新更改:</p>
-                <p>销售额、广告数据重复已修正(宫本和赫曼2月5号-2月9号的销售额广告计算重复)</p>
+                <p>时间更新至{data?.enddate}</p>
             </div>
             <Tabs>
                 {(Tdata ? JSON.parse(Tdata).sale : data?.sale)?.map((item: any) => (

@@ -11,240 +11,6 @@ const Edit = (props) => {
     url: '/api/sku/static',
     method: 'get',
   });
-  // 联动添加
-  const [peijian, setpeijian] = useState([]);
-  const [detailitem, setdetailitem] = useState([]);
-  const [yuanying, setyuanying] = useState([]);
-  const [detailreason, setdetailreason] = useState([]);
-  const [refund, setrefund] = useState(0);
-  const [renew, setrenew] = useState('0');
-  const { isModalVisible } = props;
-  const { isShowModal } = props;
-  const { actionRef } = props;
-  const { editId } = props;
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(async () => {
-
-    //发请求取售后详情
-    if (editId !== undefined) {
-      const response = await edit_after(editId);
-      console.log(response);
-      // 创建初始数组(用来存配件)
-      let initial_dic = {
-        id: response.id,
-        登记人: response.登记人,
-        店铺: response.店铺,
-        订单号: response.订单号,
-        SKU: response.SKU,
-        订单状态: response.订单状态,
-        Refund: response.Refund,
-        备注: response.备注,
-      };
-      // 对顾客反馈和客服操作进行处理
-      response.顾客反馈 = response.顾客反馈.split("&");
-      response.客服操作 = response.客服操作.split("&");
-      const temp_fankui = new Array();
-      const temp_yuanying = new Array();
-      for (const key in response.顾客反馈) {
-        if (Object.hasOwnProperty.call(response.顾客反馈, key)) {
-          let element = response.顾客反馈[key];
-          element = element.split('$');
-          const temp_first = element[0].split('-');
-          response.顾客反馈[key] = [temp_first[0] + '-0', element[0]];
-          if ((element.length > 1)) {
-            initial_dic[element[0]] = element[1];
-            temp_fankui.push(element[0]);
-          }
-        }
-      }
-      for (const key in response.客服操作) {
-        if (Object.hasOwnProperty.call(response.客服操作, key)) {
-          let element = response.客服操作[key];
-          element = element.split('$');
-          const temp_first = element[0].split('-');
-          response.客服操作[key] = [temp_first[0] + '-0', element[0]];
-          if (element.length > 1) {
-            if (element[0] == '3-1') {
-              initial_dic.补寄新件 = element[1];
-              setrenew('3-1');
-            } else {
-              initial_dic[element[0]] = element[1];
-              temp_yuanying.push(element[0]);
-            }
-
-
-          }
-        }
-      }
-      initial_dic.客服操作 = response.客服操作
-      initial_dic.顾客反馈 = response.顾客反馈
-      setInitialValues(initial_dic);
-      setdetailitem(temp_fankui);
-      setpeijian(temp_fankui);
-      setdetailreason(temp_yuanying);
-      setyuanying(temp_yuanying);
-      setrefund(response.Refund);
-    }
-  }, [])
-  /**
-   * 售后修改
-   * @param values 表单数据
-   */
-  const editafter = async values => {
-    //发送请求，修改售后
-    const response = await editafter(editId, values)
-    if (response.status === undefined) {
-      message.success('修改成功')
-      //刷新表格数据
-      actionRef.current.reload()
-      //关闭模态框
-      isShowModal(false)
-    }
-  }
-
-  // 判断联动是否有一项只选了大类
-  const [fankuierror, setfankuierror] = useState(false);
-  const [yuanyingerror, setyuanyingerror] = useState(false);
-  const fankuionChange = (value) => {
-    const temp_peijian = [];
-    const temp_item = [];
-    let temp_fankuierror = false;
-    console.log(value);
-    for (const key in value) {
-      if (Object.prototype.hasOwnProperty.call(value, key)) {
-        const element = value[key];
-        if (element.length > 1) {
-          if ((element[0] == '5-0') ||
-            (element[0] == '6-0') || (element[0] == '7-0')) {
-            temp_peijian.push(element[1]);
-            temp_item.push(element[1]);
-          }
-        } else {
-          temp_fankuierror = true;
-        }
-      }
-    }
-    setfankuierror(temp_fankuierror);
-    setdetailitem(temp_item);
-    setpeijian(temp_peijian);
-  };
-  const getfankuipeijianFields = () => {
-    const children = [];
-    for (let i = 0; i < detailitem.length; i++) {
-      children.push(
-        <ProForm.Item
-          label={detailitem[i]}
-          name={peijian[i]}
-          tooltip="输入多个请用逗号隔开，第一位为大写字母，第二位为非0数字，第三位为数字或空"
-          rules={[{ pattern: /(^[A-Z][1-9]{1}$)|(^[A-Z][1-9][0-9]{1}$)|((^[A-Z][1-9]{1}((,[A-Z][1-9]{1})|(,[A-Z][1-9][0-9]{1})){1,}$)|(^[A-Z][1-9][0-9]{1}(((,[A-Z][1-9]{1})$|(,[A-Z][1-9][0-9]{1})){1,}$)))/, message: '请以大写字母+数字+数字的形式输入' }]}
-        >
-          <Input
-            style={{ width: 150 }}
-            name={peijian[i]}
-            placeholder="请输入配件"
-          />
-        </ProForm.Item>
-      )
-    }
-    return children;
-  }
-  const yuanyingChange = (value) => {
-    const temp_yuanying = [];
-    const temp_reason = [];
-    // 判断是否填写了大类
-    let temp_yuanyingerror = false;
-    let temp_refund = 0;
-    let temp_renew = '0';
-    for (const key in value) {
-      if (Object.prototype.hasOwnProperty.call(value, key)) {
-        const element = value[key];
-        if (element.length > 1) {
-          // 判断配件
-          if ((element[1] == '3-4') ||
-            (element[1] == '3-5')) {
-            temp_yuanying.push(element[1]);
-            temp_reason.push(element[1]);
-          }
-          // 判断refund
-          if ((element[1] == '1-1') || (element[1] == '1-2')) {
-            temp_refund = 1;
-          }
-          // 判断补寄新件
-          if ((element[1] == '3-1')) {
-            temp_renew = '3-1';
-          }
-        } else {
-          temp_yuanyingerror = true;
-        }
-      }
-    }
-    setyuanyingerror(temp_yuanyingerror);
-    setrefund(temp_refund);
-    setrenew(temp_renew);
-    setdetailreason(temp_reason);
-    setyuanying(temp_yuanying);
-  };
-  const getyuanyingFields = () => {
-    const children = [];
-    for (let i = 0; i < detailreason.length; i++) {
-      children.push(
-        <ProForm.Item
-          label={detailreason[i]}
-          name={yuanying[i]}
-          tooltip="输入多个请用逗号隔开，第一位为大写字母，第二位为非0数字，第三位为数字或空"
-          rules={[{ pattern: /(^[A-Z][1-9]{1}$)|(^[A-Z][1-9][0-9]{1}$)|((^[A-Z][1-9]{1}((,[A-Z][1-9]{1})|(,[A-Z][1-9][0-9]{1})){1,}$)|(^[A-Z][1-9][0-9]{1}(((,[A-Z][1-9]{1})$|(,[A-Z][1-9][0-9]{1})){1,}$)))/, message: '请以大写字母+数字+数字的形式输入' }]}
-        >
-          <Input
-            style={{ width: 150 }}
-            name={yuanying[i]}
-            placeholder="请输入配件"
-          />
-        </ProForm.Item >
-      )
-    }
-    let temp_refund = 0;
-    if (refund != 0) {
-      temp_refund = 1;
-      children.push(
-        <ProFormDigit
-          width="md"
-          name="Refund"
-          label="Refund"
-          placeholder=""
-          initialValue="0"
-          tooltip="若无退款,默认输入0"
-          rules={[{ required: true, message: '若无退款,请输入0' }]}
-        />
-      )
-    }
-    let temp_renew = 0;
-    if (renew != '0') {
-      temp_renew = 1;
-      children.push(
-        <ProForm.Item
-          label='补寄新件'
-          name='补寄新件'
-          tooltip="若为空，则为记录订单号填写的sku"
-          rules={[{ pattern: /[^,||^，]$/, message: '最后一位不能为,' }]}
-        >
-          <Input
-            width="md"
-            placeholder="请填写具体补寄sku"
-
-          />
-        </ProForm.Item>
-      )
-    }
-    if ((temp_refund == 1) && (refund == 0)) {
-      children.pop();
-      temp_refund = 0;
-    }
-    if ((temp_renew == 1) && (renew == '0')) {
-      children.pop();
-      temp_renew = 0;
-    }
-    return children;
-  }
   // 联动表单数值
   const fankuicol = [
     {
@@ -282,25 +48,25 @@ const Edit = (props) => {
       value: '2-0',
       children: [
         {
-          label: '包装SKU和自发货一致',
+          label: '仓库发错',
           value: '2-1-C',
         },
         {
-          label: '改成包装SKU和自发货不一致',
+          label: '工厂装错',
           value: '2-2-Z',
         },
       ],
     },
     {
-      label: '改地址',
+      label: '物流咨询/改地址',
       value: '3-0',
       children: [
         {
-          label: '未发出',
+          label: '发货后改地址',
           value: '3-1-M',
         },
         {
-          label: '已发出',
+          label: '询问物流',
           value: '3-2-M',
         },
       ],
@@ -335,7 +101,7 @@ const Edit = (props) => {
         },
         {
           label: '价格贵',
-          value: '4-7-F',
+          value: '4-7-X',
         },
         {
           label: '无法安装/不会用',
@@ -396,7 +162,7 @@ const Edit = (props) => {
           value: '5-6-Y',
         },
         {
-          label: '少件',
+          label: '少配件',
           value: '5-7-Y',
         },
       ],
@@ -430,7 +196,7 @@ const Edit = (props) => {
           value: '6-6-Z',
         },
         {
-          label: '少件',
+          label: '少配件',
           value: '6-7-S',
         },
         {
@@ -442,11 +208,11 @@ const Edit = (props) => {
           value: '6-9-Z',
         },
         {
-          label: '走线不均',
+          label: '走线歪斜/纽扣歪斜',
           value: '6-10-Z',
         },
         {
-          label: '孔位错误',
+          label: '孔位错误/缺失',
           value: '6-11-Z',
         },
         {
@@ -458,7 +224,7 @@ const Edit = (props) => {
           value: '6-13-Z',
         },
         {
-          label: '缺少编号',
+          label: '缺少编号/说明书或标签贴错',
           value: '6-14-S',
         },
       ],
@@ -523,11 +289,11 @@ const Edit = (props) => {
       children: [
         {
           label: '退全款',
-          value: '1-1',
+          value: '1-1-0',
         },
         {
           label: '退部分款',
-          value: '1-2',
+          value: '1-2-0',
         },
       ],
     },
@@ -536,40 +302,40 @@ const Edit = (props) => {
       value: '2-0',
       children: [
         {
-          label: '截包退货',
-          value: '2-1',
+          label: '出仓前截回',
+          value: '2-1-0',
         },
         {
-          label: '拦截退货',
-          value: '2-2',
+          label: '半路拦截退货',
+          value: '2-2-0',
         },
         {
           label: '拒收退货',
-          value: '2-3',
+          value: '2-3-0',
         },
         {
           label: '地址不明/错误退货',
-          value: '2-4',
+          value: '2-4-0',
         },
         {
           label: '买家自行退货',
-          value: '2-5',
+          value: '2-5-0',
         },
         {
           label: '买家使用我司Return label退货',
-          value: '2-6',
+          value: '2-6-0',
         },
         {
           label: '买家使用Amazon Return label退货',
-          value: '2-7',
+          value: '2-7-0',
         },
         {
           label: '买家使用仓库Return label退货',
-          value: '2-8',
+          value: '2-8-0',
         },
         {
           label: '买家上门取件退货',
-          value: '2-9',
+          value: '2-9-0',
         },
       ],
     },
@@ -579,63 +345,424 @@ const Edit = (props) => {
       children: [
         {
           label: '海外仓补寄新件',
-          value: '3-1',
+          value: '3-1-0',
         },
         {
           label: '海外仓补寄退件',
-          value: '3-2',
+          value: '3-2-0',
         },
         {
           label: '海外仓补寄破损件',
-          value: '3-3',
+          value: '3-3-0',
         },
         {
           label: '海外仓补寄配件',
-          value: '3-4',
+          value: '3-4-0',
         },
         {
           label: '国内补寄配件',
-          value: '3-5',
+          value: '3-5-0',
         },
         {
           label: '国内补寄电子说明书',
-          value: '3-6',
+          value: '3-6-0',
         },
       ],
     },
     {
-      label: '改地址',
+      label: '发货后改地址',
       value: '4-0',
       children: [
         {
-          label: '发货前改地址',
-          value: '4-1',
+          label: 'label created暂不能修改',
+          value: '4-1-0',
         },
         {
-          label: '发货后改地址',
-          value: '4-2',
+          label: 'in transit已申请修改地址',
+          value: '4-2-0',
+        },
+        {
+          label: '修改失败',
+          value: '4-3-0',
         },
       ],
     },
     {
-      label: '等待进一步处理',
+      label: '其他处理',
       value: '5-0',
       children: [
         {
           label: '等待买家补充信息',
-          value: '5-1',
+          value: '5-1-0',
         },
         {
           label: '等待开发提供方案',
-          value: '5-2',
+          value: '5-2-0',
         },
         {
           label: '目前方案买家不满意',
-          value: '5-3',
+          value: '5-3-0',
+        },
+        {
+          label: '已解决',
+          value: '5-4-0',
         },
       ],
     },
   ];
+  // 联动添加
+  const [peijian, setpeijian] = useState([]);
+  const [detailitem, setdetailitem] = useState([]);
+  const [yuanying, setyuanying] = useState([]);
+  const [detailreason, setdetailreason] = useState([]);
+  const [refund, setrefund] = useState(0);
+  const [renew, setrenew] = useState([]);
+  const { isModalVisible } = props;
+  const { isShowModal } = props;
+  const { actionRef } = props;
+  const { editId } = props;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(async () => {
+
+    //发请求取售后详情
+    if (editId !== undefined) {
+      const response = await edit_after(editId);
+      console.log(response);
+      // 创建初始数组(用来存配件)
+      let initial_dic = {
+        id: response.id,
+        登记人: response.登记人,
+        店铺: response.店铺,
+        订单号: response.订单号,
+        SKU: response.SKU,
+        订单状态: response.订单状态,
+        Refund: response.Refund,
+        备注: response.备注,
+        sku数量: response.sku数量,
+      };
+      // 对顾客反馈和客服操作进行处理
+      response.顾客反馈 = response.顾客反馈.split("&");
+      response.客服操作 = response.客服操作.split("&");
+      const temp_fankui = new Array();
+      const temp_yuanying = new Array();
+      const temp_renew = new Array();
+      for (const key in response.顾客反馈) {
+        if (Object.hasOwnProperty.call(response.顾客反馈, key)) {
+          let element = response.顾客反馈[key];
+          element = element.split('$');
+          const temp_first = element[0].split('-');
+          response.顾客反馈[key] = [temp_first[0] + '-0', element[0]];
+          if ((element.length > 1)) {
+            initial_dic[element[0]] = element[1].replace(new RegExp('#', ("gm")), ',');
+            temp_fankui.push(element[0]);
+          }
+        }
+      }
+      for (const key in response.客服操作) {
+        if (Object.hasOwnProperty.call(response.客服操作, key)) {
+          let element = response.客服操作[key];
+          element = element.split('$');
+          const temp_first = element[0].split('-');
+          response.客服操作[key] = [temp_first[0] + '-0', element[0]];
+          if (element.length > 1) {
+            if ((element[0] == '3-1-0') || (element[0] == '3-2-0') || ((element[0] == '3-3-0'))) {
+              const temp_element = element[1].split('num');
+              initial_dic[element[0]] = temp_element[0].replace(new RegExp('#', ("gm")), ',');
+              initial_dic[element[0] + '数量'] = temp_element[1];
+              temp_renew.push(element[0]);
+            } else {
+              initial_dic[element[0]] = element[1].replace(new RegExp('#', ("gm")), ',');
+              temp_yuanying.push(element[0]);
+            }
+          }
+        }
+      }
+      initial_dic.客服操作 = response.客服操作
+      initial_dic.顾客反馈 = response.顾客反馈
+      setInitialValues(initial_dic);
+      setdetailitem(temp_fankui);
+      setpeijian(temp_fankui);
+      setdetailreason(temp_yuanying);
+      setyuanying(temp_yuanying);
+      setrefund(response.Refund);
+      setrenew(temp_renew);
+    }
+  }, [])
+  /**
+   * 售后修改
+   * @param values 表单数据
+   */
+  const editafter = async values => {
+    //发送请求，修改售后
+    const response = await editafter(editId, values)
+    if (response.status === undefined) {
+      message.success('修改成功')
+      //刷新表格数据
+      actionRef.current.reload()
+      //关闭模态框
+      isShowModal(false)
+    }
+  }
+
+  // 判断联动是否有一项只选了大类
+  const [fankuierror, setfankuierror] = useState(false);
+  const [yuanyingerror, setyuanyingerror] = useState(false);
+  // 翻译编码
+  const fankui_tran = {
+    "1-1-C": "未上网(未收到)",
+    "1-2-X": "缺货(未收到)",
+    "1-3-K": "显示签收(未收到)",
+    "1-4-K": "快递停滞/送错州/要求自提(未收到)",
+    "1-5-K": "快递中途破损/退回(未收到)",
+    "1-6-X": "未录入自发货(未收到)",
+    "2-1-C": "仓库发错(发错货)",
+    "2-2-Z": "工厂装错(发错货)",
+    "3-1-M": "发货后改地址(改地址)",
+    "3-2-M": "询问物流(改地址)",
+    "4-1-M": "无理由退货(不想要)",
+    "4-2-X": "网页描述与实物不符(不想要)",
+    "4-3-M": "不符合预期/不满意(不想要)",
+    "4-4-K": "超时送达(不想要)",
+    "4-5-Z": "有异味(不想要)",
+    "4-6-M": "重复下单(不想要)",
+    "4-7-X": "价格贵(不想要)",
+    "4-8-F": "无法安装/不会用(不想要)",
+    "4-9-M": "未授权购买/不小心购买(不想要)",
+    "4-10-K": "快递态度恶劣(不想要)",
+    "4-11-F": "需要床箱/床垫不适合(不想要)",
+    "4-12-M": "尺寸买错(不想要)",
+    "4-13-M": "更换付款方式(不想要)",
+    "4-14-M": "其他(不想要)",
+    "5-1-Y": "断裂(包装破损)",
+    "5-2-Y": "弯折/开裂/变形(包装破损)",
+    "5-3-Y": "破损/破洞(包装破损)",
+    "5-4-Y": "松动/掉落(包装破损)",
+    "5-5-Y": "腐蚀/发霉/生虫/生锈/污渍(包装破损)",
+    "5-6-Y": "划痕/凹痕/凸痕/压痕/褶皱(包装破损)",
+    "5-7-Y": "少配件(包装破损)",
+    "6-1-Z": "断裂(包装未破损)",
+    "6-2-Z": "弯折/开裂/变形(包装未破损)",
+    "6-3-Z": "破损/破洞(包装未破损)",
+    "6-4-Z": "松动/掉落(包装未破损)",
+    "6-5-Z": "腐蚀/发霉/生虫/生锈/污渍(包装未破损)",
+    "6-6-Z": "划痕/凹痕/凸痕/压痕/褶皱(包装未破损)",
+    "6-7-S": "少配件(包装未破损)",
+    "6-8-S": "错件(包装未破损)",
+    "6-9-Z": "异味(包装未破损)",
+    "6-10-Z": "走线歪斜/纽扣歪斜(包装未破损)",
+    "6-11-Z": "孔位错误/缺失(包装未破损)",
+    "6-12-Z": "色差(包装未破损)",
+    "6-13-Z": "配件功能失效(包装未破损)",
+    "6-14-S": "缺少编号/说明书或标签贴错(包装未破损)",
+    "7-1-Z": "断裂(使用后故障)",
+    "7-2-Z": "弯折/开裂/变形(使用后故障)",
+    "7-3-Z": "配件松脱(使用后故障)",
+    "7-4-Z": "功能故障(使用后故障)",
+    "7-5-Z": "产品不稳固(使用后故障)",
+    "7-6-Z": "腐蚀/发霉/生虫/生锈(使用后故障)",
+    "7-7-Z": "异味(使用后故障)",
+    "7-8-Z": "噪音(使用后故障)",
+    "8-1-M": "问题已反馈未解决(差评)",
+    "8-2-M": "问题未反馈(差评)",
+  }
+  const yuanying_tran = {
+    "1-1-0": "退全款",
+    "1-2-0": "退部分款",
+    "2-1-0": "出仓前截回",
+    "2-2-0": "半路拦截退货",
+    "2-3-0": "拒收退货",
+    "2-4-0": "地址不明/错误退货",
+    "2-5-0": "买家自行退货",
+    "2-6-0": "买家使用我司Return label退货",
+    "2-7-0": "买家使用Amazon Return label退货",
+    "2-8-0": "买家使用仓库Return label退货",
+    "2-9-0": "买家上门取件退货",
+    "3-1-0": "海外仓补寄新件",
+    "3-2-0": "海外仓补寄退件",
+    "3-3-0": "海外仓补寄破损件",
+    "3-4-0": "海外仓补寄配件",
+    "3-5-0": "国内补寄配件",
+    "3-6-0": "国内补寄电子说明书",
+    "4-1-0": "label created暂不能修改",
+    "4-2-0": "in transit已申请修改地址",
+    "4-3-0": "修改失败",
+    "5-1-0": "等待买家补充信息",
+    "5-2-0": "等待开发提供方案",
+    "5-3-0": "目前方案买家不满意",
+    "5-4-0": "已解决"
+  }
+  const fankuionChange = (value) => {
+    const temp_peijian = [];
+    const temp_item = [];
+    let temp_fankuierror = false;
+    for (const key in value) {
+      if (Object.prototype.hasOwnProperty.call(value, key)) {
+        const element = value[key];
+        if (element.length > 1) {
+          if ((element[0] == '5-0') ||
+            (element[0] == '6-0') || (element[0] == '7-0')) {
+            temp_peijian.push(element[1]);
+            temp_item.push(element[1]);
+          }
+        } else {
+          temp_fankuierror = true;
+        }
+      }
+    }
+    setfankuierror(temp_fankuierror);
+    setdetailitem(temp_item);
+    setpeijian(temp_peijian);
+  };
+  const getfankuipeijianFields = () => {
+    const children = [];
+    for (let i = 0; i < detailitem.length; i++) {
+      children.push(
+        <ProForm.Item
+          label={'顾客反馈:' + fankui_tran[detailitem[i]]}
+          name={peijian[i]}
+          tooltip="输入多个请用逗号隔开，第一位为大写字母，第二位为非0数字，第三位为数字或空,例：允许A，A1，A10，不允许1A，A01，a1。特例 编号标贴-B99 螺丝包-L99 排骨条-P99 说明书-S99 五金盒-W99 配件未知-U99"
+          rules={[{ pattern: /(^[A-Z]{1}$)|(^[A-Z][1-9]{1}$)|(^[A-Z][1-9][0-9]{1}$)|((^[A-Z]{1}((,[A-Z]{1})|(,[A-Z][1-9]{1})|(,[A-Z][1-9][0-9]{1})){1,}$)|(^[A-Z][1-9]{1}((,[A-Z]{1})|(,[A-Z][1-9]{1})|(,[A-Z][1-9][0-9]{1})){1,}$)|(^[A-Z][1-9][0-9]{1}(((,[A-Z]{1})|(,[A-Z][1-9]{1})$|(,[A-Z][1-9][0-9]{1})){1,}$)))/, message: '请以大写字母+数字+数字的形式输入' }]}
+        >
+          <Input
+            style={{ width: 150 }}
+            name={peijian[i]}
+            placeholder="请输入配件"
+          />
+        </ProForm.Item>
+      )
+    }
+    return children;
+  }
+  const yuanyingChange = (value, selectOptions) => {
+    const temp_yuanying = [];
+    const temp_reason = [];
+    const temp_yuanyinchina = [];
+    // 判断是否填写了大类
+    let temp_yuanyingerror = false;
+    let temp_refund = 0;
+    let count_0 = 0;
+    let count_1 = 0;
+    let count_2 = 0;
+    let count_3 = 0;
+    const temp_renew = [];
+    const temp_renewchina = [];
+    for (const key in value) {
+      if (Object.prototype.hasOwnProperty.call(value, key)) {
+        const element = value[key];
+        if (element.length > 1) {
+          // 判断小类是否有两个
+          if (element[0] == '1-0') {
+            console.log(count_0);
+            count_0 = count_0 + 1;
+            if (count_0 > 1)
+              message.error('退款只能含一个小类');
+          } else if (element[0] == '2-0') {
+            count_1 = count_1 + 1;
+            if (count_1 > 1)
+              message.error('退货只能含一个小类');
+          } else if (element[0] == '4-0') {
+            count_2 = count_2 + 1;
+            if (count_2 > 1)
+              message.error('发货后改地址只能含一个小类');
+          } else if (element[0] == '5-0') {
+            count_3 = count_3 + 1;
+            if (count_3 > 1)
+              message.error('等待进一步操作只能含一个小类');
+          }
+          // 判断配件
+          if ((element[1] == '3-4-0') ||
+            (element[1] == '3-5-0')) {
+            temp_yuanying.push(element[1]);
+            temp_reason.push(element[1]);
+            temp_yuanyinchina.push(selectOptions[key][1]['label']);
+          } else
+            // 判断refund
+            if ((element[1] == '1-1-0') || (element[1] == '1-2-0')) {
+              temp_refund = 1;
+            } else
+              // 判断补寄sku
+              if ((element[1] == '3-1-0') || (element[1] == '3-2-0') || (element[1] == '3-3-0')) {
+                temp_renew.push(element[1]);
+                temp_renewchina.push(selectOptions[key][1]['label']);
+              }
+        } else {
+          temp_yuanyingerror = true;
+          message.error('不能只选大类');
+        }
+      }
+    }
+    setyuanyingerror(temp_yuanyingerror);
+    setrefund(temp_refund);
+    setrenew(temp_renew);
+    setdetailreason(temp_reason);
+    setyuanying(temp_yuanying);
+  };
+  const getyuanyingFields = () => {
+    const children = [];
+    for (let i = 0; i < detailreason.length; i++) {
+      children.push(
+        <ProForm.Item
+          label={yuanying_tran[detailreason[i]]}
+          name={yuanying[i]}
+          tooltip="输入多个请用逗号隔开，第一位为大写字母，第二位为非0数字，第三位为数字或空,例：允许A，A1，A10，不允许1A，A01，a1。特例 编号标贴-B99 螺丝包-L99 排骨条-P99 说明书-S99 五金盒-W99 配件未知-U99"
+          rules={[{ pattern: /(^[A-Z]{1}$)|(^[A-Z][1-9]{1}$)|(^[A-Z][1-9][0-9]{1}$)|((^[A-Z]{1}((,[A-Z]{1})|(,[A-Z][1-9]{1})|(,[A-Z][1-9][0-9]{1})){1,}$)|(^[A-Z][1-9]{1}((,[A-Z]{1})|(,[A-Z][1-9]{1})|(,[A-Z][1-9][0-9]{1})){1,}$)|(^[A-Z][1-9][0-9]{1}(((,[A-Z]{1})|(,[A-Z][1-9]{1})$|(,[A-Z][1-9][0-9]{1})){1,}$)))/, message: '请以大写字母+数字+数字的形式输入' }]}
+        >
+          <Input
+            style={{ width: 150 }}
+            name={yuanying[i]}
+            placeholder="请输入配件"
+          />
+        </ProForm.Item >
+      )
+    }
+    let temp_refund = 0;
+    if (refund != 0) {
+      temp_refund = 1;
+      children.push(
+        <ProFormDigit
+          width="md"
+          name="Refund"
+          label="退款金额"
+          placeholder=""
+          tooltip="若无退款,默认输入0"
+          rules={[{ required: true, message: '若无退款,请输入0' }]}
+        />
+      )
+    }
+    if (renew.length >= 0) {
+      for (let i = 0; i < renew.length; i++) {
+        children.push(
+          <>
+            <ProForm.Item
+              label={yuanying_tran[renew[i]]}
+              name={renew[i]}
+              tooltip="若为空，则为记录订单号填写的sku"
+              rules={[{ pattern: /[^,||^，]$/, message: '限填一个' }]}
+            >
+              <Input
+                width="md"
+                placeholder="请填写具体补寄sku"
+              />
+            </ProForm.Item>
+            <ProFormDigit
+              width="md"
+              name={[renew[i]] + '数量'}
+              label={yuanying_tran[renew[i]] + '数量'}
+              placeholder=""
+              initialValue={1}
+              tooltip="默认为1"
+              rules={[{ required: true, message: '请输出数量' }]}
+            />
+          </>
+        )
+      }
+    }
+    if ((temp_refund == 1) && (refund == 0)) {
+      children.pop();
+      temp_refund = 0;
+    }
+    return children;
+  }
 
   return (
     <Modal
@@ -651,80 +778,136 @@ const Edit = (props) => {
           <ProForm
             initialValues={initialValues}
             onFinish={async (values) => {
-              // 规范数据
-              let sku_in = true;
-              values['SKU'] = values['SKU'].replace(new RegExp('，', ("gm")), ',');
-              values['SKU'] = values['SKU'].replace(new RegExp(' ', ("gm")), '');
-              values['SKU'] = values['SKU'].replace(new RegExp('  ', ("gm")), '');
-              const sku = values['SKU'].split(',');
-              // 判断sku是否含有
-              sku.forEach((element) => {
-                if (!data.sku_name.find((item) => item == element)) {
+              if ((yuanyingerror == true) || (fankuierror == true)) {
+                message.error('顾客反馈和客服操作不能只选大类');
+              } else {
+                console.log(values);
+                // 规范数据
+                let sku_in = true;
+                values['SKU'] = values['SKU'].replace(new RegExp('，', ("gm")), ',');
+                values['SKU'] = values['SKU'].replace(new RegExp(' ', ("gm")), '');
+                values['SKU'] = values['SKU'].replace(new RegExp('  ', ("gm")), '');
+                // 判断sku是否含有
+                if (!data.sku_name.find((item) => item == values['SKU'])) {
                   sku_in = false;
-                  message.error('传入的SKU:' + element + '不正确(注:捆绑sku要拆成产品sku)');
+                  message.error('传入的SKU:' + values['SKU'] + '不正确(注:AB箱只填有问题的那箱，不同SKU请分条填写。)');
                 }
-              });
-              if ('补寄新件' in values) {
-                // 如果不为空，则重新判断是否正确
-                values['补寄新件'] = values['补寄新件'].replace(new RegExp('，', ("gm")), ',');
-                values['补寄新件'] = values['补寄新件'].replace(new RegExp(' ', ("gm")), '');
-                values['补寄新件'] = values['补寄新件'].replace(new RegExp('  ', ("gm")), '');
-                const temp_newsku = values['补寄新件'].split(',');
-                temp_newsku.forEach((element) => {
-                  if (!data.sku_name.find((item) => item == element)) {
+                if ('3-1-0' in values) {
+                  // 如果不为空，则重新判断是否正确
+                  values['3-1-0'] = values['3-1-0'].replace(new RegExp('，', ("gm")), ',');
+                  values['3-1-0'] = values['3-1-0'].replace(new RegExp(' ', ("gm")), '');
+                  values['3-1-0'] = values['3-1-0'].replace(new RegExp('  ', ("gm")), '');
+                  if (!data.sku_name.find((item) => item == values['3-1-0'])) {
                     sku_in = false;
-                    message.error('传入的补寄新件SKU:' + element + '不正确(注:捆绑sku要拆成产品sku)');
+                    message.error('传入的补寄新件SKU:' + values['3-1-0'] + '不正确(注:AB箱只填有问题的那箱，不同SKU请分条填写。)');
                   }
-                });
-              }
-              // 顾客反馈做处理
-              for (const key in values['顾客反馈']) {
-                if (Object.prototype.hasOwnProperty.call(values['顾客反馈'], key)) {
-                  const element = values['顾客反馈'][key];
-                  if ((element[0] == '5-0') ||
-                    (element[0] == '6-0') || (element[0] == '7-0')) {
-                    if (element[1] in values) {
-                      values['顾客反馈'][key][1] += '$' + values[element[1]].replace(',', '#');
-                    }
-                  }
-                  if (values['顾客反馈'][key].length > 1) {
-                    values['顾客反馈'][key].splice(0, 1);
+                } else {
+                  if ('3-1-0数量' in values) {
+                    values['3-1-0'] = values['SKU'];
                   }
                 }
-              }
-              values['顾客反馈'] = values['顾客反馈'].join('&');
-              // 客服操作做处理
-              for (const key in values['客服操作']) {
-                if (Object.prototype.hasOwnProperty.call(values['客服操作'], key)) {
-                  const element = values['客服操作'][key];
-                  // 判断配件
-                  if ((element[1] == '3-4') ||
-                    (element[1] == '3-5')) {
-                    if (element[1] in values) {
-                      values['客服操作'][key][1] += '$' + values[element[1]].replace(',', '#');
-                    }
+                if ('3-2-0' in values) {
+                  // 如果不为空，则重新判断是否正确
+                  values['3-2-0'] = values['3-2-0'].replace(new RegExp('，', ("gm")), ',');
+                  values['3-2-0'] = values['3-2-0'].replace(new RegExp(' ', ("gm")), '');
+                  values['3-2-0'] = values['3-2-0'].replace(new RegExp('  ', ("gm")), '');
+                  if (!data.sku_name.find((item) => item == values['3-2-0'])) {
+                    sku_in = false;
+                    message.error('传入的补寄新件SKU:' + values['3-2-0'] + '不正确(注:AB箱只填有问题的那箱，不同SKU请分条填写。)');
                   }
-                  // 判断补寄新件
-                  if ((element[1] == '3-1')) {
-                    if ('补寄新件' in values) {
-                      values['客服操作'][key][1] += '$' + values['补寄新件'].replace(',', '#');
-                    }
-                  }
-                  if (values['客服操作'][key].length > 1) {
-                    values['客服操作'][key].splice(0, 1);
+                } else {
+                  if ('3-2-0数量' in values) {
+                    values['3-2-0'] = values['SKU'];
                   }
                 }
-              }
-              values['客服操作'] = values['客服操作'].join('&');
-              isShowModal(false);
-              message.success('提交成功');
-              isShowModal(false);
-              if (sku_in == true) {
-                return request(`/api/after/change`, {
-                  method: 'POST',
-                  data: { ...values },
-                  requestType: 'form',
-                });
+                if ('3-3-0' in values) {
+                  // 如果不为空，则重新判断是否正确
+                  values['3-3-0'] = values['3-3-0'].replace(new RegExp('，', ("gm")), ',');
+                  values['3-3-0'] = values['3-3-0'].replace(new RegExp(' ', ("gm")), '');
+                  values['3-3-0'] = values['3-3-0'].replace(new RegExp('  ', ("gm")), '');
+                  if (!data.sku_name.find((item) => item == values['3-3-0'])) {
+                    sku_in = false;
+                    message.error('传入的补寄新件SKU:' + values['3-3-0'] + '不正确(注:AB箱只填有问题的那箱，不同SKU请分条填写。)');
+                  }
+                } else {
+                  if ('3-3-0数量' in values) {
+                    values['3-3-0'] = values['SKU'];
+                  }
+                }
+                values['guke'] = new Array();
+                values['kefu'] = new Array();
+                // 顾客反馈做处理
+                for (const key in values['顾客反馈']) {
+                  if (Object.prototype.hasOwnProperty.call(values['顾客反馈'], key)) {
+                    const element = values['顾客反馈'][key];
+                    values['guke'][key] = values['顾客反馈'][key][1];
+                    if ((element[0] == '5-0') ||
+                      (element[0] == '6-0') || (element[0] == '7-0')) {
+                      if (element[1] in values) {
+                        if (values[element[1]] != '') {
+                          values['guke'][key] += '$' + values[element[1]].replace(new RegExp(',', ("gm")), '#');
+                        } else {
+                          if (values['订单状态'] == '已解决') {
+                            sku_in = false;
+                            message.error('请填写配件');
+                          }
+                        }
+                      } else {
+                        if (values['订单状态'] == '已解决') {
+                          sku_in = false;
+                          message.error('请填写配件');
+                        }
+                      }
+                    }
+                  }
+                }
+                values['guke'] = values['guke'].join('&');
+                // 客服操作做处理
+                for (const key in values['客服操作']) {
+                  if (Object.prototype.hasOwnProperty.call(values['客服操作'], key)) {
+                    const element = values['客服操作'][key];
+                    values['kefu'][key] = values['客服操作'][key][1];
+                    // 判断配件
+                    if ((element[1] == '3-4-0') ||
+                      (element[1] == '3-5-0')) {
+                      if (element[1] in values) {
+                        if (values[element[1] != '']) {
+                          values['kefu'][key] += '$' + values[element[1]].replace(new RegExp(',', ("gm")), '#');
+                        } else {
+                          if (values['订单状态'] == '已解决') {
+                            sku_in = false;
+                            message.error('请填写配件');
+                          }
+                        }
+
+                      } else {
+                        if (values['订单状态'] == '已解决') {
+                          sku_in = false;
+                          message.error('请填写配件');
+                        }
+                      }
+                    }
+                    // 判断补寄新件
+                    if ((element[1] == '3-1-0') || (element[1] == '3-2-0') || (element[1] == '3-3-0')) {
+                      if (element[1] in values) {
+                        const temp_element = values[element[1]];
+                        const temp_element_num = values[element[1] + '数量'];
+                        values['kefu'][key] += '$' + temp_element + 'num' + temp_element_num;
+                      }
+                    }
+                  }
+                }
+                values['kefu'] = values['kefu'].join('&');
+                if (sku_in == true) {
+                  isShowModal(false);
+                  isShowModal(false);
+                  message.success('提交成功');
+                  return request(`/api/after/change`, {
+                    method: 'POST',
+                    data: { ...values },
+                    requestType: 'form',
+                  });
+                }
               }
 
               //if (response.status === undefined) message.success('添加成功')
@@ -752,6 +935,10 @@ const Edit = (props) => {
                 name="店铺"
                 label="店铺"
                 placeholder="请输入店铺"
+                fieldProps={{
+                  size: "small",
+                  listHeight: 250,
+                }}
                 valueEnum={{
                   '赫曼': '赫曼',
                   '信盒': '信盒',
@@ -781,7 +968,18 @@ const Edit = (props) => {
                 rules={[{ required: true, message: '请输入店铺!' }]}
               />
               <ProFormText width="md" name="订单号" label="订单号" rules={[{ required: true, message: '请输入订单号!' }]} />
-              <ProFormText width="md" name="SKU" label="SKU" tooltip="请勿输入渠道SKU/订单号/包裹号" placeholder="两箱包形如'USAN1018800-5,USAN1018800-6'" rules={[{ required: true, message: '两箱包的请输入两个公司SKU' }]} />
+              <ProFormText width="md" name="SKU" label="SKU" tooltip="AB箱只填有问题的，限填一个。" placeholder="AB箱只填有问题的，限填一个。"
+                rules={[{ required: true, message: 'AB箱只填有问题的，限填一个。' }, { pattern: /[^,||^，]$/, message: '限填一件' }]}
+              />
+              <ProFormDigit
+                width="md"
+                name="sku数量"
+                label="数量"
+                placeholder=""
+                initialValue={1}
+                tooltip="默认数量为1"
+                rules={[{ required: true, message: '请输入' }]}
+              />
               <ProFormSelect
                 width="md"
                 name="订单状态"
@@ -800,9 +998,9 @@ const Edit = (props) => {
               >
                 <Cascader
                   multiple
-                  maxTagCount="responsive"
+                  maxTagCount={4}
                   onChange={fankuionChange}
-                  style={{ width: '150px' }}
+                  style={{ width: '300px' }}
                   options={fankuicol}
                 />
               </ProForm.Item>
@@ -814,9 +1012,9 @@ const Edit = (props) => {
               >
                 <Cascader
                   multiple
-                  maxTagCount="responsive"
+                  maxTagCount={4}
                   onChange={yuanyingChange}
-                  style={{ width: '150px' }}
+                  style={{ width: '300px' }}
                   options={yuanyingcol}
                 />
 

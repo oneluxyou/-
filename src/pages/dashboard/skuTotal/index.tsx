@@ -139,17 +139,55 @@ const SkuTotal = () => {
                     children.push(
                         <Col span={24} style={{ marginBottom: 10, marginTop: -10 }} key={"tip"}><strong>人员组别</strong></Col>
                     )
+                    children.push(
+                        <Col span={6} key={attribute_sort[i]}>
+                            <Form.Item
+                                label={attribute_sort[i]}
+                                name={attribute_sort[i]}
+                            >
+                                <Input style={{ width: 100 }} name={attribute_sort[i]} />
+                            </Form.Item>
+                        </Col >,
+                    )
                 }
-                children.push(
-                    <Col span={6} key={attribute_sort[i]}>
-                        <Form.Item
-                            label={attribute_sort[i]}
-                            name={attribute_sort[i]}
-                        >
-                            <Input style={{ width: 100 }} name={attribute_sort[i]} />
-                        </Form.Item>
-                    </Col >,
-                )
+                else if (i == 1) {
+                    children.push(
+                        <Col span={6} key={attribute_sort[i]}>
+                            <Form.Item
+                                label={attribute_sort[i]}
+                                name={attribute_sort[i]}
+                            >
+                                <Input style={{ width: 100 }} name={attribute_sort[i]} />
+                            </Form.Item>
+                        </Col >,
+                    )
+                } else if (i == 2) {
+                    children.push(
+                        <Col span={6} key={attribute_sort[i]}>
+                            <Form.Item
+                                name={attribute_sort[i]}
+                                label={attribute_sort[i]}
+                            >
+                                <Select
+                                    style={{ width: 120 }}
+                                    options={[
+                                        { label: 'A组', value: '利芬组_A组' },
+                                        { label: 'B组', value: '利芬组_B组' },
+                                        { label: 'C组', value: '利芬组_C组' },
+                                        { label: 'D组', value: '利芬组_D组' },
+                                        { label: 'F组', value: '利芬组_F组' },
+                                        { label: 'H组', value: '利芬组_H组' },
+                                        { label: 'G组', value: '利芬组_G组' },
+                                        { label: 'J组', value: '利芬组_J组' },
+                                        { label: 'I组', value: '利芬组_I组' },
+                                    ]}
+                                    placeholder="请输入组别"
+                                />
+
+                            </Form.Item>
+                        </Col >,
+                    )
+                }
             }
             for (i = 0; i < attribute_value.length; i++) {
                 if (i == 0) {

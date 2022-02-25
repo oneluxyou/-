@@ -12,5 +12,11 @@ export default function access(initialState: { currentUser?: API.CurrentUser | u
     // 匹配表页面权限
     MatchManager: () =>
       currentUser && (currentUser.authority === 'admin' || currentUser.authority === 'manager'),
+    // 全部页面权限
+    AllManager: () =>
+      currentUser &&
+      (currentUser.authority === 'admin' ||
+        currentUser.authority === 'manager' ||
+        currentUser.authority === 'saler'),
   };
 }

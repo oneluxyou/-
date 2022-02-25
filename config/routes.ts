@@ -22,6 +22,7 @@
     path: '/after',
     icon: 'smile',
     name: 'after',
+    access: 'AllManager',
     routes: [
       {
         path: '/after/add',
@@ -51,6 +52,7 @@
   //   path: '/dashboard',
   //   name: '销售预报',
   //   icon: 'crown',
+  //   access: 'MatchManager',
   //   routes: [
   //     // {
   //     //   path: '/dashboard/saleTotal',
