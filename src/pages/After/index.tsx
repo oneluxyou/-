@@ -1219,42 +1219,23 @@ const TableList: React.FC = () => {
               }).then(res => {
                 //自行根据条件清除
                 console.log(res);
-                if (res == '请重新登录') {
-                  message.error('提交异常,请重新登录账号');
-                } else {
-                  setorder_name(res);
-                  message.success('提交成功');
-                  // 储存历史记录
-                  for (const key in item_dict) {
-                    temp_dict[key] = new Array();
-                    if (item_dict[key] in storage) {
-                      temp_data = eval(storage[item_dict[key]]).split('|');
-                      for (const key2 in temp_data) {
-                        if (Object.prototype.hasOwnProperty.call(temp_data, key2)) {
-                          const element = temp_data[key2];
-                          temp_dict[key].push(renderItem(element, parseInt(key2), item_dict[key]));
-                        }
+                setorder_name(res);
+                message.success('提交成功');
+                // 储存历史记录
+                for (const key in item_dict) {
+                  temp_dict[key] = new Array();
+                  if (item_dict[key] in storage) {
+                    temp_data = eval(storage[item_dict[key]]).split('|');
+                    for (const key2 in temp_data) {
+                      if (Object.prototype.hasOwnProperty.call(temp_data, key2)) {
+                        const element = temp_data[key2];
+                        temp_dict[key].push(renderItem(element, parseInt(key2), item_dict[key]));
                       }
-                      if (temp_data.indexOf(values[form_dict[key]]) == -1) {
-                        temp_data.push(values[form_dict[key]]);
-                        temp_dict[key].push(renderItem(values[form_dict[key]], temp_data.length - 1, item_dict[key]));
-                        console.log('提交后', temp_data)
-                        let temp_storage = temp_data.join('|');
-                        temp_storage = JSON.stringify(temp_storage);
-                        storage[item_dict[key]] = temp_storage;
-                        //自行根据条件清除
-                        if (parseInt(key) == 0) {
-                          setdengji(temp_dict[0]);
-                        } else if (parseInt(key) == 1) {
-                          setosku(temp_dict[1]);
-                        } else if (parseInt(key) == 3) {
-                          setbeizhu(temp_dict[2]);
-                        }
-                      }
-                    } else {
-                      temp_data = []
+                    }
+                    if (temp_data.indexOf(values[form_dict[key]]) == -1) {
                       temp_data.push(values[form_dict[key]]);
                       temp_dict[key].push(renderItem(values[form_dict[key]], temp_data.length - 1, item_dict[key]));
+                      console.log('提交后', temp_data)
                       let temp_storage = temp_data.join('|');
                       temp_storage = JSON.stringify(temp_storage);
                       storage[item_dict[key]] = temp_storage;
@@ -1267,13 +1248,28 @@ const TableList: React.FC = () => {
                         setbeizhu(temp_dict[2]);
                       }
                     }
+                  } else {
+                    temp_data = []
+                    temp_data.push(values[form_dict[key]]);
+                    temp_dict[key].push(renderItem(values[form_dict[key]], temp_data.length - 1, item_dict[key]));
+                    let temp_storage = temp_data.join('|');
+                    temp_storage = JSON.stringify(temp_storage);
+                    storage[item_dict[key]] = temp_storage;
+                    //自行根据条件清除
+                    if (parseInt(key) == 0) {
+                      setdengji(temp_dict[0]);
+                    } else if (parseInt(key) == 1) {
+                      setosku(temp_dict[1]);
+                    } else if (parseInt(key) == 3) {
+                      setbeizhu(temp_dict[2]);
+                    }
                   }
-                  formRef.current?.resetFields();
-                  setdetailitem([]);
-                  setdetailreason([]);
-                  setrefund(0);
-                  setresku([]);
                 }
+                formRef.current?.resetFields();
+                setdetailitem([]);
+                setdetailreason([]);
+                setrefund(0);
+                setresku([]);
               });
             }
           }
