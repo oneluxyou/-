@@ -871,7 +871,8 @@ const Edit = (props) => {
                     if ((element[1] == '3-4-0') ||
                       (element[1] == '3-5-0')) {
                       if (element[1] in values) {
-                        if (values[element[1] != '']) {
+                        console.log(values[element[1]]);
+                        if (values[element[1]] != '') {
                           values['kefu'][key] += '$' + values[element[1]].replace(new RegExp(',', ("gm")), '#');
                         } else {
                           if (values['订单状态'] == '已解决') {
