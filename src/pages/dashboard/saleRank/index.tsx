@@ -55,6 +55,7 @@ const SaleRank: FC<any> = () => {
         '成本': '成本(￥)',
         '广告': '广告(￥)', '损耗': '损耗(￥)', '净毛利润': '净毛利润(￥)',
     }
+
     return (
         <>
             <span>时间:　</span>
@@ -68,7 +69,7 @@ const SaleRank: FC<any> = () => {
             </Tooltip>
             <div style={{ textAlign: "center", color: "#EE7700", fontSize: 16 }}>
                 <p><SoundOutlined />　最新更改:</p>
-                <p>时间更新至{data?.enddate}</p>
+                <p>默认时间为01-01 到 02-26</p>
             </div>
             <Tabs>
                 {(Tdata ? JSON.parse(Tdata).sale : data?.sale)?.map((item: any) => (

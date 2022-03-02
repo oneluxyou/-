@@ -74,7 +74,7 @@ const App: React.FC = () => {
       if (type === '捷克') {
         return '#a9a9a9';
       }
-      if (type === '未知') {
+      if (type === '沃尔玛') {
         return '#2f4f4f';
       }
       if (type === 'WF') {
@@ -164,7 +164,7 @@ const App: React.FC = () => {
       if (type === '捷克') {
         return '#a9a9a9';
       }
-      if (type === '未知') {
+      if (type === '沃尔玛') {
         return '#2f4f4f';
       }
       if (type === 'WF') {
@@ -254,7 +254,7 @@ const App: React.FC = () => {
       if (type === '捷克') {
         return '#a9a9a9';
       }
-      if (type === '未知') {
+      if (type === '沃尔玛') {
         return '#2f4f4f';
       }
       if (type === 'WF') {

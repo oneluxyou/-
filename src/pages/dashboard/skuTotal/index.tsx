@@ -94,6 +94,9 @@ const SkuTotal = () => {
                             { label: 'amazonCPower', value: 'amazoncpower' },
                             { label: 'amazon玲琅', value: 'amazon玲琅' },
                             { label: 'amazon治润', value: 'amazon治润' },
+                            { label: 'amazon旗辰', value: 'amazon旗辰' },
+                            { label: 'amazon启珊', value: 'amazon启珊' },
+                            { label: 'amazon赛迦曼', value: 'amazon赛迦曼' },
                             { label: 'Walmart_优瑞斯特', value: 'walmart优瑞斯特' },
                             { label: 'Walmart_赫曼', value: 'walmart赫曼' },
                             { label: 'Walmart_信盒', value: 'walmart信盒' },
@@ -708,7 +711,7 @@ const SkuTotal = () => {
                 </Form>
             </div>
             <div style={{ backgroundColor: "white", paddingLeft: 10, paddingRight: 10 }}>
-                <p style={{ display: "none" }} className="detail">销量总计:　{num_sum}　　　交易额总计:　{money_sum}　　　广告费用总计:　{promotion_sum}　　　售后费用总计:　{after_sale_sum}　　　毛利润:　{profit_sum}　　　净毛利润:　{gross_profit_sum}</p>
+                <p style={{ display: "none" }} className="detail">销量总计:　{num_sum}　　　交易额总计:　{money_sum}　　　广告费用总计:　{promotion_sum}　　　售后费用总计:　{after_sale_sum}　　　净毛利润:　{gross_profit_sum}</p>
                 <Row style={{ marginBottom: 5 }}>
                     <Col span={12}>
                         <span>列选择器：</span>
