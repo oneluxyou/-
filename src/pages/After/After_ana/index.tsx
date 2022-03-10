@@ -16,7 +16,7 @@ const App: React.FC = () => {
     const arr: ProColumns[] =
         [{ title: '工厂', dataIndex: "工厂", key: "工厂", width: 50 },
         { title: 'SKU', dataIndex: "SKU", key: "SKU", width: 130 },
-        { title: 'SKU名称', dataIndex: 'SKU名称', key: "SKU名称", search: false, width: 500 },
+        { title: 'SKU名称', dataIndex: 'SKU名称', key: "SKU名称", search: false, width: 350 },
         {
             title: '销量完成度(全平台)(%)', dataIndex: '完成率', key: "完成率", search: false,
             sorter: (a: { 完成率: number; }, b: { 完成率: number; }) => a.完成率 - b.完成率,
@@ -36,9 +36,8 @@ const App: React.FC = () => {
             key: 'dateTimeRange',
             dataIndex: 'createdAtRange',
             valueType: 'dateRange',
-            width: 300,
             search: {
-                transform: (value: any) => ({ startTime: value[0], endTime: value[1] }),
+                transform: (value: any) => ({ startTime: value[0], endTime: value[1] })
             },
             hideInTable: true,
         },
@@ -137,7 +136,7 @@ const App: React.FC = () => {
         ],
     };
     const config2 = {
-        theme: { "styleSheet": { "brandColor": "#FF6B3B", "paletteQualitative10": ["#FF6B3B", "#E19348", "#FFC100", "#7b68ee", "#9FB40F", "#DAD5B5", "#626681", "#0E8E89", "#F383A2", "#247FEA"], "paletteQualitative20": ["#FF6B3B", "#E19348", "#FFC100", "#7b68ee", "#9FB40F", "#DAD5B5", "#626681", "#0E8E89", "#F383A2", "#247FEA", "#2BCB95", "#B1ABF4", "#1D42C2", "#1D9ED1", "#D64BC0", "#255634", "#8C8C47", "#8CDAE5", "#8E283B", "#791DC9"] } },
+        theme: { "styleSheet": { "brandColor": "#FF6B3B", "paletteQualitative10": ["#FF6B3B", "#E19348", "#FFC100", "#76523B", "#9FB40F", "#DAD5B5", "#626681", "#0E8E89", "#F383A2", "#247FEA"], "paletteQualitative20": ["#FF6B3B", "#E19348", "#FFC100", "#76523B", "#9FB40F", "#DAD5B5", "#626681", "#0E8E89", "#F383A2", "#247FEA", "#2BCB95", "#B1ABF4", "#1D42C2", "#1D9ED1", "#D64BC0", "#255634", "#8C8C47", "#8CDAE5", "#8E283B", "#791DC9"] } },
         height: 250,
         appendPadding: 10,
         data: cost,
@@ -254,7 +253,6 @@ const App: React.FC = () => {
                 }}
                 search={{
                     labelWidth: "auto",
-                    span: 5,
                     defaultCollapsed: false,
                 }}
                 toolbar={{
