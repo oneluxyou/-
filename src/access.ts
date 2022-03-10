@@ -6,17 +6,30 @@ export default function access(initialState: { currentUser?: API.CurrentUser | u
   // console.log(currentUser && currentUser.authority === 'leader');
   // console.log(currentUser?.authority);
   return {
-    // 销售汇总页面权限
-    Skusaler: () =>
-      currentUser && (currentUser.authority === 'admin' || currentUser.authority === 'leader'),
     // 匹配表页面权限
-    MatchManager: () =>
-      currentUser && (currentUser.authority === 'admin' || currentUser.authority === 'manager'),
-    // 全部页面权限
-    AllManager: () =>
+    MatchPage: () =>
       currentUser &&
       (currentUser.authority === 'admin' ||
         currentUser.authority === 'manager' ||
-        currentUser.authority === 'saler'),
+        currentUser.authority === 'saler' ||
+        currentUser.authority === 'after_sale'),
+    // 匹配表页面修改
+    MatchManager: () =>
+      currentUser &&
+      (currentUser.authority === 'admin' ||
+        currentUser.authority === 'manager' ||
+        currentUser.authority === 'after_sale'),
+    // 销售预报页面权限
+    SalerManager: () =>
+      currentUser && (currentUser.authority === 'admin' || currentUser.authority === 'manager'),
+    // 售后页面权限
+    AfterPage: () =>
+      currentUser &&
+      (currentUser.authority === 'admin' ||
+        currentUser.authority === 'manager' ||
+        currentUser.authority === 'saler' ||
+        currentUser.authority === 'develop' ||
+        currentUser.authority === 'developmanager' ||
+        currentUser.authority === 'after_sale'),
   };
 }

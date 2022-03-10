@@ -42,6 +42,7 @@
     path: '/match',
     name: '匹配表',
     icon: 'crown',
+    access: 'MatchPage',
     routes: [
       {
         path: '/match/index',
@@ -58,15 +59,8 @@
     path: '/dashboard',
     name: '销售预报',
     icon: 'crown',
-    // access: 'MatchManager',
+    access: 'SalerManager',
     routes: [
-      // {
-      //   path: '/dashboard/saleTotal',
-      //   name: '销售汇总',
-      //   icon: 'smile',
-      //   component: './dashboard/saleTotal/index',
-      //   access: 'Skusaler',
-      // },
       {
         path: '/dashboard/skuTotal',
         name: '各sku序号销售情况',
