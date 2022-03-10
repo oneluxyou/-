@@ -53,7 +53,7 @@ const SaleRank: FC<any> = () => {
         '销量': '销量',
         '交易额': '交易额(￥)',
         '成本': '成本(￥)',
-        '广告': '广告(￥)', '损耗': '损耗(￥)', '净毛利润': '净毛利润(￥)',
+        '广告': '广告(￥)', '损耗': '损耗(￥)', '净毛利润': '毛利润(￥)',
     }
 
     return (
@@ -64,12 +64,12 @@ const SaleRank: FC<any> = () => {
                 onChange={onChange}
             />
             <span>　</span>
-            <Tooltip title={"最新结束日期:　" + data?.enddate || ''}>
+            {/* <Tooltip title={"最新结束日期:　" + data?.enddate || ''}>
                 <QuestionCircleOutlined />
-            </Tooltip>
+            </Tooltip> */}
             <div style={{ textAlign: "center", color: "#EE7700", fontSize: 16 }}>
-                <p><SoundOutlined />　最新更改:</p>
-                <p>默认时间为01-01 到 02-26</p>
+                <p><SoundOutlined />　默认时间为{data?.startdate} 到 {data?.enddate}</p>
+                <p>汇率调整，按照每个月的平均汇率来算(之前默认为6.3708)</p>
             </div>
             <Tabs>
                 {(Tdata ? JSON.parse(Tdata).sale : data?.sale)?.map((item: any) => (
@@ -79,7 +79,7 @@ const SaleRank: FC<any> = () => {
                                 <Col span={7} style={{ minWidth: "300px", marginLeft: 10 }}>
                                     <Card style={{ borderRadius: "15px" }}>
                                         <div style={{ textAlign: "center" }}>
-                                            <div style={{ fontFamily: "微软雅黑", fontSize: 24 }}>{attr}</div>
+                                            <div style={{ fontFamily: "微软雅黑", fontSize: 24 }}>{attr == '净毛利润' ? '毛利润' : attr}</div>
                                             <div style={{ fontFamily: "华文细黑", fontSize: 30 }}>{item?.[attr + 'total'] + (attr == '销量' ? '' : (attr == '推广占比') || (attr == '损耗占比') || (attr == '广告占比') || (attr == '成本占比') ? '%' : '￥')}</div>
                                         </div>
                                         <hr />

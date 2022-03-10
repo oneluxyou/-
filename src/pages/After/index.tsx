@@ -5,6 +5,7 @@ import ProTable from '@ant-design/pro-table';
 import { PageContainer } from "@ant-design/pro-layout";
 import request from "umi-request";
 import { Button, Tag, Space, Menu, Dropdown, message, Tooltip, Modal, Table, AutoComplete, Col, Row, Input, Cascader } from 'antd';
+import { SoundOutlined } from '@ant-design/icons';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProForm, {
   ProFormDigit,
@@ -51,14 +52,12 @@ const TableList: React.FC = () => {
       dataIndex: '订单状态',
       filters: true,
       onFilter: true,
-      valueType: 'select',
       valueEnum: {
-        all: { text: '全部', status: 'Default' },
-        已解决: {
+        "已解决": {
           text: '已解决',
           status: 'Default',
         },
-        解决中: {
+        "解决中": {
           text: '解决中',
           status: 'error',
         },
@@ -559,7 +558,7 @@ const TableList: React.FC = () => {
           value: '4-11-F',
         },
         {
-          label: '尺寸买错',
+          label: '尺寸/颜色买错',
           value: '4-12-M',
         },
         {
@@ -1078,6 +1077,10 @@ const TableList: React.FC = () => {
   };
   return (
     <>
+      {/* <div style={{ textAlign: "center", color: "#EE7700", fontSize: 16 }}>
+        <p><SoundOutlined />　最新更改:</p>
+        <p>默认时间为01-01 到 02-26</p>
+      </div> */}
       <ProForm
         autoComplete="on"
         size='small'
@@ -1126,7 +1129,7 @@ const TableList: React.FC = () => {
               values['3-2-0'] = values['3-2-0'].replace(new RegExp('  ', ("gm")), '');
               if (!data.sku_name.find((item) => item == values['3-2-0'])) {
                 sku_in = false;
-                message.error('传入的补寄新件SKU:' + values['3-2-0'] + '不正确(注:AB箱填有问题的那箱，不同SKU请分条填写。)');
+                message.error('传入的补寄退件SKU:' + values['3-2-0'] + '不正确(注:AB箱填有问题的那箱，不同SKU请分条填写。)');
               }
             } else {
               if ('3-2-0数量' in values) {
@@ -1140,7 +1143,7 @@ const TableList: React.FC = () => {
               values['3-3-0'] = values['3-3-0'].replace(new RegExp('  ', ("gm")), '');
               if (!data.sku_name.find((item) => item == values['3-3-0'])) {
                 sku_in = false;
-                message.error('传入的补寄新件SKU:' + values['3-3-0'] + '不正确(注:AB箱填有问题的那箱，不同SKU请分条填写。)');
+                message.error('传入的补寄破损件SKU:' + values['3-3-0'] + '不正确(注:AB箱填有问题的那箱，不同SKU请分条填写。)');
               }
             } else {
               if ('3-3-0数量' in values) {
@@ -1455,7 +1458,7 @@ const TableList: React.FC = () => {
         columns={column}
         actionRef={actionRef}
         onChange={onTableChange}
-        scroll={{ x: 900, y: 300 }}
+        scroll={{ x: 900, y: 500 }}
         request={async (params = {}) => {
           const result = request('/api/aftersale', {
             method: 'POST',

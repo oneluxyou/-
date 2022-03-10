@@ -58,7 +58,7 @@
     path: '/dashboard',
     name: '销售预报',
     icon: 'crown',
-    access: 'MatchManager',
+    // access: 'MatchManager',
     routes: [
       // {
       //   path: '/dashboard/saleTotal',

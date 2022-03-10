@@ -30,7 +30,6 @@ const SkuTotal = () => {
     const [money_sum, setmoney_sum] = useState([]) as any;
     const [promotion_sum, setpromotion_sum] = useState([]) as any;
     const [after_sale_sum, setafter_sale_sum] = useState([]) as any;
-    const [profit_sum, setprofit_sum] = useState([]) as any;
     const [gross_profit_sum, setgross_profit_sum] = useState([]) as any;
     // 表格列选择
     const [selectedRowKeys, setselectedRowKeys] = useState() as any;
@@ -201,7 +200,7 @@ const SkuTotal = () => {
                 children.push(
                     <Col span={6} key={attribute_value[i]}>
                         <Form.Item
-                            label={attribute_value[i]}
+                            label={attribute_value[i] == '净毛利润' ? '毛利润' : attribute_value[i]}
                         >
                             <Input.Group compact>
                                 <Form.Item
@@ -239,7 +238,7 @@ const SkuTotal = () => {
                 children.push(
                     <Col span={6} key={i + attribute_value.length}>
                         <Form.Item
-                            label={attribute_per[i]}
+                            label={attribute_per[i] == '净毛利润率' ? '毛利润率' : attribute_value[i]}
                         >
                             <Input.Group compact>
                                 <Form.Item
@@ -343,7 +342,7 @@ const SkuTotal = () => {
     {
         title: '平均售价',
         dataIndex: '平均售价',
-        sorter: (a: { 平均售价: number; }, b: { 平均售价: number; }) => a.平均售价 - b.平均售价,
+        // sorter: (a: { 平均售价: number; }, b: { 平均售价: number; }) => a.平均售价 - b.平均售价,
         render: (text: number) => <span>{text.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</span>,
         width: 120,
     },
@@ -363,6 +362,7 @@ const SkuTotal = () => {
     {
         title: '损耗',
         dataIndex: '损耗',
+        sorter: (a: { 损耗: number; }, b: { 损耗: number; }) => a.损耗 - b.损耗,
         render: (text: number) => <span>{text.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</span>,
         width: 100,
     },
@@ -378,13 +378,14 @@ const SkuTotal = () => {
             </span>
         ),
         dataIndex: '广告',
+        sorter: (a: { 广告: number; }, b: { 广告: number; }) => a.广告 - b.广告,
         render: (text: number) => <span>{text.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</span>,
         width: 100,
     },
     {
         title: () => (
             <span>
-                净毛利润
+                毛利润
                 {/* <Tooltip
                     title={'=0.85*销售额 - 销售总成本 - 推广费-售后'}
                 >
@@ -393,6 +394,7 @@ const SkuTotal = () => {
             </span>
         ),
         dataIndex: '净毛利润',
+        sorter: (a: { 净毛利润: number; }, b: { 净毛利润: number; }) => a.净毛利润 - b.净毛利润,
         render: (text: number) => <span>{text.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</span>,
         width: 110,
     },
@@ -408,7 +410,7 @@ const SkuTotal = () => {
             </span>
         ),
         dataIndex: '成本占比',
-        render: (text: number) => <span>{text.toFixed(4).toString()}%</span>,
+        render: (text: number) => <span>{text.toFixed(2).toString()}%</span>,
         width: 125,
     },
     {
@@ -423,7 +425,7 @@ const SkuTotal = () => {
             </span>
         ),
         dataIndex: '损耗占比',
-        render: (text: number) => <span>{text.toFixed(4).toString()}%</span>,
+        render: (text: number) => <span>{text.toFixed(2).toString()}%</span>,
         width: 125,
     },
     // {
@@ -453,13 +455,13 @@ const SkuTotal = () => {
             </span>
         ),
         dataIndex: '广告占比',
-        render: (text: number) => <span>{text.toFixed(4).toString()}%</span>,
+        render: (text: number) => <span>{text.toFixed(2).toString()}%</span>,
         width: 135,
     },
     {
         title: () => (
             <span>
-                净毛利润率(%)
+                毛利润率(%)
                 <Tooltip
                     title={'=净毛利润 / 销售额'}
                 >
@@ -468,7 +470,7 @@ const SkuTotal = () => {
             </span>
         ),
         dataIndex: '净毛利润率',
-        render: (text: number) => <span>{text.toFixed(4).toString()}%</span>,
+        render: (text: number) => <span>{text.toFixed(2).toString()}%</span>,
         width: 145,
     },
     {
@@ -483,7 +485,7 @@ const SkuTotal = () => {
             </span>
         ),
         dataIndex: '销量贡献率',
-        render: (text: number) => <span>{text.toFixed(4).toString()}%</span>,
+        render: (text: number) => <span>{text.toFixed(2).toString()}%</span>,
         width: 145,
     },
     {
@@ -498,7 +500,7 @@ const SkuTotal = () => {
             </span>
         ),
         dataIndex: '交易额贡献率',
-        render: (text: number) => <span>{text.toFixed(4).toString()}%</span>,
+        render: (text: number) => <span>{text.toFixed(2).toString()}%</span>,
         width: 170,
     },
     {
@@ -513,7 +515,7 @@ const SkuTotal = () => {
             </span>
         ),
         dataIndex: '广告贡献率',
-        render: (text: number) => <span>{text.toFixed(4).toString()}%</span>,
+        render: (text: number) => <span>{text.toFixed(2).toString()}%</span>,
         width: 170,
     },
     {
@@ -528,13 +530,13 @@ const SkuTotal = () => {
             </span>
         ),
         dataIndex: '售后贡献率',
-        render: (text: number) => <span>{text.toFixed(4).toString()}%</span>,
+        render: (text: number) => <span>{text.toFixed(2).toString()}%</span>,
         width: 145,
     },
     {
         title: () => (
             <span>
-                净毛利贡献值(%)
+                毛利贡献值(%)
                 <Tooltip
                     title={'=净毛利 / 所有sku净毛利'}
                 >
@@ -543,7 +545,7 @@ const SkuTotal = () => {
             </span>
         ),
         dataIndex: '净毛利贡献率',
-        render: (text: number) => <span>{text.toFixed(4).toString()}%</span>,
+        render: (text: number) => <span>{text.toFixed(2).toString()}%</span>,
         width: 170,
     },
     {
@@ -604,7 +606,6 @@ const SkuTotal = () => {
                 setmoney_sum(resp_data.money_sum);
                 setpromotion_sum(resp_data.promotion_sum);
                 setafter_sale_sum(resp_data.after_sale_sum);
-                setprofit_sum(resp_data.profit_sum)
                 setgross_profit_sum(resp_data.gross_profit_sum);
             }
             else {
