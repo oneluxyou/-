@@ -974,11 +974,11 @@ const Edit = (props) => {
               />
               <ProFormDigit
                 width="md"
-                name="sku数量"
-                label="数量"
+                name="序号"
+                label="序号"
                 placeholder=""
                 initialValue={1}
-                tooltip="默认数量为1"
+                tooltip="默认序号为1，第二件为2，第三件为3"
                 rules={[{ required: true, message: '请输入' }]}
               />
               <ProFormSelect

@@ -22,6 +22,16 @@ export default function access(initialState: { currentUser?: API.CurrentUser | u
     // 销售预报页面权限
     SalerManager: () =>
       currentUser && (currentUser.authority === 'admin' || currentUser.authority === 'manager'),
+    // 销售权限
+    SalerAuth: () =>
+      currentUser && (currentUser.authority === 'saler' || currentUser.authority === 'manager'),
+    // 非销售权限权限
+    NotSalerAuth: () =>
+      currentUser &&
+      (currentUser.authority === 'admin' ||
+        currentUser.authority === 'develop' ||
+        currentUser.authority === 'developmanager' ||
+        currentUser.authority === 'after_sale'),
     // 售后页面权限
     AfterPage: () =>
       currentUser &&

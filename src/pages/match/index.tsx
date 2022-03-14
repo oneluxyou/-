@@ -47,6 +47,7 @@ const TableList: React.FC = () => {
       title: 'ASIN',
       dataIndex: 'ASIN',
       key: 'ASIN',
+      width: 120,
     },
     {
       title: '公司SKU',

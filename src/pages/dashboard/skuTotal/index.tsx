@@ -85,6 +85,7 @@ const SkuTotal = () => {
                         options={[
                             { label: 'amazon赫曼', value: 'amazon赫曼' },
                             { label: 'amazon信盒', value: 'amazon信盒' },
+                            { label: 'amazon信盒欧线', value: 'amazon信盒欧线' },
                             { label: 'amazon宫本', value: 'amazon宫本' },
                             { label: 'amazon森月', value: 'amazon森月' },
                             { label: 'amazon维禄', value: 'amazon维禄' },
@@ -641,6 +642,7 @@ const SkuTotal = () => {
         console.log(attribute);
         // 列标题，逗号隔开，每一个逗号就是隔开一个单元格
         let str = attribute.join(",") + '\n';
+        str = str.replace(new RegExp("净毛利润", ("gm")), '毛利润');
         // 增加\t为了不让表格显示科学计数法或者其他格式
         for (let i = 0; i < excel_datas.length; i++) {
             excel_datas[i]['sku'] = excel_datas[i]['sku'].replace(new RegExp(",", ("gm")), "|")

@@ -6,9 +6,11 @@ import ProCard from '@ant-design/pro-card';
 import RcResizeObserver from 'rc-resize-observer';
 import request from "umi-request";
 import { Pie, measureTextWidth } from '@ant-design/charts';
+import { useRequest, useAccess, Access } from 'umi';
 
 
 const App: React.FC = () => {
+    const access = useAccess();
     const { Divider } = ProCard;
     const [responsive, setResponsive] = useState(false);
     const onTableChange = () => { };
@@ -42,7 +44,30 @@ const App: React.FC = () => {
             hideInTable: true,
         },
         ];
-
+    const arr1: ProColumns[] =
+        [{ title: '工厂', dataIndex: "工厂", key: "工厂", width: 50 },
+        { title: 'SKU', dataIndex: "SKU", key: "SKU", width: 130 },
+        { title: 'SKU名称', dataIndex: 'SKU名称', key: "SKU名称", search: false, width: 350 },
+        {
+            title: '工厂不良率(%)', dataIndex: '不良率', key: "不良率", search: false, align: 'center',
+            render: (text: number) => <span>{text.toString()}</span>,
+        },
+        {
+            title: '预估费用', dataIndex: '预估费用', key: "预估费用", search: false,
+            sorter: (a: { 预估费用: number; }, b: { 预估费用: number; }) => a.预估费用 - b.预估费用,
+            render: (text: number) => <span>{text.toFixed(0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</span>,
+        },
+        {
+            title: '时间区间',
+            key: 'dateTimeRange',
+            dataIndex: 'createdAtRange',
+            valueType: 'dateRange',
+            search: {
+                transform: (value: any) => ({ startTime: value[0], endTime: value[1] })
+            },
+            hideInTable: true,
+        },
+        ];
     // 饼图数据
     const [quantity, setquantity] = useState<any>([{}]);
     const [quantity_max, setquantity_max] = useState<any>({});
@@ -136,7 +161,7 @@ const App: React.FC = () => {
         ],
     };
     const config2 = {
-        theme: { "styleSheet": { "brandColor": "#FF6B3B", "paletteQualitative10": ["#FF6B3B", "#E19348", "#FFC100", "#76523B", "#9FB40F", "#DAD5B5", "#626681", "#0E8E89", "#F383A2", "#247FEA"], "paletteQualitative20": ["#FF6B3B", "#E19348", "#FFC100", "#76523B", "#9FB40F", "#DAD5B5", "#626681", "#0E8E89", "#F383A2", "#247FEA", "#2BCB95", "#B1ABF4", "#1D42C2", "#1D9ED1", "#D64BC0", "#255634", "#8C8C47", "#8CDAE5", "#8E283B", "#791DC9"] } },
+        theme: { "styleSheet": { "brandColor": "#FF6B3B", "paletteQualitative10": ["#FF6B3B", "#E19348", "#FFC100", "#7b68ee", "#9FB40F", "#DAD5B5", "#626681", "#0E8E89", "#F383A2", "#247FEA"], "paletteQualitative20": ["#FF6B3B", "#E19348", "#FFC100", "#7b68ee", "#9FB40F", "#DAD5B5", "#626681", "#0E8E89", "#F383A2", "#247FEA", "#2BCB95", "#B1ABF4", "#1D42C2", "#1D9ED1", "#D64BC0", "#255634", "#8C8C47", "#8CDAE5", "#8E283B", "#791DC9"] } },
         height: 250,
         appendPadding: 10,
         data: cost,
@@ -228,52 +253,100 @@ const App: React.FC = () => {
                     </ProCard>
                 </ProCard.Group>
             </RcResizeObserver>
+            <Access accessible={access.NotSalerAuth()} >
+                <ProTable
+                    columns={arr}
+                    request={async (skusearch = {}) => {
+                        console.log(skusearch);
+                        const result = request('/api/after_sale/ana', {
+                            method: 'POST',
+                            data: { ...skusearch },
+                            requestType: 'form',
+                            success: true,
+                        });
+                        const data = await result;
+                        setquantity(data.quantity);
+                        setcost(data.cost);
+                        setquantity_max(data.quantity_max);
+                        setcost_max(data.cost_max);
+                        setall_sum(data.all_sum);
+                        setbadsum(data.badsum);
+                        setbuliang_a(data.buliang_a);
+                        setbuliang_b(data.buliang_b);
+                        return result;
 
-            <ProTable
-                columns={arr}
-                request={async (skusearch = {}) => {
-                    console.log(skusearch);
-                    const result = request('/api/after_sale/ana', {
-                        method: 'POST',
-                        data: { ...skusearch },
-                        requestType: 'form',
-                        success: true,
-                    });
-                    const data = await result;
-                    setquantity(data.quantity);
-                    setcost(data.cost);
-                    setquantity_max(data.quantity_max);
-                    setcost_max(data.cost_max);
-                    setall_sum(data.all_sum);
-                    setbadsum(data.badsum);
-                    setbuliang_a(data.buliang_a);
-                    setbuliang_b(data.buliang_b);
-                    return result;
+                    }}
+                    search={{
+                        labelWidth: "auto",
+                        defaultCollapsed: false,
+                    }}
+                    toolbar={{
+                        actions: [
+                            <span> 在售SKU{all_sum}个　　不良SKU占{badsum}%　　不良率（工厂售后总数/对应SKU总销量）为{buliang_a}%　　不良率（工厂售后总数/工厂全销量）为{buliang_b}%
+                            </span>,
+                        ],
+                    }}
 
-                }}
-                search={{
-                    labelWidth: "auto",
-                    defaultCollapsed: false,
-                }}
-                toolbar={{
-                    actions: [
-                        <span> 在售SKU{all_sum}个　　不良SKU占{badsum}%　　不良率（工厂售后总数/对应SKU总销量）为{buliang_a}%　　不良率（工厂售后总数/工厂全销量）为{buliang_b}%
-                        </span>,
-                    ],
-                }}
+                    actionRef={actionRef}
+                    onChange={onTableChange}
 
-                actionRef={actionRef}
-                onChange={onTableChange}
+                    pagination={{
+                        pageSize: 100,
+                    }}
 
-                pagination={{
-                    pageSize: 100,
-                }}
+                    scroll={{ x: 1000, y: 400 }}
 
-                scroll={{ x: 1000, y: 400 }}
+                    headerTitle='售后分析表'
 
-                headerTitle='售后分析表'
+                />
+            </Access>
+            <Access accessible={access.SalerAuth()} >
+                <ProTable
+                    columns={arr1}
+                    request={async (skusearch = {}) => {
+                        console.log(skusearch);
+                        const result = request('/api/after_sale/ana', {
+                            method: 'POST',
+                            data: { ...skusearch },
+                            requestType: 'form',
+                            success: true,
+                        });
+                        const data = await result;
+                        setquantity(data.quantity);
+                        setcost(data.cost);
+                        setquantity_max(data.quantity_max);
+                        setcost_max(data.cost_max);
+                        setall_sum(data.all_sum);
+                        setbadsum(data.badsum);
+                        setbuliang_a(data.buliang_a);
+                        setbuliang_b(data.buliang_b);
+                        return result;
 
-            />
+                    }}
+                    search={{
+                        labelWidth: "auto",
+                        defaultCollapsed: false,
+                    }}
+                    toolbar={{
+                        actions: [
+                            <span> 在售SKU{all_sum}个　　不良SKU占{badsum}%　　不良率（工厂售后总数/对应SKU总销量）为{buliang_a}%　　不良率（工厂售后总数/工厂全销量）为{buliang_b}%
+                            </span>,
+                        ],
+                    }}
+
+                    actionRef={actionRef}
+                    onChange={onTableChange}
+
+                    pagination={{
+                        pageSize: 100,
+                    }}
+
+                    scroll={{ x: 1000, y: 400 }}
+
+                    headerTitle='售后分析表'
+
+                />
+            </Access>
         </>
     )
 }

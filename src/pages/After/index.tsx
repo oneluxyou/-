@@ -73,6 +73,14 @@ const TableList: React.FC = () => {
       width: 90
     },
     {
+      title: '更新日期',
+      dataIndex: '更新日期',
+      hideInSearch: true,
+      sorter: (a, b) => a.id - b.id,
+      //数据库格式问题
+      width: 90
+    },
+    {
       title: '登记人',
       dataIndex: '登记人',
       filters: true,
@@ -129,8 +137,8 @@ const TableList: React.FC = () => {
       width: 100,
     },
     {
-      title: '数量',
-      dataIndex: 'sku数量',
+      title: '序号',
+      dataIndex: '序号',
       hideInSearch: true,
       width: 50,
     },
@@ -213,7 +221,7 @@ const TableList: React.FC = () => {
             } else if (item_dict.indexOf(item) == 1) {
               setosku(temp_dict[1]);
             } else if (item_dict.indexOf(item) == 3) {
-              setbeizhu(temp_dict[2]);
+              setbeizhu([]);
             }
           }}
         >
@@ -1016,23 +1024,44 @@ const TableList: React.FC = () => {
         }).then(res => {
           //自行根据条件清除
           console.log(res);
-          setorder_name(res);
-          message.success('提交成功');
-          // 储存历史记录
-          for (const key in item_dict) {
-            temp_dict[key] = new Array();
-            if (item_dict[key] in storage) {
-              temp_data = eval(storage[item_dict[key]]).split('|');
-              for (const key2 in temp_data) {
-                if (Object.prototype.hasOwnProperty.call(temp_data, key2)) {
-                  const element = temp_data[key2];
-                  temp_dict[key].push(renderItem(element, parseInt(key2), item_dict[key]));
+          if (res == '请重新登录') {
+            message.error('请重新登录账号');
+          } else if (res == '序列重复') {
+            message.error('该订单号的序列重复(注意:订单号里每一件都要分开填写，第一件序号填1，第二件序号填2,第三件序号填3)');
+          } else {
+            setorder_name(res);
+            message.success('提交成功');
+            // 储存历史记录
+            for (const key in item_dict) {
+              temp_dict[key] = new Array();
+              if (item_dict[key] in storage) {
+                temp_data = eval(storage[item_dict[key]]).split('|');
+                for (const key2 in temp_data) {
+                  if (Object.prototype.hasOwnProperty.call(temp_data, key2)) {
+                    const element = temp_data[key2];
+                    temp_dict[key].push(renderItem(element, parseInt(key2), item_dict[key]));
+                  }
                 }
-              }
-              if (temp_data.indexOf(temp_values[form_dict[key]]) == -1) {
+                if (temp_data.indexOf(temp_values[form_dict[key]]) == -1) {
+                  temp_data.push(temp_values[form_dict[key]]);
+                  temp_dict[key].push(renderItem(temp_values[form_dict[key]], temp_data.length - 1, item_dict[key]));
+                  console.log('提交后', temp_data)
+                  let temp_storage = temp_data.join('|');
+                  temp_storage = JSON.stringify(temp_storage);
+                  storage[item_dict[key]] = temp_storage;
+                  //自行根据条件清除
+                  if (parseInt(key) == 0) {
+                    setdengji(temp_dict[0]);
+                  } else if (parseInt(key) == 1) {
+                    setosku(temp_dict[1]);
+                  } else if (parseInt(key) == 3) {
+                    setbeizhu([]);
+                  }
+                }
+              } else {
+                temp_data = []
                 temp_data.push(temp_values[form_dict[key]]);
                 temp_dict[key].push(renderItem(temp_values[form_dict[key]], temp_data.length - 1, item_dict[key]));
-                console.log('提交后', temp_data)
                 let temp_storage = temp_data.join('|');
                 temp_storage = JSON.stringify(temp_storage);
                 storage[item_dict[key]] = temp_storage;
@@ -1042,32 +1071,18 @@ const TableList: React.FC = () => {
                 } else if (parseInt(key) == 1) {
                   setosku(temp_dict[1]);
                 } else if (parseInt(key) == 3) {
-                  setbeizhu(temp_dict[2]);
+                  setbeizhu([]);
                 }
               }
-            } else {
-              temp_data = []
-              temp_data.push(temp_values[form_dict[key]]);
-              temp_dict[key].push(renderItem(temp_values[form_dict[key]], temp_data.length - 1, item_dict[key]));
-              let temp_storage = temp_data.join('|');
-              temp_storage = JSON.stringify(temp_storage);
-              storage[item_dict[key]] = temp_storage;
-              //自行根据条件清除
-              if (parseInt(key) == 0) {
-                setdengji(temp_dict[0]);
-              } else if (parseInt(key) == 1) {
-                setosku(temp_dict[1]);
-              } else if (parseInt(key) == 3) {
-                setbeizhu(temp_dict[2]);
-              }
             }
+            formRef.current?.resetFields();
+            setdetailitem([]);
+            setdetailreason([]);
+            setrefund(0);
+            setresku([]);
           }
-          formRef.current?.resetFields();
-          setdetailitem([]);
-          setdetailreason([]);
-          setrefund(0);
-          setresku([]);
         });
+
       }
     }
   };
@@ -1090,10 +1105,12 @@ const TableList: React.FC = () => {
         }}
         onFinish={async (values, ...rest) => {
           console.log(values);
-          const temp_order_name = order_name?.length > 0 ? order_name : data?.order_name;
           if ((yuanyingerror == true) || (fankuierror == true)) {
             message.error('顾客反馈和客服操作不能只选大类');
-          } else if (temp_order_name.indexOf(values['订单号']) > -1) {
+          } else if (data?.order_name.indexOf(values['订单号']) > -1) {
+            settemp_values(values);
+            setIsModalVisible(true);
+          } else if ((data?.order_name.indexOf(values['订单号']) < -1) && (order_name?.indexOf(values['订单号']) > -1)) {
             settemp_values(values);
             setIsModalVisible(true);
           }
@@ -1220,25 +1237,48 @@ const TableList: React.FC = () => {
                 data: { ...values },
                 requestType: 'form',
               }).then(res => {
+                console.log('12312');
                 //自行根据条件清除
                 console.log(res);
-                setorder_name(res);
-                message.success('提交成功');
-                // 储存历史记录
-                for (const key in item_dict) {
-                  temp_dict[key] = new Array();
-                  if (item_dict[key] in storage) {
-                    temp_data = eval(storage[item_dict[key]]).split('|');
-                    for (const key2 in temp_data) {
-                      if (Object.prototype.hasOwnProperty.call(temp_data, key2)) {
-                        const element = temp_data[key2];
-                        temp_dict[key].push(renderItem(element, parseInt(key2), item_dict[key]));
+                if (res == '请重新登录') {
+                  message.error('请重新登录账号');
+                } else if (res == '序列重复') {
+                  message.error('该订单号的序列重复(注意:订单号里每一件都要分开填写，第一件序号填1，第二件序号填2,第三件序号填3)');
+                } else {
+                  setorder_name(res);
+                  console.log(order_name);
+                  message.success('提交成功');
+                  // 储存历史记录
+                  for (const key in item_dict) {
+                    temp_dict[key] = new Array();
+                    if (item_dict[key] in storage) {
+                      temp_data = eval(storage[item_dict[key]]).split('|');
+                      for (const key2 in temp_data) {
+                        if (Object.prototype.hasOwnProperty.call(temp_data, key2)) {
+                          const element = temp_data[key2];
+                          temp_dict[key].push(renderItem(element, parseInt(key2), item_dict[key]));
+                        }
                       }
-                    }
-                    if (temp_data.indexOf(values[form_dict[key]]) == -1) {
+                      if (temp_data.indexOf(values[form_dict[key]]) == -1) {
+                        temp_data.push(values[form_dict[key]]);
+                        temp_dict[key].push(renderItem(values[form_dict[key]], temp_data.length - 1, item_dict[key]));
+                        console.log('提交后', temp_data)
+                        let temp_storage = temp_data.join('|');
+                        temp_storage = JSON.stringify(temp_storage);
+                        storage[item_dict[key]] = temp_storage;
+                        //自行根据条件清除
+                        if (parseInt(key) == 0) {
+                          setdengji(temp_dict[0]);
+                        } else if (parseInt(key) == 1) {
+                          setosku(temp_dict[1]);
+                        } else if (parseInt(key) == 3) {
+                          setbeizhu(temp_dict[2]);
+                        }
+                      }
+                    } else {
+                      temp_data = []
                       temp_data.push(values[form_dict[key]]);
                       temp_dict[key].push(renderItem(values[form_dict[key]], temp_data.length - 1, item_dict[key]));
-                      console.log('提交后', temp_data)
                       let temp_storage = temp_data.join('|');
                       temp_storage = JSON.stringify(temp_storage);
                       storage[item_dict[key]] = temp_storage;
@@ -1248,31 +1288,17 @@ const TableList: React.FC = () => {
                       } else if (parseInt(key) == 1) {
                         setosku(temp_dict[1]);
                       } else if (parseInt(key) == 3) {
-                        setbeizhu(temp_dict[2]);
+                        setbeizhu([]);
                       }
                     }
-                  } else {
-                    temp_data = []
-                    temp_data.push(values[form_dict[key]]);
-                    temp_dict[key].push(renderItem(values[form_dict[key]], temp_data.length - 1, item_dict[key]));
-                    let temp_storage = temp_data.join('|');
-                    temp_storage = JSON.stringify(temp_storage);
-                    storage[item_dict[key]] = temp_storage;
-                    //自行根据条件清除
-                    if (parseInt(key) == 0) {
-                      setdengji(temp_dict[0]);
-                    } else if (parseInt(key) == 1) {
-                      setosku(temp_dict[1]);
-                    } else if (parseInt(key) == 3) {
-                      setbeizhu(temp_dict[2]);
-                    }
                   }
+                  formRef.current?.resetFields();
+                  setdetailitem([]);
+                  setdetailreason([]);
+                  setrefund(0);
+                  setresku([]);
                 }
-                formRef.current?.resetFields();
-                setdetailitem([]);
-                setdetailreason([]);
-                setrefund(0);
-                setresku([]);
+
               });
             }
           }
@@ -1364,11 +1390,11 @@ const TableList: React.FC = () => {
           <Col span={3}>
             <ProFormDigit
               width="md"
-              name="sku数量"
-              label="数量"
+              name="序号"
+              label="序号"
               placeholder=""
               initialValue={1}
-              tooltip="默认数量为1"
+              tooltip="同一个订单里，第一件填1，第二件填2，以此类推"
               rules={[{ required: true, message: '请输入' }]}
             />
           </Col >
@@ -1426,7 +1452,6 @@ const TableList: React.FC = () => {
               name="备注" label="备注"
             >
               <AutoComplete
-                options={beizhu}
               >
                 <TextArea
                   placeholder="请填写详细(不得超过255个字)"
