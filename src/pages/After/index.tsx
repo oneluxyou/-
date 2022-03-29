@@ -61,6 +61,7 @@ const TableList: React.FC = () => {
           text: '解决中',
           status: 'error',
         },
+        "已校对": { text: '已校对', status: 'Success' },
       },
       width: 75
     },
@@ -91,7 +92,7 @@ const TableList: React.FC = () => {
     {
       title: '店铺',
       dataIndex: '店铺',
-      hideInSearch: true,
+      // hideInSearch: true,
       filters: true,
       onFilter: true,
       width: 80,
@@ -117,7 +118,7 @@ const TableList: React.FC = () => {
         'eBay-雅秦': 'eBay-雅秦',
         'Nextfur-Shopify': 'Nextfur-Shopify',
         '旗辰': '旗辰',
-        '塞迦曼': '塞迦曼',
+        '赛迦曼': '赛迦曼',
         '启珊': '启珊',
         '驰甬': '驰甬',
         '杉绮': '杉绮',
@@ -260,10 +261,12 @@ const TableList: React.FC = () => {
   const [yuanyinchina, setyuanyinchina] = useState([]) as any;
   // 退款显示
   const [refund, setrefund] = useState(0) as any;
-  // 补寄新件显示
+  // 补寄sku显示
   const [resku, setresku] = useState([]) as any;
-  // 补寄退件翻译显示
+  // 补寄sku翻译显示
   const [reskuchina, setreskuchina] = useState([]) as any;
+  // 退货次数显示
+  const [returnsku, setreturnsku] = useState([]) as any;
 
   // 判断联动是否有一项只选了大类
   const [fankuierror, setfankuierror] = useState(false) as any;
@@ -320,6 +323,7 @@ const TableList: React.FC = () => {
     const temp_yuanying = [];
     const temp_reason = [];
     const temp_yuanyinchina = [];
+    const temp_returnsku = [];
     // 判断是否填写了大类
     let temp_yuanyingerror = false;
     let temp_refund = 0;
@@ -335,7 +339,6 @@ const TableList: React.FC = () => {
         if (element.length > 1) {
           // 判断小类是否有两个
           if (element[0] == '1-0') {
-            console.log(count_0);
             count_0 = count_0 + 1;
             if (count_0 > 1)
               message.error('退款只能含一个小类');
@@ -367,13 +370,19 @@ const TableList: React.FC = () => {
               if ((element[1] == '3-1-0') || (element[1] == '3-2-0') || (element[1] == '3-3-0')) {
                 temp_renew.push(element[1]);
                 temp_renewchina.push(selectOptions[key][1]['label']);
-              }
+              } else
+                if ((element[1] == '2-1-0') || (element[1] == '2-2-0') || (element[1] == '2-3-0')
+                  || (element[1] == '2-4-0') || (element[1] == '2-5-0') || (element[1] == '2-6-0')
+                  || (element[1] == '2-7-0') || (element[1] == '2-8-0') || (element[1] == '2-9-0')) {
+                  temp_returnsku.push(element[1]);
+                }
         } else {
           temp_yuanyingerror = true;
           message.error('不能只选大类');
         }
       }
     }
+    setreturnsku(temp_returnsku);
     setyuanyingerror(temp_yuanyingerror);
     setyuanyinchina(temp_yuanyinchina);
     setrefund(temp_refund);
@@ -386,20 +395,33 @@ const TableList: React.FC = () => {
     const children = [];
     for (let i = 0; i < detailreason.length; i++) {
       children.push(
-        <Col span={4} key={yuanying[i]}>
-          <ProForm.Item
-            label={yuanyinchina[i]}
-            name={yuanying[i]}
-            tooltip="输入多个请用逗号隔开，第一位为大写字母，第二位为非0数字，第三位为数字或空,例：允许A，A1，A10，不允许1A，A01，a1。特例 编号标贴-B99 螺丝包-L99 排骨条-P99 说明书-S99 五金盒-W99 配件未知-U99"
-            rules={[{ pattern: /(^[A-Z]{1}$)|(^[A-Z][1-9]{1}$)|(^[A-Z][1-9][0-9]{1}$)|((^[A-Z]{1}((,[A-Z]{1})|(,[A-Z][1-9]{1})|(,[A-Z][1-9][0-9]{1})){1,}$)|(^[A-Z][1-9]{1}((,[A-Z]{1})|(,[A-Z][1-9]{1})|(,[A-Z][1-9][0-9]{1})){1,}$)|(^[A-Z][1-9][0-9]{1}(((,[A-Z]{1})|(,[A-Z][1-9]{1})$|(,[A-Z][1-9][0-9]{1})){1,}$)))/, message: '请以大写字母+数字+数字的形式输入' }]}
-          >
-            <Input
-              style={{ width: 150 }}
+        <>
+          <Col span={4} key={yuanying[i]}>
+            <ProForm.Item
+              label={yuanyinchina[i]}
               name={yuanying[i]}
-              placeholder="请输入配件"
+              tooltip="输入多个请用逗号隔开，第一位为大写字母，第二位为非0数字，第三位为数字或空,例：允许A，A1，A10，不允许1A，A01，a1。特例 编号标贴-B99 螺丝包-L99 排骨条-P99 说明书-S99 五金盒-W99 配件未知-U99"
+              rules={[{ pattern: /(^[A-Z]{1}$)|(^[A-Z][1-9]{1}$)|(^[A-Z][1-9][0-9]{1}$)|((^[A-Z]{1}((,[A-Z]{1})|(,[A-Z][1-9]{1})|(,[A-Z][1-9][0-9]{1})){1,}$)|(^[A-Z][1-9]{1}((,[A-Z]{1})|(,[A-Z][1-9]{1})|(,[A-Z][1-9][0-9]{1})){1,}$)|(^[A-Z][1-9][0-9]{1}(((,[A-Z]{1})|(,[A-Z][1-9]{1})$|(,[A-Z][1-9][0-9]{1})){1,}$)))/, message: '请以大写字母+数字+数字的形式输入' }]}
+            >
+              <Input
+                style={{ width: 150 }}
+                name={yuanying[i]}
+                placeholder="请输入配件"
+              />
+            </ProForm.Item>
+          </Col >
+          <Col span={4} key={yuanying[i] + '数量'} >
+            <ProFormDigit
+              width="md"
+              name={yuanying[i] + '补寄次数'}
+              label={yuanyinchina[i] + '补寄次数'}
+              placeholder=""
+              initialValue={1}
+              tooltip="默认为1"
+              rules={[{ required: true, message: '请输出数量' }]}
             />
-          </ProForm.Item>
-        </Col >,
+          </Col >
+        </>
       )
     }
     let temp_refund = 0;
@@ -417,6 +439,25 @@ const TableList: React.FC = () => {
           />
         </Col >
       )
+    }
+    if (returnsku.length >= 0) {
+      for (let i = 0; i < returnsku.length; i++) {
+        children.push(
+          <>
+            <Col span={4} key={returnsku[i] + '退货次数'} >
+              <ProFormDigit
+                width="md"
+                name={returnsku[i] + '退货次数'}
+                label={'退货次数'}
+                placeholder=""
+                initialValue={1}
+                tooltip="默认为1"
+                rules={[{ required: true, message: '请输出数量' }]}
+              />
+            </Col >
+          </>
+        )
+      }
     }
     if (resku.length >= 0) {
       for (let i = 0; i < resku.length; i++) {
@@ -436,7 +477,7 @@ const TableList: React.FC = () => {
                 />
               </ProForm.Item>
             </Col >
-            <Col span={5} key={resku[i] + '数量'} >
+            <Col span={4} key={resku[i] + '数量'} >
               <ProFormDigit
                 width="md"
                 name={resku[i] + '数量'}
@@ -861,15 +902,13 @@ const TableList: React.FC = () => {
   // 导出报表
   const downloadExcel = () => {
     const excel_datas = tableData.data;
-    console.log(excel_datas);
 
     // 列标题，逗号隔开，每一个逗号就是隔开一个单元格
-    let str = `id,登记日期,登记人,店铺,订单号,SKU,数量,订单状态,顾客反馈,客服操作,退款金额,备注\n`;
+    let str = `id,登记日期,更新日期,登记人,店铺,订单号,SKU,序号,订单状态,顾客反馈,客服操作,退款金额,备注\n`;
     // 增加\t为了不让表格显示科学计数法或者其他格式
     for (let i = 0; i < excel_datas.length; i++) {
       // console.log(excel_datas[i])
       for (const key in excel_datas[i]) {
-        console.log(excel_datas[i].SKU);
         const temp_dict_but = excel_datas[i].SKU.split(',');
         excel_datas[i].公司SKU = temp_dict_but.join('a');
         if (Object.prototype.hasOwnProperty.call(excel_datas[i], key)) {
@@ -899,6 +938,7 @@ const TableList: React.FC = () => {
     if ((yuanyingerror == true) || (fankuierror == true)) {
       message.error('顾客反馈和客服操作不能只选大类');
     } else {
+      temp_values['订单号'] = temp_values['订单号'].replace(new RegExp(' ', ("gm")), '').replace(new RegExp('/[\r\n]/g', ("gm")), "").replace(new RegExp('　', ("gm")), "");
       // 规范数据
       let sku_in = true;
       temp_values['SKU'] = temp_values['SKU'].replace(new RegExp('，', ("gm")), ',');
@@ -990,7 +1030,7 @@ const TableList: React.FC = () => {
             (element[1] == '3-5-0')) {
             if (element[1] in temp_values) {
               if (temp_values[element[1]] != '') {
-                temp_values['kefu'][key] += '$' + temp_values[element[1]].replace(new RegExp(',', ("gm")), '#');
+                temp_values['kefu'][key] += '$' + temp_values[element[1]].replace(new RegExp(',', ("gm")), '#') + 'ship' + temp_values[element[1] + '补寄次数'];
               } else {
                 if (temp_values['订单状态'] == '已解决') {
                   sku_in = false;
@@ -1013,6 +1053,14 @@ const TableList: React.FC = () => {
               temp_values['kefu'][key] += '$' + temp_element + 'num' + temp_element_num;
             }
           }
+          if ((element[1] == '2-1-0') || (element[1] == '2-2-0') || (element[1] == '2-3-0')
+            || (element[1] == '2-4-0') || (element[1] == '2-5-0') || (element[1] == '2-6-0')
+            || (element[1] == '2-7-0') || (element[1] == '2-8-0') || (element[1] == '2-9-0')) {
+            if (element[1] + '退货次数' in temp_values) {
+              const temp_element_num = temp_values[element[1] + '退货次数'];
+              temp_values['kefu'][key] += 'ship' + temp_element_num;
+            }
+          }
         }
       }
       temp_values['kefu'] = temp_values['kefu'].join('&');
@@ -1025,7 +1073,7 @@ const TableList: React.FC = () => {
           //自行根据条件清除
           console.log(res);
           if (res == '请重新登录') {
-            message.error('请重新登录账号');
+            message.error('账户过期,请重新登录账号');
           } else if (res == '序列重复') {
             message.error('该订单号的序列重复(注意:订单号里每一件都要分开填写，第一件序号填1，第二件序号填2,第三件序号填3)');
           } else {
@@ -1045,7 +1093,6 @@ const TableList: React.FC = () => {
                 if (temp_data.indexOf(temp_values[form_dict[key]]) == -1) {
                   temp_data.push(temp_values[form_dict[key]]);
                   temp_dict[key].push(renderItem(temp_values[form_dict[key]], temp_data.length - 1, item_dict[key]));
-                  console.log('提交后', temp_data)
                   let temp_storage = temp_data.join('|');
                   temp_storage = JSON.stringify(temp_storage);
                   storage[item_dict[key]] = temp_storage;
@@ -1104,7 +1151,7 @@ const TableList: React.FC = () => {
           '登记人': initialState.currentUser?.name
         }}
         onFinish={async (values, ...rest) => {
-          console.log(values);
+          values['订单号'] = values['订单号'].replace(new RegExp(' ', ("gm")), '').replace(new RegExp('/[\r\n]/g', ("gm")), "").replace(new RegExp('　', ("gm")), "");
           if ((yuanyingerror == true) || (fankuierror == true)) {
             message.error('顾客反馈和客服操作不能只选大类');
           } else if (data?.order_name.indexOf(values['订单号']) > -1) {
@@ -1206,7 +1253,7 @@ const TableList: React.FC = () => {
                   (element[1] == '3-5-0')) {
                   if (element[1] in values) {
                     if (values[element[1]] != '') {
-                      values['kefu'][key] += '$' + values[element[1]].replace(new RegExp(',', ("gm")), '#');
+                      values['kefu'][key] += '$' + values[element[1]].replace(new RegExp(',', ("gm")), '#') + 'ship' + values[element[1] + '补寄次数'];
                     } else {
                       if (values['订单状态'] == '已解决') {
                         sku_in = false;
@@ -1228,6 +1275,14 @@ const TableList: React.FC = () => {
                     values['kefu'][key] += '$' + temp_element + 'num' + temp_element_num;
                   }
                 }
+                if ((element[1] == '2-1-0') || (element[1] == '2-2-0') || (element[1] == '2-3-0')
+                  || (element[1] == '2-4-0') || (element[1] == '2-5-0') || (element[1] == '2-6-0')
+                  || (element[1] == '2-7-0') || (element[1] == '2-8-0') || (element[1] == '2-9-0')) {
+                  if (element[1] + '退货次数' in values) {
+                    const temp_element_num = values[element[1] + '退货次数'];
+                    values['kefu'][key] += 'ship' + temp_element_num;
+                  }
+                }
               }
             }
             values['kefu'] = values['kefu'].join('&');
@@ -1237,16 +1292,13 @@ const TableList: React.FC = () => {
                 data: { ...values },
                 requestType: 'form',
               }).then(res => {
-                console.log('12312');
                 //自行根据条件清除
-                console.log(res);
                 if (res == '请重新登录') {
-                  message.error('请重新登录账号');
+                  message.error('账户过期,请重新登录账号');
                 } else if (res == '序列重复') {
                   message.error('该订单号的序列重复(注意:订单号里每一件都要分开填写，第一件序号填1，第二件序号填2,第三件序号填3)');
                 } else {
                   setorder_name(res);
-                  console.log(order_name);
                   message.success('提交成功');
                   // 储存历史记录
                   for (const key in item_dict) {
@@ -1262,7 +1314,6 @@ const TableList: React.FC = () => {
                       if (temp_data.indexOf(values[form_dict[key]]) == -1) {
                         temp_data.push(values[form_dict[key]]);
                         temp_dict[key].push(renderItem(values[form_dict[key]], temp_data.length - 1, item_dict[key]));
-                        console.log('提交后', temp_data)
                         let temp_storage = temp_data.join('|');
                         temp_storage = JSON.stringify(temp_storage);
                         storage[item_dict[key]] = temp_storage;
@@ -1353,7 +1404,7 @@ const TableList: React.FC = () => {
                   'eBay-雅秦': 'eBay-雅秦',
                   'Nextfur-Shopify': 'Nextfur-Shopify',
                   '旗辰': '旗辰',
-                  '塞迦曼': '塞迦曼',
+                  '赛迦曼': '赛迦曼',
                   '启珊': '启珊',
                   '驰甬': '驰甬',
                   '杉绮': '杉绮',
@@ -1476,7 +1527,6 @@ const TableList: React.FC = () => {
         }}
         search={{
           labelWidth: "auto",
-          span: 4,
           defaultCollapsed: false,
         }}
         rowKey="key"
@@ -1491,6 +1541,10 @@ const TableList: React.FC = () => {
             requestType: 'form',
           });
           settableData(await result);
+          const temp_result = await result;
+          if (temp_result == '请重新登录') {
+            message.error('账户过期,请重新登录账号');
+          }
           return result;
         }}
 

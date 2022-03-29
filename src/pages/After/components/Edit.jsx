@@ -12,6 +12,7 @@ const Edit = (props) => {
     method: 'get',
   });
   // 联动表单数值
+  // 反馈翻译
   const fankuicol = [
     {
       label: '未收到',
@@ -282,6 +283,7 @@ const Edit = (props) => {
       ],
     },
   ];
+  // 原因翻译
   const yuanyingcol = [
     {
       label: '退款',
@@ -417,6 +419,8 @@ const Edit = (props) => {
   const [detailreason, setdetailreason] = useState([]);
   const [refund, setrefund] = useState(0);
   const [renew, setrenew] = useState([]);
+  // 退货次数显示
+  const [returnsku, setreturnsku] = useState([]);
   const { isModalVisible } = props;
   const { isShowModal } = props;
   const { actionRef } = props;
@@ -438,7 +442,7 @@ const Edit = (props) => {
         订单状态: response.订单状态,
         Refund: response.Refund,
         备注: response.备注,
-        sku数量: response.sku数量,
+        序号: response.序号,
       };
       // 对顾客反馈和客服操作进行处理
       response.顾客反馈 = response.顾客反馈.split("&");
@@ -464,15 +468,31 @@ const Edit = (props) => {
           element = element.split('$');
           const temp_first = element[0].split('-');
           response.客服操作[key] = [temp_first[0] + '-0', element[0]];
+          // 数量更换
           if (element.length > 1) {
             if ((element[0] == '3-1-0') || (element[0] == '3-2-0') || ((element[0] == '3-3-0'))) {
               const temp_element = element[1].split('num');
               initial_dic[element[0]] = temp_element[0].replace(new RegExp('#', ("gm")), ',');
               initial_dic[element[0] + '数量'] = temp_element[1];
               temp_renew.push(element[0]);
-            } else {
+            } else if ((element[0] == '3-4-0') || (element[0] == '3-5-0')) {
+              const temp_element = element[1].split('ship');
+              initial_dic[element[0]] = temp_element[0].replace(new RegExp('#', ("gm")), ',');
+              initial_dic[element[0] + '数量'] = temp_element[1];
+              temp_renew.push(element[0]);
+            }
+            else {
               initial_dic[element[0]] = element[1].replace(new RegExp('#', ("gm")), ',');
               temp_yuanying.push(element[0]);
+            }
+          } else {
+            const temp_element = element[0].split('ship');
+            if ((temp_element[0] == '2-1-0') || (temp_element[0] == '2-2-0') || (temp_element[0] == '2-3-0')
+              || (temp_element[0] == '2-4-0') || (temp_element[0] == '2-5-0') || (temp_element[0] == '2-6-0')
+              || (temp_element[0] == '2-7-0') || (temp_element[0] == '2-8-0') || (temp_element[0] == '2-9-0')) {
+              response.客服操作[key] = [temp_first[0] + '-0', temp_element[0].replace(new RegExp('#', ("gm")), ',')];
+              initial_dic[element[0] + '退货次数'] = temp_element[1];
+              returnsku.push(element[0]);
             }
           }
         }
@@ -564,6 +584,9 @@ const Edit = (props) => {
     "7-8-Z": "噪音(使用后故障)",
     "8-1-M": "问题已反馈未解决(差评)",
     "8-2-M": "问题未反馈(差评)",
+    "9-1-P": "描述/图片不符合(wayfair平台问题)",
+    "9-2-P": "面单问题(wayfair平台问题)",
+    "9-3-P": "平台客服拒绝沟通(wayfair平台问题)",
   }
   const yuanying_tran = {
     "1-1-0": "退全款",
@@ -577,6 +600,7 @@ const Edit = (props) => {
     "2-7-0": "买家使用Amazon Return label退货",
     "2-8-0": "买家使用仓库Return label退货",
     "2-9-0": "买家上门取件退货",
+    "2-10-0": "WF退货",
     "3-1-0": "海外仓补寄新件",
     "3-2-0": "海外仓补寄退件",
     "3-3-0": "海外仓补寄破损件",
@@ -646,11 +670,12 @@ const Edit = (props) => {
     let count_3 = 0;
     const temp_renew = [];
     const temp_renewchina = [];
+    const temp_returnsku = [];
     for (const key in value) {
       if (Object.prototype.hasOwnProperty.call(value, key)) {
         const element = value[key];
         if (element.length > 1) {
-          // 判断小类是否有两个
+          // 判断小类是否有两个,若有两个及以上，则温馨提示
           if (element[0] == '1-0') {
             console.log(count_0);
             count_0 = count_0 + 1;
@@ -684,13 +709,19 @@ const Edit = (props) => {
               if ((element[1] == '3-1-0') || (element[1] == '3-2-0') || (element[1] == '3-3-0')) {
                 temp_renew.push(element[1]);
                 temp_renewchina.push(selectOptions[key][1]['label']);
-              }
+              } else
+                if ((element[1] == '2-1-0') || (element[1] == '2-2-0') || (element[1] == '2-3-0')
+                  || (element[1] == '2-4-0') || (element[1] == '2-5-0') || (element[1] == '2-6-0')
+                  || (element[1] == '2-7-0') || (element[1] == '2-8-0') || (element[1] == '2-9-0')) {
+                  temp_returnsku.push(element[1]);
+                }
         } else {
           temp_yuanyingerror = true;
           message.error('不能只选大类');
         }
       }
     }
+    setreturnsku(temp_returnsku);
     setyuanyingerror(temp_yuanyingerror);
     setrefund(temp_refund);
     setrenew(temp_renew);
@@ -728,6 +759,23 @@ const Edit = (props) => {
           rules={[{ required: true, message: '若无退款,请输入0' }]}
         />
       )
+    }
+    if (returnsku.length >= 0) {
+      for (let i = 0; i < returnsku.length; i++) {
+        children.push(
+          <>
+            <ProFormDigit
+              width="md"
+              name={returnsku[i] + '退货次数'}
+              label={'退货次数'}
+              placeholder=""
+              initialValue={1}
+              tooltip="默认为1"
+              rules={[{ required: true, message: '请输出数量' }]}
+            />
+          </>
+        )
+      }
     }
     if (renew.length >= 0) {
       for (let i = 0; i < renew.length; i++) {
@@ -782,6 +830,7 @@ const Edit = (props) => {
                 message.error('顾客反馈和客服操作不能只选大类');
               } else {
                 console.log(values);
+                values['订单号'] = values['订单号'].replace(new RegExp(' ', ("gm")), '').replace(new RegExp('/[\r\n]/g', ("gm")), "").replace(new RegExp('　', ("gm")), "");
                 // 规范数据
                 let sku_in = true;
                 values['SKU'] = values['SKU'].replace(new RegExp('，', ("gm")), ',');
@@ -896,17 +945,30 @@ const Edit = (props) => {
                         values['kefu'][key] += '$' + temp_element + 'num' + temp_element_num;
                       }
                     }
+                    if ((element[1] == '2-1-0') || (element[1] == '2-2-0') || (element[1] == '2-3-0')
+                      || (element[1] == '2-4-0') || (element[1] == '2-5-0') || (element[1] == '2-6-0')
+                      || (element[1] == '2-7-0') || (element[1] == '2-8-0') || (element[1] == '2-9-0')) {
+                      if (element[1] + '退货次数' in values) {
+                        const temp_element_num = values[element[1] + '退货次数'];
+                        values['kefu'][key] += 'ship' + temp_element_num;
+                      }
+                    }
                   }
                 }
                 values['kefu'] = values['kefu'].join('&');
                 if (sku_in == true) {
-                  isShowModal(false);
-                  isShowModal(false);
-                  message.success('提交成功');
                   return request(`/api/after/change`, {
                     method: 'POST',
                     data: { ...values },
                     requestType: 'form',
+                  }).then(res => {
+                    console.log(res);
+                    if (res == '不能更改') {
+                      message.error('【已校对】状态不可更改,若要更改这条记录,请先更换订单状态');
+                    } else {
+                      message.success('提交成功');
+                      isShowModal(false);
+                    }
                   });
                 }
               }
@@ -961,7 +1023,7 @@ const Edit = (props) => {
                   'eBay-雅秦': 'eBay-雅秦',
                   'Nextfur-Shopify': 'Nextfur-Shopify',
                   '旗辰': '旗辰',
-                  '塞迦曼': '塞迦曼',
+                  '赛迦曼': '赛迦曼',
                   '启珊': '启珊',
                   '驰甬': '驰甬',
                   '杉绮': '杉绮',
@@ -975,6 +1037,7 @@ const Edit = (props) => {
               <ProFormDigit
                 width="md"
                 name="序号"
+                disabled
                 label="序号"
                 placeholder=""
                 initialValue={1}

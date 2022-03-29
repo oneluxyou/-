@@ -47,7 +47,7 @@ const TableList: React.FC = () => {
       title: 'ASIN',
       dataIndex: 'ASIN',
       key: 'ASIN',
-      width: 120,
+      ellipsis: true,
     },
     {
       title: '公司SKU',
@@ -106,6 +106,7 @@ const TableList: React.FC = () => {
         amazon治润: 'Amazon-治润',
         amazon驰甬: 'Amazon-驰甬',
         amazon启珊: 'Amazon-启珊',
+        amazon旗辰: 'Amazon-旗辰',
         amazoncpower: 'Central_Power_International_Limited',
         amazon: 'Amazon',
         wayfair信盒: 'Wayfair-信盒',
@@ -117,13 +118,13 @@ const TableList: React.FC = () => {
         shopifynextfur: 'Nextfur-Shopify',
       },
     },
-    {
-      title: 'KEY',
-      dataIndex: 'KEY',
-      hideInSearch: true,
-      key: 'KEY',
-      tooltip: '自动生成',
-    },
+    // {
+    //   title: 'KEY',
+    //   dataIndex: 'KEY',
+    //   hideInSearch: true,
+    //   key: 'KEY',
+    //   tooltip: '自动生成',
+    // },
     {
       title: 'sku序号',
       dataIndex: 'sku序号',
@@ -144,6 +145,23 @@ const TableList: React.FC = () => {
       // hideInSearch: true,
       key: '结束时间',
       tooltip: '自动生成(美国时间)',
+    },
+    {
+      title: '状态',
+      dataIndex: '状态',
+      // hideInSearch: true,
+      key: '状态',
+      valueEnum: {
+        "停用": {
+          text: '停用',
+          status: 'Default',
+        },
+        "迭代": {
+          text: '迭代',
+          status: 'error',
+        },
+        "正常": { text: '正常', status: 'Success' },
+      },
     },
     {
       title: '操作',
@@ -173,7 +191,7 @@ const TableList: React.FC = () => {
     console.log(excel_datas);
 
     // 列标题，逗号隔开，每一个逗号就是隔开一个单元格
-    let str = `id,渠道sku,ASIN,公司SKU,运营,运维,组别,店铺,KEY,sku序号,开始时间,结束时间\n`;
+    let str = `id,渠道sku,ASIN,公司SKU,运营,运维,组别,店铺,KEY,sku序号,开始时间,结束时间,状态\n`;
     // 增加\t为了不让表格显示科学计数法或者其他格式
     for (let i = 0; i < excel_datas.length; i++) {
       // console.log(excel_datas[i])
@@ -422,8 +440,9 @@ const TableList: React.FC = () => {
                   amazon玲琅: 'Amazon-玲琅',
                   amazon治润: 'Amazon-治润',
                   amazon驰甬: 'Amazon-驰甬',
-                  amazoncpower: 'Central_Power_International_Limited',
                   amazon启珊: 'Amazon-启珊',
+                  amazon旗辰: 'Amazon-旗辰',
+                  amazoncpower: 'Central_Power_International_Limited',
                   wayfair信盒: 'Wayfair-信盒',
                   wayfair维禄: 'Wayfair-维禄',
                   ebay玲琅: 'eBay-玲琅',

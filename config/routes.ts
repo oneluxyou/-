@@ -55,29 +55,29 @@
       },
     ],
   },
-  // {
-  //   path: '/dashboard',
-  //   name: '销售预报',
-  //   icon: 'crown',
-  //   access: 'SalerManager',
-  //   routes: [
-  //     {
-  //       path: '/dashboard/skuTotal',
-  //       name: '各sku序号销售情况',
-  //       icon: 'smile',
-  //       component: './dashboard/skuTotal/index',
-  //     },
-  //     {
-  //       path: '/dashboard/saleRank',
-  //       name: '销售报表',
-  //       icon: 'smile',
-  //       component: './dashboard/saleRank/index',
-  //     },
-  //     {
-  //       component: './404',
-  //     },
-  //   ],
-  // },
+  {
+    path: '/dashboard',
+    name: '销售预报',
+    icon: 'crown',
+    access: 'SalerManager',
+    routes: [
+      {
+        path: '/dashboard/skuTotal',
+        name: '各sku序号销售情况',
+        icon: 'smile',
+        component: './dashboard/skuTotal/index',
+      },
+      {
+        path: '/dashboard/saleRank',
+        name: '销售报表',
+        icon: 'smile',
+        component: './dashboard/saleRank/index',
+      },
+      {
+        component: './404',
+      },
+    ],
+  },
   {
     path: '/welcome',
     name: '周转表',

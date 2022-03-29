@@ -265,6 +265,7 @@ const App: React.FC = () => {
                             success: true,
                         });
                         const data = await result;
+                        console.log(data)
                         setquantity(data.quantity);
                         setcost(data.cost);
                         setquantity_max(data.quantity_max);

@@ -149,6 +149,7 @@ const Edit = (props) => {
                 amazon治润: 'Amazon-治润',
                 amazonCPower: 'Central_Power_International_Limited',
                 amazon启珊: 'Amazon-启珊',
+                amazon旗辰: 'Amazon-旗辰',
                 wayfair信盒: 'Wayfair-信盒',
                 wayfair维禄: 'Wayfair-维禄',
                 ebay玲琅: 'eBay-玲琅',

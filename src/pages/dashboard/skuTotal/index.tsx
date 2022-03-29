@@ -634,7 +634,7 @@ const SkuTotal = () => {
     }
     // 列筛选器选项
     const Option = total_attribute.map((value: any) => {
-        return { label: value, value: value };
+        return { label: value == '净毛利润' ? '毛利润' : (value == '净毛利润率' ? '毛利润率' : (value == '净毛利贡献率' ? '毛利润贡献率' : value)), value: value };
     })
     // 导出报表
     const downloadExcel = () => {
@@ -714,7 +714,7 @@ const SkuTotal = () => {
                 </Form>
             </div>
             <div style={{ backgroundColor: "white", paddingLeft: 10, paddingRight: 10 }}>
-                <p style={{ display: "none" }} className="detail">销量总计:　{num_sum}　　　交易额总计:　{money_sum}　　　广告费用总计:　{promotion_sum}　　　售后费用总计:　{after_sale_sum}　　　净毛利润:　{gross_profit_sum}</p>
+                <p style={{ display: "none" }} className="detail">销量总计:　{num_sum}　　　交易额总计:　{money_sum}　　　广告费用总计:　{promotion_sum}　　　售后费用总计:　{after_sale_sum}　　　毛利润:　{gross_profit_sum}</p>
                 <Row style={{ marginBottom: 5 }}>
                     <Col span={12}>
                         <span>列选择器：</span>
