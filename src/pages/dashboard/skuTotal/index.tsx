@@ -625,7 +625,7 @@ const SkuTotal = () => {
             setattribute(total_attribute);
         }
         else {
-            const col_array = `${i}`.split(',')
+            const col_array = `${i}`.split(',');
             setattribute(col_array);
             setcolumns(col_array.map((value) => {
                 return temp_columns[total_attribute.indexOf(value)];
@@ -634,7 +634,7 @@ const SkuTotal = () => {
     }
     // 列筛选器选项
     const Option = total_attribute.map((value: any) => {
-        return { label: value == '净毛利润' ? '毛利润' : (value == '净毛利润率' ? '毛利润率' : (value == '净毛利贡献率' ? '毛利润贡献率' : value)), value: value };
+        return { label: value == '净毛利润' ? '毛利润' : (value == '净毛利润率' ? '毛利润率' : (value == '净毛利润贡献率' ? '毛利润贡献率' : value)), value: value };
     })
     // 导出报表
     const downloadExcel = () => {

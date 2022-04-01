@@ -1027,6 +1027,8 @@ const Edit = (props) => {
                   '启珊': '启珊',
                   '驰甬': '驰甬',
                   '杉绮': '杉绮',
+                  '治润': '治润',
+                  'Central_Power_International_Limited': 'Central_Power_International_Limited',
                 }}
                 rules={[{ required: true, message: '请输入店铺!' }]}
               />

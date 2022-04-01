@@ -133,18 +133,25 @@ const TableList: React.FC = () => {
       tooltip: '自动生成',
     },
     {
-      title: '开始时间(美国时间)',
+      title: '款式序号',
+      dataIndex: '款式序号',
+      hideInSearch: true,
+      key: '款式序号',
+      tooltip: '自动生成',
+    },
+    {
+      title: '开始时间',
       dataIndex: '开始时间',
       hideInSearch: true,
       key: '开始时间',
-      tooltip: '自动生成(美国时间)',
+      tooltip: '自动生成',
     },
     {
       title: '结束时间',
       dataIndex: '结束时间',
       // hideInSearch: true,
       key: '结束时间',
-      tooltip: '自动生成(美国时间)',
+      tooltip: '自动生成',
     },
     {
       title: '状态',
@@ -191,7 +198,7 @@ const TableList: React.FC = () => {
     console.log(excel_datas);
 
     // 列标题，逗号隔开，每一个逗号就是隔开一个单元格
-    let str = `id,渠道sku,ASIN,公司SKU,运营,运维,组别,店铺,KEY,sku序号,开始时间,结束时间,状态\n`;
+    let str = `id,渠道sku,ASIN,公司SKU,运营,运维,组别,店铺,KEY,sku序号,款式序号,开始时间,结束时间,状态\n`;
     // 增加\t为了不让表格显示科学计数法或者其他格式
     for (let i = 0; i < excel_datas.length; i++) {
       // console.log(excel_datas[i])

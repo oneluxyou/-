@@ -15,10 +15,7 @@ export default function access(initialState: { currentUser?: API.CurrentUser | u
         currentUser.authority === 'after_sale'),
     // 匹配表页面修改
     MatchManager: () =>
-      currentUser &&
-      (currentUser.authority === 'admin' ||
-        currentUser.authority === 'manager' ||
-        currentUser.authority === 'after_sale'),
+      currentUser && (currentUser.authority === 'admin' || currentUser.authority === 'manager'),
     // 销售预报页面权限
     SalerManager: () =>
       currentUser && (currentUser.authority === 'admin' || currentUser.authority === 'manager'),
