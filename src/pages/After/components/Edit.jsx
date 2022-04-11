@@ -419,6 +419,7 @@ const Edit = (props) => {
   const [detailreason, setdetailreason] = useState([]);
   const [refund, setrefund] = useState(0);
   const [renew, setrenew] = useState([]);
+  const [yuanyinchina, setyuanyinchina] = useState([]);
   // 退货次数显示
   const [returnsku, setreturnsku] = useState([]);
   const { isModalVisible } = props;
@@ -478,8 +479,8 @@ const Edit = (props) => {
             } else if ((element[0] == '3-4-0') || (element[0] == '3-5-0')) {
               const temp_element = element[1].split('ship');
               initial_dic[element[0]] = temp_element[0].replace(new RegExp('#', ("gm")), ',');
-              initial_dic[element[0] + '数量'] = temp_element[1];
-              temp_renew.push(element[0]);
+              initial_dic[element[0] + '补寄次数'] = temp_element[1];
+              temp_yuanying.push(element[0]);
             }
             else {
               initial_dic[element[0]] = element[1].replace(new RegExp('#', ("gm")), ',');
@@ -723,6 +724,7 @@ const Edit = (props) => {
     }
     setreturnsku(temp_returnsku);
     setyuanyingerror(temp_yuanyingerror);
+    setyuanyinchina(temp_yuanyinchina);
     setrefund(temp_refund);
     setrenew(temp_renew);
     setdetailreason(temp_reason);
@@ -732,18 +734,29 @@ const Edit = (props) => {
     const children = [];
     for (let i = 0; i < detailreason.length; i++) {
       children.push(
-        <ProForm.Item
-          label={yuanying_tran[detailreason[i]]}
-          name={yuanying[i]}
-          tooltip="输入多个请用逗号隔开，第一位为大写字母，第二位为非0数字，第三位为数字或空,例：允许A，A1，A10，不允许1A，A01，a1。特例 编号标贴-B99 螺丝包-L99 排骨条-P99 说明书-S99 五金盒-W99 配件未知-U99"
-          rules={[{ pattern: /(^[A-Z]{1}$)|(^[A-Z][1-9]{1}$)|(^[A-Z][1-9][0-9]{1}$)|((^[A-Z]{1}((,[A-Z]{1})|(,[A-Z][1-9]{1})|(,[A-Z][1-9][0-9]{1})){1,}$)|(^[A-Z][1-9]{1}((,[A-Z]{1})|(,[A-Z][1-9]{1})|(,[A-Z][1-9][0-9]{1})){1,}$)|(^[A-Z][1-9][0-9]{1}(((,[A-Z]{1})|(,[A-Z][1-9]{1})$|(,[A-Z][1-9][0-9]{1})){1,}$)))/, message: '请以大写字母+数字+数字的形式输入' }]}
-        >
-          <Input
-            style={{ width: 150 }}
-            name={yuanying[i]}
-            placeholder="请输入配件"
+        <>
+          <ProForm.Item
+            label={yuanying_tran[detailreason[i]]}
+            name={detailreason[i]}
+            tooltip="输入多个请用逗号隔开，第一位为大写字母，第二位为非0数字，第三位为数字或空,例：允许A，A1，A10，不允许1A，A01，a1。特例 编号标贴-B99 螺丝包-L99 排骨条-P99 说明书-S99 五金盒-W99 配件未知-U99"
+            rules={[{ pattern: /(^[A-Z]{1}$)|(^[A-Z][1-9]{1}$)|(^[A-Z][1-9][0-9]{1}$)|((^[A-Z]{1}((,[A-Z]{1})|(,[A-Z][1-9]{1})|(,[A-Z][1-9][0-9]{1})){1,}$)|(^[A-Z][1-9]{1}((,[A-Z]{1})|(,[A-Z][1-9]{1})|(,[A-Z][1-9][0-9]{1})){1,}$)|(^[A-Z][1-9][0-9]{1}(((,[A-Z]{1})|(,[A-Z][1-9]{1})$|(,[A-Z][1-9][0-9]{1})){1,}$)))/, message: '请以大写字母+数字+数字的形式输入' }]}
+          >
+            <Input
+              style={{ width: 150 }}
+              name={detailreason[i]}
+              placeholder="请输入配件"
+            />
+          </ProForm.Item >
+          <ProFormDigit
+            width="md"
+            name={detailreason[i] + '补寄次数'}
+            label={yuanying_tran[detailreason[i]] + '补寄次数'}
+            placeholder=""
+            initialValue={1}
+            tooltip="默认为1"
+            rules={[{ required: true, message: '请输出数量' }]}
           />
-        </ProForm.Item >
+        </>
       )
     }
     let temp_refund = 0;
@@ -922,7 +935,7 @@ const Edit = (props) => {
                       if (element[1] in values) {
                         console.log(values[element[1]]);
                         if (values[element[1]] != '') {
-                          values['kefu'][key] += '$' + values[element[1]].replace(new RegExp(',', ("gm")), '#');
+                          values['kefu'][key] += '$' + values[element[1]].replace(new RegExp(',', ("gm")), '#') + 'ship' + values[element[1] + '补寄次数'];;
                         } else {
                           if (values['订单状态'] == '已解决') {
                             sku_in = false;
@@ -1055,7 +1068,7 @@ const Edit = (props) => {
                   '已解决': '已解决',
                   '解决中': '解决中',
                 }}
-                rules={[{ required: true, message: '请输入店铺!' }]}
+                rules={[{ required: true, message: '请输入状态!' }]}
               />
               <ProForm.Item
                 name="顾客反馈"

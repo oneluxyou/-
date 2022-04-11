@@ -16,7 +16,7 @@ import ProForm, {
 import type { ProFormInstance } from '@ant-design/pro-form';
 import Edit from './components/Edit'
 import styles from './index.less'
-import { useRequest, useModel } from 'umi';
+import { useRequest, useAccess, Access, useModel } from 'umi';
 
 //表单part
 
@@ -28,6 +28,7 @@ import { useRequest, useModel } from 'umi';
 
 
 const TableList: React.FC = () => {
+  const access = useAccess();
   const { data } = useRequest({
     url: '/api/sku/static',
     method: 'get',
@@ -1143,175 +1144,192 @@ const TableList: React.FC = () => {
         <p><SoundOutlined />　最新更改:</p>
         <p>默认时间为01-01 到 02-26</p>
       </div> */}
-      <ProForm
-        autoComplete="on"
-        size='small'
-        formRef={formRef}
-        initialValues={{
-          '登记人': initialState.currentUser?.name
-        }}
-        onFinish={async (values, ...rest) => {
-          values['订单号'] = values['订单号'].replace(new RegExp(' ', ("gm")), '').replace(new RegExp('/[\r\n]/g', ("gm")), "").replace(new RegExp('　', ("gm")), "");
-          if ((yuanyingerror == true) || (fankuierror == true)) {
-            message.error('顾客反馈和客服操作不能只选大类');
-          } else if (data?.order_name.indexOf(values['订单号']) > -1) {
-            settemp_values(values);
-            setIsModalVisible(true);
-          } else if ((data?.order_name.indexOf(values['订单号']) < -1) && (order_name?.indexOf(values['订单号']) > -1)) {
-            settemp_values(values);
-            setIsModalVisible(true);
-          }
-          else {
-            // 规范数据
-            let sku_in = true;
-            values['SKU'] = values['SKU'].replace(new RegExp('，', ("gm")), ',');
-            values['SKU'] = values['SKU'].replace(new RegExp(' ', ("gm")), '');
-            values['SKU'] = values['SKU'].replace(new RegExp('  ', ("gm")), '');
+      <Access accessible={access.AfterManager()}>
+        <ProForm
+          autoComplete="on"
+          size='small'
+          formRef={formRef}
+          initialValues={{
+            '登记人': initialState.currentUser?.name
+          }}
+          onFinish={async (values, ...rest) => {
+            values['订单号'] = values['订单号'].replace(new RegExp(' ', ("gm")), '').replace(new RegExp('/[\r\n]/g', ("gm")), "").replace(new RegExp('　', ("gm")), "");
+            if ((yuanyingerror == true) || (fankuierror == true)) {
+              message.error('顾客反馈和客服操作不能只选大类');
+            } else if (data?.order_name.indexOf(values['订单号']) > -1) {
+              settemp_values(values);
+              setIsModalVisible(true);
+            } else if ((data?.order_name.indexOf(values['订单号']) < -1) && (order_name?.indexOf(values['订单号']) > -1)) {
+              settemp_values(values);
+              setIsModalVisible(true);
+            }
+            else {
+              // 规范数据
+              let sku_in = true;
+              values['SKU'] = values['SKU'].replace(new RegExp('，', ("gm")), ',');
+              values['SKU'] = values['SKU'].replace(new RegExp(' ', ("gm")), '');
+              values['SKU'] = values['SKU'].replace(new RegExp('  ', ("gm")), '');
 
-            if (!data.sku_name.find((item: string) => item == values['SKU'])) {
-              sku_in = false;
-              message.error('传入的SKU:' + values['SKU'] + '不正确(注:AB箱填有问题的那箱，不同SKU请分条填写。)');
-            }
-            if ('3-1-0' in values) {
-              // 如果不为空，则重新判断是否正确
-              values['3-1-0'] = values['3-1-0'].replace(new RegExp('，', ("gm")), ',');
-              values['3-1-0'] = values['3-1-0'].replace(new RegExp(' ', ("gm")), '');
-              values['3-1-0'] = values['3-1-0'].replace(new RegExp('  ', ("gm")), '');
-              if (!data.sku_name.find((item) => item == values['3-1-0'])) {
+              if (!data.sku_name.find((item: string) => item == values['SKU'])) {
                 sku_in = false;
-                message.error('传入的补寄新件SKU:' + values['3-1-0'] + '不正确(注:AB箱填有问题的那箱，不同SKU请分条填写。)');
+                message.error('传入的SKU:' + values['SKU'] + '不正确(注:AB箱填有问题的那箱，不同SKU请分条填写。)');
               }
-            } else {
-              if ('3-1-0数量' in values) {
-                values['3-1-0'] = values['SKU'];
-              }
-            }
-            if ('3-2-0' in values) {
-              // 如果不为空，则重新判断是否正确
-              values['3-2-0'] = values['3-2-0'].replace(new RegExp('，', ("gm")), ',');
-              values['3-2-0'] = values['3-2-0'].replace(new RegExp(' ', ("gm")), '');
-              values['3-2-0'] = values['3-2-0'].replace(new RegExp('  ', ("gm")), '');
-              if (!data.sku_name.find((item) => item == values['3-2-0'])) {
-                sku_in = false;
-                message.error('传入的补寄退件SKU:' + values['3-2-0'] + '不正确(注:AB箱填有问题的那箱，不同SKU请分条填写。)');
-              }
-            } else {
-              if ('3-2-0数量' in values) {
-                values['3-2-0'] = values['SKU'];
-              }
-            }
-            if ('3-3-0' in values) {
-              // 如果不为空，则重新判断是否正确
-              values['3-3-0'] = values['3-3-0'].replace(new RegExp('，', ("gm")), ',');
-              values['3-3-0'] = values['3-3-0'].replace(new RegExp(' ', ("gm")), '');
-              values['3-3-0'] = values['3-3-0'].replace(new RegExp('  ', ("gm")), '');
-              if (!data.sku_name.find((item) => item == values['3-3-0'])) {
-                sku_in = false;
-                message.error('传入的补寄破损件SKU:' + values['3-3-0'] + '不正确(注:AB箱填有问题的那箱，不同SKU请分条填写。)');
-              }
-            } else {
-              if ('3-3-0数量' in values) {
-                values['3-3-0'] = values['SKU'];
-              }
-            }
-            values['guke'] = new Array();
-            values['kefu'] = new Array();
-            // 顾客反馈做处理
-            for (const key in values['顾客反馈']) {
-              if (Object.prototype.hasOwnProperty.call(values['顾客反馈'], key)) {
-                const element = values['顾客反馈'][key];
-                values['guke'][key] = values['顾客反馈'][key][1];
-                if ((element[0] == '5-0') ||
-                  (element[0] == '6-0') || (element[0] == '7-0')) {
-                  if (element[1] in values) {
-                    if (values[element[1]] != '') {
-                      values['guke'][key] += '$' + values[element[1]].replace(new RegExp(',', ("gm")), '#');
-                    } else {
-                      if (values['订单状态'] == '已解决') {
-                        sku_in = false;
-                        message.error('请填写配件');
-                      }
-                    }
-
-                  } else {
-                    if (values['订单状态'] == '已解决') {
-                      sku_in = false;
-                      message.error('请填写配件');
-                    }
-                  }
+              if ('3-1-0' in values) {
+                // 如果不为空，则重新判断是否正确
+                values['3-1-0'] = values['3-1-0'].replace(new RegExp('，', ("gm")), ',');
+                values['3-1-0'] = values['3-1-0'].replace(new RegExp(' ', ("gm")), '');
+                values['3-1-0'] = values['3-1-0'].replace(new RegExp('  ', ("gm")), '');
+                if (!data.sku_name.find((item) => item == values['3-1-0'])) {
+                  sku_in = false;
+                  message.error('传入的补寄新件SKU:' + values['3-1-0'] + '不正确(注:AB箱填有问题的那箱，不同SKU请分条填写。)');
+                }
+              } else {
+                if ('3-1-0数量' in values) {
+                  values['3-1-0'] = values['SKU'];
                 }
               }
-            }
-            values['guke'] = values['guke'].join('&');
-            // 客服操作做处理
-            for (const key in values['客服操作']) {
-              if (Object.prototype.hasOwnProperty.call(values['客服操作'], key)) {
-                const element = values['客服操作'][key];
-                values['kefu'][key] = values['客服操作'][key][1];
-                // 判断配件
-                if ((element[1] == '3-4-0') ||
-                  (element[1] == '3-5-0')) {
-                  if (element[1] in values) {
-                    if (values[element[1]] != '') {
-                      values['kefu'][key] += '$' + values[element[1]].replace(new RegExp(',', ("gm")), '#') + 'ship' + values[element[1] + '补寄次数'];
-                    } else {
-                      if (values['订单状态'] == '已解决') {
-                        sku_in = false;
-                        message.error('请填写配件');
-                      }
-                    }
-                  } else {
-                    if (values['订单状态'] == '已解决') {
-                      sku_in = false;
-                      message.error('请填写配件');
-                    }
-                  }
+              if ('3-2-0' in values) {
+                // 如果不为空，则重新判断是否正确
+                values['3-2-0'] = values['3-2-0'].replace(new RegExp('，', ("gm")), ',');
+                values['3-2-0'] = values['3-2-0'].replace(new RegExp(' ', ("gm")), '');
+                values['3-2-0'] = values['3-2-0'].replace(new RegExp('  ', ("gm")), '');
+                if (!data.sku_name.find((item) => item == values['3-2-0'])) {
+                  sku_in = false;
+                  message.error('传入的补寄退件SKU:' + values['3-2-0'] + '不正确(注:AB箱填有问题的那箱，不同SKU请分条填写。)');
                 }
-                // 判断补寄新件
-                if ((element[1] == '3-1-0') || (element[1] == '3-2-0') || (element[1] == '3-3-0')) {
-                  if (element[1] in values) {
-                    const temp_element = values[element[1]];
-                    const temp_element_num = values[element[1] + '数量'];
-                    values['kefu'][key] += '$' + temp_element + 'num' + temp_element_num;
-                  }
-                }
-                if ((element[1] == '2-1-0') || (element[1] == '2-2-0') || (element[1] == '2-3-0')
-                  || (element[1] == '2-4-0') || (element[1] == '2-5-0') || (element[1] == '2-6-0')
-                  || (element[1] == '2-7-0') || (element[1] == '2-8-0') || (element[1] == '2-9-0')) {
-                  if (element[1] + '退货次数' in values) {
-                    const temp_element_num = values[element[1] + '退货次数'];
-                    values['kefu'][key] += 'ship' + temp_element_num;
-                  }
+              } else {
+                if ('3-2-0数量' in values) {
+                  values['3-2-0'] = values['SKU'];
                 }
               }
-            }
-            values['kefu'] = values['kefu'].join('&');
-            if (sku_in == true) {
-              return request(`/api/afterinsert`, {
-                method: 'POST',
-                data: { ...values },
-                requestType: 'form',
-              }).then(res => {
-                //自行根据条件清除
-                if (res == '请重新登录') {
-                  message.error('账户过期,请重新登录账号');
-                } else if (res == '序列重复') {
-                  message.error('该订单号的序列重复(注意:订单号里每一件都要分开填写，第一件序号填1，第二件序号填2,第三件序号填3)');
-                } else {
-                  setorder_name(res);
-                  message.success('提交成功');
-                  // 储存历史记录
-                  for (const key in item_dict) {
-                    temp_dict[key] = new Array();
-                    if (item_dict[key] in storage) {
-                      temp_data = eval(storage[item_dict[key]]).split('|');
-                      for (const key2 in temp_data) {
-                        if (Object.prototype.hasOwnProperty.call(temp_data, key2)) {
-                          const element = temp_data[key2];
-                          temp_dict[key].push(renderItem(element, parseInt(key2), item_dict[key]));
+              if ('3-3-0' in values) {
+                // 如果不为空，则重新判断是否正确
+                values['3-3-0'] = values['3-3-0'].replace(new RegExp('，', ("gm")), ',');
+                values['3-3-0'] = values['3-3-0'].replace(new RegExp(' ', ("gm")), '');
+                values['3-3-0'] = values['3-3-0'].replace(new RegExp('  ', ("gm")), '');
+                if (!data.sku_name.find((item) => item == values['3-3-0'])) {
+                  sku_in = false;
+                  message.error('传入的补寄破损件SKU:' + values['3-3-0'] + '不正确(注:AB箱填有问题的那箱，不同SKU请分条填写。)');
+                }
+              } else {
+                if ('3-3-0数量' in values) {
+                  values['3-3-0'] = values['SKU'];
+                }
+              }
+              values['guke'] = new Array();
+              values['kefu'] = new Array();
+              // 顾客反馈做处理
+              for (const key in values['顾客反馈']) {
+                if (Object.prototype.hasOwnProperty.call(values['顾客反馈'], key)) {
+                  const element = values['顾客反馈'][key];
+                  values['guke'][key] = values['顾客反馈'][key][1];
+                  if ((element[0] == '5-0') ||
+                    (element[0] == '6-0') || (element[0] == '7-0')) {
+                    if (element[1] in values) {
+                      if (values[element[1]] != '') {
+                        values['guke'][key] += '$' + values[element[1]].replace(new RegExp(',', ("gm")), '#');
+                      } else {
+                        if (values['订单状态'] == '已解决') {
+                          sku_in = false;
+                          message.error('请填写配件');
                         }
                       }
-                      if (temp_data.indexOf(values[form_dict[key]]) == -1) {
+
+                    } else {
+                      if (values['订单状态'] == '已解决') {
+                        sku_in = false;
+                        message.error('请填写配件');
+                      }
+                    }
+                  }
+                }
+              }
+              values['guke'] = values['guke'].join('&');
+              // 客服操作做处理
+              for (const key in values['客服操作']) {
+                if (Object.prototype.hasOwnProperty.call(values['客服操作'], key)) {
+                  const element = values['客服操作'][key];
+                  values['kefu'][key] = values['客服操作'][key][1];
+                  // 判断配件
+                  if ((element[1] == '3-4-0') ||
+                    (element[1] == '3-5-0')) {
+                    if (element[1] in values) {
+                      if (values[element[1]] != '') {
+                        values['kefu'][key] += '$' + values[element[1]].replace(new RegExp(',', ("gm")), '#') + 'ship' + values[element[1] + '补寄次数'];
+                      } else {
+                        if (values['订单状态'] == '已解决') {
+                          sku_in = false;
+                          message.error('请填写配件');
+                        }
+                      }
+                    } else {
+                      if (values['订单状态'] == '已解决') {
+                        sku_in = false;
+                        message.error('请填写配件');
+                      }
+                    }
+                  }
+                  // 判断补寄新件
+                  if ((element[1] == '3-1-0') || (element[1] == '3-2-0') || (element[1] == '3-3-0')) {
+                    if (element[1] in values) {
+                      const temp_element = values[element[1]];
+                      const temp_element_num = values[element[1] + '数量'];
+                      values['kefu'][key] += '$' + temp_element + 'num' + temp_element_num;
+                    }
+                  }
+                  if ((element[1] == '2-1-0') || (element[1] == '2-2-0') || (element[1] == '2-3-0')
+                    || (element[1] == '2-4-0') || (element[1] == '2-5-0') || (element[1] == '2-6-0')
+                    || (element[1] == '2-7-0') || (element[1] == '2-8-0') || (element[1] == '2-9-0')) {
+                    if (element[1] + '退货次数' in values) {
+                      const temp_element_num = values[element[1] + '退货次数'];
+                      values['kefu'][key] += 'ship' + temp_element_num;
+                    }
+                  }
+                }
+              }
+              values['kefu'] = values['kefu'].join('&');
+              if (sku_in == true) {
+                return request(`/api/afterinsert`, {
+                  method: 'POST',
+                  data: { ...values },
+                  requestType: 'form',
+                }).then(res => {
+                  //自行根据条件清除
+                  if (res == '请重新登录') {
+                    message.error('账户过期,请重新登录账号');
+                  } else if (res == '序列重复') {
+                    message.error('该订单号的序列重复(注意:订单号里每一件都要分开填写，第一件序号填1，第二件序号填2,第三件序号填3)');
+                  } else {
+                    setorder_name(res);
+                    message.success('提交成功');
+                    // 储存历史记录
+                    for (const key in item_dict) {
+                      temp_dict[key] = new Array();
+                      if (item_dict[key] in storage) {
+                        temp_data = eval(storage[item_dict[key]]).split('|');
+                        for (const key2 in temp_data) {
+                          if (Object.prototype.hasOwnProperty.call(temp_data, key2)) {
+                            const element = temp_data[key2];
+                            temp_dict[key].push(renderItem(element, parseInt(key2), item_dict[key]));
+                          }
+                        }
+                        if (temp_data.indexOf(values[form_dict[key]]) == -1) {
+                          temp_data.push(values[form_dict[key]]);
+                          temp_dict[key].push(renderItem(values[form_dict[key]], temp_data.length - 1, item_dict[key]));
+                          let temp_storage = temp_data.join('|');
+                          temp_storage = JSON.stringify(temp_storage);
+                          storage[item_dict[key]] = temp_storage;
+                          //自行根据条件清除
+                          if (parseInt(key) == 0) {
+                            setdengji(temp_dict[0]);
+                          } else if (parseInt(key) == 1) {
+                            setosku(temp_dict[1]);
+                          } else if (parseInt(key) == 3) {
+                            setbeizhu(temp_dict[2]);
+                          }
+                        }
+                      } else {
+                        temp_data = []
                         temp_data.push(values[form_dict[key]]);
                         temp_dict[key].push(renderItem(values[form_dict[key]], temp_data.length - 1, item_dict[key]));
                         let temp_storage = temp_data.join('|');
@@ -1323,206 +1341,198 @@ const TableList: React.FC = () => {
                         } else if (parseInt(key) == 1) {
                           setosku(temp_dict[1]);
                         } else if (parseInt(key) == 3) {
-                          setbeizhu(temp_dict[2]);
+                          setbeizhu([]);
                         }
                       }
-                    } else {
-                      temp_data = []
-                      temp_data.push(values[form_dict[key]]);
-                      temp_dict[key].push(renderItem(values[form_dict[key]], temp_data.length - 1, item_dict[key]));
-                      let temp_storage = temp_data.join('|');
-                      temp_storage = JSON.stringify(temp_storage);
-                      storage[item_dict[key]] = temp_storage;
-                      //自行根据条件清除
-                      if (parseInt(key) == 0) {
-                        setdengji(temp_dict[0]);
-                      } else if (parseInt(key) == 1) {
-                        setosku(temp_dict[1]);
-                      } else if (parseInt(key) == 3) {
-                        setbeizhu([]);
-                      }
                     }
+                    formRef.current?.resetFields();
+                    setdetailitem([]);
+                    setdetailreason([]);
+                    setrefund(0);
+                    setresku([]);
                   }
-                  formRef.current?.resetFields();
-                  setdetailitem([]);
-                  setdetailreason([]);
-                  setrefund(0);
-                  setresku([]);
-                }
 
-              });
+                });
+              }
             }
+
+          }
           }
 
-        }
-        }
-
-      >
-        <Row gutter={[32, 16]}>
-          <Col span={3}>
-            <ProForm.Item
-              name="登记人"
-              label="登记人"
-              tooltip="请勿输入渠道SKU/订单号/包裹号"
-              rules={[{ required: true, message: '请输入登记人!' }]}
-            >
-              <AutoComplete
-                placeholder="请输入名称"
-                options={dengji}
-              />
-            </ProForm.Item>
-          </Col>
-          <Col span={5}>
-            <ProForm.Item
-              name="店铺"
-              label="店铺"
-              rules={[{ required: true, message: '请输入店铺!' }]}
-            >
-              <ProFormSelect
-                width="md"
-                fieldProps={{
-                  listHeight: 450,
-                }}
-                valueEnum={{
-                  '赫曼': '赫曼',
-                  '信盒': '信盒',
-                  '宫本': '宫本',
-                  '森月': '森月',
-                  '维禄': '维禄',
-                  '玲琅': '玲琅',
-                  '信盒-法国': '信盒-法国',
-                  '信盒-意大利': '信盒-意大利',
-                  '信盒-西班牙': '信盒-西班牙',
-                  'Wayfair-信盒': 'Wayfair-信盒',
-                  'Wayfair-维禄': 'Wayfair-维禄',
-                  'Walmart-优瑞斯特': 'Walmart-优瑞斯特',
-                  'Walmart-赫曼': 'Walmart-赫曼',
-                  'Walmart-信盒': 'Walmart-信盒',
-                  'Walmart-宫本': 'Walmart-宫本',
-                  'eBay-玲琅': 'eBay-玲琅',
-                  'eBay-治润': 'eBay-治润',
-                  'eBay-雅秦': 'eBay-雅秦',
-                  'Nextfur-Shopify': 'Nextfur-Shopify',
-                  '旗辰': '旗辰',
-                  '赛迦曼': '赛迦曼',
-                  '启珊': '启珊',
-                  '驰甬': '驰甬',
-                  '杉绮': '杉绮',
-                  '治润': '治润',
-                  'Central_Power_International_Limited': 'Central_Power_International_Limited',
-                }}
-              />
-            </ProForm.Item>
-          </Col>
-          <Col span={5}>
-            <ProForm.Item
-              name="订单号"
-              label="订单号"
-              rules={[{ required: true, message: '请输入' }]}
-            >
-              <AutoComplete
-                placeholder="请输入订单号!"
-              />
-            </ProForm.Item>
-          </Col>
-          <Col span={5}>
-            <ProForm.Item
-              name="SKU"
-              label="SKU"
-              rules={[{ required: true, message: 'AB箱填有问题的那箱，不同SKU请分条填写。' }, { pattern: /[^,||^，]$/, message: '限填一件' }]}
-              tooltip="AB箱填有问题的那箱,限填一个"
-            >
-              <AutoComplete
-                placeholder="AB箱填有问题的,限填一个"
-                options={osku}
-              />
-            </ProForm.Item>
-          </Col>
-          <Col span={3}>
-            <ProFormDigit
-              width="md"
-              name="序号"
-              label="序号"
-              placeholder=""
-              initialValue={1}
-              tooltip="同一个订单里，第一件填1，第二件填2，以此类推"
-              rules={[{ required: true, message: '请输入' }]}
-            />
-          </Col >
-          <Col span={3}>
-            <ProForm.Item
-              name="订单状态"
-              label="订单状态"
-              rules={[{ required: true, message: '请输入状态!' }]}
-            >
-              <ProFormSelect
-                width="md"
-                valueEnum={{
-                  '已解决': '已解决',
-                  '解决中': '解决中',
-                }}
-              />
-            </ProForm.Item>
-          </Col>
-          <Col span={4}>
-            <ProForm.Item
-              name="顾客反馈"
-              label="顾客反馈"
-              rules={[{ required: true, message: '请输入' }]}
-            >
-              <Cascader
-                multiple
-                className={styles.fankuicas}
-                onChange={fankuionChange}
-                options={fankuicol}
-                expandTrigger="hover"
-              />
-
-            </ProForm.Item>
-          </Col>
-          {getfankuipeijianFields()}
-          <Col span={4}>
-            <ProForm.Item
-              name="客服操作"
-              label="客服操作"
-              rules={[{ required: true, message: '请输入' }]}
-            >
-              <Cascader
-                multiple
-                maxTagCount="responsive"
-                onChange={yuanyingChange}
-                style={{ width: '100%' }}
-                options={yuanyingcol}
-                expandTrigger="hover"
-              />
-            </ProForm.Item>
-          </Col>
-          {getyuanyingFields()}
-          <Col span={20}>
-            <ProForm.Item
-              name="备注" label="备注"
-            >
-              <AutoComplete
+        >
+          <Row gutter={[32, 16]}>
+            <Col span={3}>
+              <ProForm.Item
+                name="登记人"
+                label="登记人"
+                tooltip="请勿输入渠道SKU/订单号/包裹号"
+                rules={[{ required: true, message: '请输入登记人!' }]}
               >
-                <TextArea
-                  placeholder="请填写详细(不得超过255个字)"
-                  className="custom"
-                  style={{ height: 50 }}
-                  showCount={true}
+                <AutoComplete
+                  placeholder="请输入名称"
+                  options={dengji}
                 />
-              </AutoComplete>
-            </ProForm.Item>
-          </Col>
-        </Row>
-      </ProForm>
+              </ProForm.Item>
+            </Col>
+            <Col span={5}>
+              <ProForm.Item
+                name="店铺"
+                label="店铺"
+                rules={[{ required: true, message: '请输入店铺!' }]}
+              >
+                <ProFormSelect
+                  width="md"
+                  fieldProps={{
+                    listHeight: 450,
+                  }}
+                  valueEnum={{
+                    '赫曼': '赫曼',
+                    '信盒': '信盒',
+                    '宫本': '宫本',
+                    '森月': '森月',
+                    '维禄': '维禄',
+                    '玲琅': '玲琅',
+                    '信盒-法国': '信盒-法国',
+                    '信盒-意大利': '信盒-意大利',
+                    '信盒-西班牙': '信盒-西班牙',
+                    'Wayfair-信盒': 'Wayfair-信盒',
+                    'Wayfair-维禄': 'Wayfair-维禄',
+                    'Walmart-优瑞斯特': 'Walmart-优瑞斯特',
+                    'Walmart-赫曼': 'Walmart-赫曼',
+                    'Walmart-信盒': 'Walmart-信盒',
+                    'Walmart-宫本': 'Walmart-宫本',
+                    'eBay-玲琅': 'eBay-玲琅',
+                    'eBay-治润': 'eBay-治润',
+                    'eBay-雅秦': 'eBay-雅秦',
+                    'Nextfur-Shopify': 'Nextfur-Shopify',
+                    '旗辰': '旗辰',
+                    '赛迦曼': '赛迦曼',
+                    '启珊': '启珊',
+                    '驰甬': '驰甬',
+                    '杉绮': '杉绮',
+                    '治润': '治润',
+                    'Central_Power_International_Limited': 'Central_Power_International_Limited',
+                  }}
+                />
+              </ProForm.Item>
+            </Col>
+            <Col span={5}>
+              <ProForm.Item
+                name="订单号"
+                label="订单号"
+                rules={[{ required: true, message: '请输入' }]}
+              >
+                <AutoComplete
+                  placeholder="请输入订单号!"
+                />
+              </ProForm.Item>
+            </Col>
+            <Col span={5}>
+              <ProForm.Item
+                name="SKU"
+                label="SKU"
+                rules={[{ required: true, message: 'AB箱填有问题的那箱，不同SKU请分条填写。' }, { pattern: /[^,||^，]$/, message: '限填一件' }]}
+                tooltip="AB箱填有问题的那箱,限填一个"
+              >
+                <AutoComplete
+                  placeholder="AB箱填有问题的,限填一个"
+                  options={osku}
+                />
+              </ProForm.Item>
+            </Col>
+            <Col span={3}>
+              <ProFormDigit
+                width="md"
+                name="序号"
+                label="序号"
+                placeholder=""
+                initialValue={1}
+                tooltip="同一个订单里，第一件填1，第二件填2，以此类推"
+                rules={[{ required: true, message: '请输入' }]}
+              />
+            </Col >
+            <Col span={3}>
+              <ProForm.Item
+                name="订单状态"
+                label="订单状态"
+                rules={[{ required: true, message: '请输入状态!' }]}
+              >
+                <ProFormSelect
+                  width="md"
+                  valueEnum={{
+                    '已解决': '已解决',
+                    '解决中': '解决中',
+                  }}
+                />
+              </ProForm.Item>
+            </Col>
+            <Col span={4}>
+              <ProForm.Item
+                name="顾客反馈"
+                label="顾客反馈"
+                rules={[{ required: true, message: '请输入' }]}
+              >
+                <Cascader
+                  multiple
+                  className={styles.fankuicas}
+                  onChange={fankuionChange}
+                  options={fankuicol}
+                  expandTrigger="hover"
+                />
+
+              </ProForm.Item>
+            </Col>
+            {getfankuipeijianFields()}
+            <Col span={4}>
+              <ProForm.Item
+                name="客服操作"
+                label="客服操作"
+                rules={[{ required: true, message: '请输入' }]}
+              >
+                <Cascader
+                  multiple
+                  maxTagCount="responsive"
+                  onChange={yuanyingChange}
+                  style={{ width: '100%' }}
+                  options={yuanyingcol}
+                  expandTrigger="hover"
+                />
+              </ProForm.Item>
+            </Col>
+            {getyuanyingFields()}
+            <Col span={20}>
+              <ProForm.Item
+                name="备注" label="备注"
+              >
+                <AutoComplete
+                >
+                  <TextArea
+                    placeholder="请填写详细(不得超过255个字)"
+                    className="custom"
+                    style={{ height: 50 }}
+                    showCount={true}
+                  />
+                </AutoComplete>
+              </ProForm.Item>
+            </Col>
+          </Row>
+        </ProForm>
+      </Access>
       <br />
       <ProTable
         size='small'
         toolbar={{
           actions: [
-            <Button key="primary" type="primary" onClick={() => downloadExcel()}>
-              导出为excel
-            </Button>,
+            <>
+              <Access accessible={access.MatchExcel()} >
+                <Button key="primary" type="primary" >
+                  <a href="/api/aftersaletotal/">导出总表</a>
+                </Button>
+              </Access>
+              <Button key="primary" type="primary" onClick={() => downloadExcel()}>
+                导出为excel
+              </Button>,
+            </>
           ],
         }}
         search={{
@@ -1535,7 +1545,7 @@ const TableList: React.FC = () => {
         onChange={onTableChange}
         scroll={{ x: 900, y: 500 }}
         request={async (params = {}) => {
-          const result = request('/api/aftersale', {
+          const result = request('/api/aftersale/', {
             method: 'POST',
             data: { ...params },
             requestType: 'form',
@@ -1550,18 +1560,21 @@ const TableList: React.FC = () => {
 
         pagination={{
           pageSize: 100,
+          pageSizeOptions: ['5', '10', '20', '50', '100'],
         }}
         dateFormatter="string"
         headerTitle="售后表格"
       />
       {
         !isModalVisibleEdit ? '' :
-          <Edit
-            isModalVisible={isModalVisibleEdit}
-            isShowModal={isShowModalEdit}
-            actionRef={actionRef}
-            editId={editId}
-          />
+          <Access accessible={access.AfterManager()} >
+            <Edit
+              isModalVisible={isModalVisibleEdit}
+              isShowModal={isShowModalEdit}
+              actionRef={actionRef}
+              editId={editId}
+            />
+          </Access>
       }
       {/* 订单重复提示 */}
       <Modal title="警示" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>

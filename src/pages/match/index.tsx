@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-for-in-array */
 /* eslint-disable @typescript-eslint/dot-notation */
 import React, { useState, useRef } from 'react';
+import { FileExcelOutlined } from '@ant-design/icons';
 import ProTable from '@ant-design/pro-table';
 import { PageContainer } from '@ant-design/pro-layout';
 import request from 'umi-request';
 import { Button, message, Col, Row, AutoComplete } from 'antd';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
-import ProForm, { ProFormSelect } from '@ant-design/pro-form';
-import type { ProFormInstance } from '@ant-design/pro-form';
+import ProForm, { ProFormSelect, ProFormInstance } from '@ant-design/pro-form';
 import Edit from './components/Edit';
 import { useRequest, useAccess, Access } from 'umi';
 
@@ -107,6 +107,7 @@ const TableList: React.FC = () => {
         amazon驰甬: 'Amazon-驰甬',
         amazon启珊: 'Amazon-启珊',
         amazon旗辰: 'Amazon-旗辰',
+        amazon赛迦曼: 'Amazon-赛迦曼',
         amazoncpower: 'Central_Power_International_Limited',
         amazon: 'Amazon',
         wayfair信盒: 'Wayfair-信盒',
@@ -449,6 +450,7 @@ const TableList: React.FC = () => {
                   amazon驰甬: 'Amazon-驰甬',
                   amazon启珊: 'Amazon-启珊',
                   amazon旗辰: 'Amazon-旗辰',
+                  amazon赛迦曼: 'Amazon-赛迦曼',
                   amazoncpower: 'Central_Power_International_Limited',
                   wayfair信盒: 'Wayfair-信盒',
                   wayfair维禄: 'Wayfair-维禄',
@@ -525,11 +527,10 @@ const TableList: React.FC = () => {
         actionRef={actionRef}
         onChange={onTableChange}
         request={async (params = {}) => {
-          const result = request('/api/skuinfo', {
+          const result = request('/api/skuinfo/', {
             method: 'POST',
             data: { ...params },
             requestType: 'form',
-            success: true,
           });
           settableData(await result);
           return result;
@@ -542,9 +543,13 @@ const TableList: React.FC = () => {
         dateFormatter="string"
         toolbar={{
           actions: [
-            <Button key="primary" type="primary" onClick={() => downloadExcel()}>
-              导出为excel
-            </Button>,
+            <>
+              <Access accessible={access.MatchManager()} >
+                <Button key="primary" type="primary" >
+                  <a href="/api/skuinfototal/">导出总表</a>
+                </Button>
+              </Access>
+            </>
           ],
         }}
       />

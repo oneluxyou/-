@@ -83,8 +83,8 @@ const Login: React.FC = () => {
       <div className={styles.content}>
         <LoginForm
           logo={<img alt="logo" src="/figma.svg" />}
-          title="Antd Pro"
-          subTitle={intl.formatMessage({ id: 'based on ant design' })}
+          title="Ant Design"
+          subTitle={intl.formatMessage({ id: '若有问题，请联系数据中心' })}
           initialValues={{
             autoLogin: true,
           }}
@@ -97,8 +97,8 @@ const Login: React.FC = () => {
             <AlipayCircleOutlined key="AlipayCircleOutlined" className={styles.icon} />,
             <TaobaoCircleOutlined key="TaobaoCircleOutlined" className={styles.icon} />,
             <WeiboCircleOutlined key="WeiboCircleOutlined" className={styles.icon} />,
-            <WechatOutlined key="WechatOutlined" className={styles.icon}/>,
-            <AmazonOutlined key="AmazonOutlined" className={styles.icon}/>
+            <WechatOutlined key="WechatOutlined" className={styles.icon} />,
+            <AmazonOutlined key="AmazonOutlined" className={styles.icon} />
           ]}
           onFinish={async (values) => {
             await handleSubmit(values as API.LoginParams);

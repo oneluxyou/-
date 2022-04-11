@@ -265,7 +265,6 @@ const App: React.FC = () => {
                             success: true,
                         });
                         const data = await result;
-                        console.log(data)
                         setquantity(data.quantity);
                         setcost(data.cost);
                         setquantity_max(data.quantity_max);
@@ -305,7 +304,6 @@ const App: React.FC = () => {
                 <ProTable
                     columns={arr1}
                     request={async (skusearch = {}) => {
-                        console.log(skusearch);
                         const result = request('/api/after_sale/ana', {
                             method: 'POST',
                             data: { ...skusearch },

@@ -36,6 +36,19 @@
         icon: 'smile',
         component: './After/After_ana',
       },
+      // {
+      //   path: '/after/sort',
+      //   name: '分页',
+      //   icon: 'smile',
+      //   routes: [
+      //     {
+      //       path: '/after/sort/az',
+      //       name: 'AZ',
+      //       icon: 'smile',
+      //       component: './After/sort/az',
+      //     },
+      //   ],
+      // },
     ],
   },
   {
