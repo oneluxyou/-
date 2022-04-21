@@ -92,10 +92,38 @@
     ],
   },
   {
-    path: '/welcome',
+    path: '/zhouzhua',
     name: '周转表',
     icon: 'TableOutlined',
-    component: './Table',
+    routes: [
+      {
+        path: '/zhouzhua/tableall',
+        name: '周转表-总表',
+        icon: 'TableOutlined',
+        component: './zhouzhuan/index',
+      },
+      {
+        path: '/zhouzhua/tablehaiwai',
+        name: '周转表-海外FBA',
+        icon: 'TableOutlined',
+        component: './zhouzhuan/table_haiwai',
+      },
+      {
+        path: '/zhouzhua/tablewm',
+        name: '周转表-WM',
+        icon: 'TableOutlined',
+        component: './zhouzhuan/table_wm',
+      },
+      {
+        path: '/zhouzhua/tablewf',
+        name: '周转表-WF',
+        icon: 'TableOutlined',
+        component: './zhouzhuan/table_wf',
+      },
+      {
+        component: './404',
+      },
+    ],
   },
   {
     path: '/inventory',

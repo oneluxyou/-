@@ -171,6 +171,38 @@ const TableList: React.FC = () => {
       hideInSearch: true,
     },
     {
+      title: '登记开始日期',
+      dataIndex: '登记开始日期',
+      valueType: 'date',
+      hideInTable: true,
+      //数据库格式问题
+      width: 90
+    },
+    {
+      title: '登记结束日期',
+      dataIndex: '登记结束日期',
+      valueType: 'date',
+      hideInTable: true,
+      //数据库格式问题
+      width: 90
+    },
+    {
+      title: '更改开始日期',
+      dataIndex: '更改开始日期',
+      valueType: 'date',
+      hideInTable: true,
+      //数据库格式问题
+      width: 90
+    },
+    {
+      title: '更改结束日期',
+      dataIndex: '更改结束日期',
+      valueType: 'date',
+      hideInTable: true,
+      //数据库格式问题
+      width: 90
+    },
+    {
       title: '操作',
       valueType: 'option',
       width: 50,
@@ -514,7 +546,7 @@ const TableList: React.FC = () => {
           value: '1-2-X',
         },
         {
-          label: '显示签收',
+          label: '显示到货/签收',
           value: '1-3-K',
         },
         {
@@ -814,7 +846,7 @@ const TableList: React.FC = () => {
           value: '2-6-0',
         },
         {
-          label: '买家使用Amazon Return label退货',
+          label: '买家使用平台 Return label退货',
           value: '2-7-0',
         },
         {
@@ -902,7 +934,7 @@ const TableList: React.FC = () => {
   const [tableData, settableData] = useState([]) as any;
   // 导出报表
   const downloadExcel = () => {
-    const excel_datas = tableData.data;
+    const excel_datas = tableData.excel;
 
     // 列标题，逗号隔开，每一个逗号就是隔开一个单元格
     let str = `id,登记日期,更新日期,登记人,店铺,订单号,SKU,序号,订单状态,顾客反馈,客服操作,退款金额,备注\n`;
@@ -1128,6 +1160,7 @@ const TableList: React.FC = () => {
             setdetailreason([]);
             setrefund(0);
             setresku([]);
+            setreturnsku([]);
           }
         });
 
@@ -1350,6 +1383,7 @@ const TableList: React.FC = () => {
                     setdetailreason([]);
                     setrefund(0);
                     setresku([]);
+                    setreturnsku([]);
                   }
 
                 });
@@ -1524,7 +1558,7 @@ const TableList: React.FC = () => {
         toolbar={{
           actions: [
             <>
-              <Access accessible={access.MatchExcel()} >
+              <Access accessible={access.AfterExcel()} >
                 <Button key="primary" type="primary" >
                   <a href="/api/aftersaletotal/">导出总表</a>
                 </Button>

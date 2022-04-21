@@ -31,6 +31,8 @@ const SkuTotal = () => {
     const [promotion_sum, setpromotion_sum] = useState([]) as any;
     const [after_sale_sum, setafter_sale_sum] = useState([]) as any;
     const [gross_profit_sum, setgross_profit_sum] = useState([]) as any;
+    const [gross_profit_per, setgross_profit_per] = useState([]) as any;
+    const [promotion_per, setpromotion_per] = useState([]) as any;
     // 表格列选择
     const [selectedRowKeys, setselectedRowKeys] = useState() as any;
     const onSelectChange = (value: any) => {
@@ -372,7 +374,7 @@ const SkuTotal = () => {
             <span>
                 广告
                 {/* <Tooltip
-                    title={'=广告 / 销售额'}
+                    title={'=广告 / 交易额'}
                 >
                     <QuestionCircleOutlined />
                 </Tooltip> */}
@@ -388,7 +390,7 @@ const SkuTotal = () => {
             <span>
                 毛利润
                 {/* <Tooltip
-                    title={'=0.85*销售额 - 销售总成本 - 推广费-售后'}
+                    title={'=0.85*交易额 - 销售总成本 - 推广费-售后'}
                 >
                     <QuestionCircleOutlined />
                 </Tooltip> */}
@@ -404,7 +406,7 @@ const SkuTotal = () => {
             <span>
                 成本占比(%)
                 <Tooltip
-                    title={'=销售总成本/销售额'}
+                    title={'=销售总成本/交易额'}
                 >
                     <QuestionCircleOutlined />
                 </Tooltip>
@@ -419,7 +421,7 @@ const SkuTotal = () => {
             <span>
                 损耗占比(%)
                 <Tooltip
-                    title={'=售后 / 销售额'}
+                    title={'=售后 / 交易额'}
                 >
                     <QuestionCircleOutlined />
                 </Tooltip>
@@ -434,7 +436,7 @@ const SkuTotal = () => {
     //         <span>
     //             推广占比(%)
     //             <Tooltip
-    //                 title={'=推广费 / 销售额'}
+    //                 title={'=推广费 / 交易额'}
     //             >
     //                 <QuestionCircleOutlined />
     //             </Tooltip>
@@ -449,7 +451,7 @@ const SkuTotal = () => {
             <span>
                 广告占比(%)
                 <Tooltip
-                    title={'=广告 / 销售额'}
+                    title={'=广告 / 交易额'}
                 >
                     <QuestionCircleOutlined />
                 </Tooltip>
@@ -464,7 +466,7 @@ const SkuTotal = () => {
             <span>
                 毛利润率(%)
                 <Tooltip
-                    title={'=净毛利润 / 销售额'}
+                    title={'=净毛利润 / '}
                 >
                     <QuestionCircleOutlined />
                 </Tooltip>
@@ -608,6 +610,8 @@ const SkuTotal = () => {
                 setpromotion_sum(resp_data.promotion_sum);
                 setafter_sale_sum(resp_data.after_sale_sum);
                 setgross_profit_sum(resp_data.gross_profit_sum);
+                setgross_profit_per(resp_data.gross_profit_per);
+                setpromotion_per(resp_data.promotion_per);
             }
             else {
                 message.error('无对应sku信息');
@@ -714,7 +718,7 @@ const SkuTotal = () => {
                 </Form>
             </div>
             <div style={{ backgroundColor: "white", paddingLeft: 10, paddingRight: 10 }}>
-                <p style={{ display: "none" }} className="detail">销量总计:　{num_sum}　　　交易额总计:　{money_sum}　　　广告费用总计:　{promotion_sum}　　　售后费用总计:　{after_sale_sum}　　　毛利润:　{gross_profit_sum}</p>
+                <p style={{ display: "none" }} className="detail">销量总计:　{num_sum}　　　交易额总计:　{money_sum}　　　广告费用总计:　{promotion_sum}　　　售后费用总计:　{after_sale_sum}　　　毛利润:　{gross_profit_sum}　　　广告占比:　{promotion_per}%　　　总毛利润率:　{gross_profit_per}%</p>
                 <Row style={{ marginBottom: 5 }}>
                     <Col span={12}>
                         <span>列选择器：</span>
