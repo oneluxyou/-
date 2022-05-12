@@ -12,6 +12,7 @@ import ProForm, {
   ModalForm,
   ProFormText,
   ProFormSelect,
+  ProFormRadio
 } from '@ant-design/pro-form';
 import type { ProFormInstance } from '@ant-design/pro-form';
 import Edit from './components/Edit'
@@ -99,32 +100,32 @@ const TableList: React.FC = () => {
       width: 80,
       ellipsis: true,
       valueEnum: {
-        '赫曼': '赫曼',
-        '信盒': '信盒',
-        '宫本': '宫本',
-        '森月': '森月',
-        '维禄': '维禄',
-        '玲琅': '玲琅',
-        '信盒-法国': '信盒-法国',
-        '信盒-意大利': '信盒-意大利',
-        '信盒-西班牙': '信盒-西班牙',
-        'Wayfair-信盒': 'Wayfair-信盒',
-        'Wayfair-维禄': 'Wayfair-维禄',
-        'Walmart-优瑞斯特': 'Walmart-优瑞斯特',
-        'Walmart-赫曼': 'Walmart-赫曼',
-        'Walmart-信盒': 'Walmart-信盒',
-        'Walmart-宫本': 'Walmart-宫本',
-        'eBay-玲琅': 'eBay-玲琅',
-        'eBay-治润': 'eBay-治润',
-        'eBay-雅秦': 'eBay-雅秦',
-        'Nextfur-Shopify': 'Nextfur-Shopify',
-        '旗辰': '旗辰',
-        '赛迦曼': '赛迦曼',
-        '启珊': '启珊',
-        '驰甬': '驰甬',
-        '杉绮': '杉绮',
-        '治润': '治润',
-        'Central_Power_International_Limited': 'Central_Power_International_Limited',
+        'amazon赫曼': '赫曼',
+        'amazon信盒': '信盒',
+        'amazon宫本': '宫本',
+        'amazon森月': '森月',
+        'amazon维禄': '维禄',
+        'amazon玲琅': '玲琅',
+        'amazon信盒法国': '信盒-法国',
+        'amazon信盒意大利': '信盒-意大利',
+        'amazon信盒西班牙': '信盒-西班牙',
+        'wayfair信盒': 'Wayfair-信盒',
+        'wayfair维禄': 'Wayfair-维禄',
+        'walmart优瑞斯特': 'Walmart-优瑞斯特',
+        'walmart赫曼': 'Walmart-赫曼',
+        'walmart信盒': 'Walmart-信盒',
+        'walmart宫本': 'Walmart-宫本',
+        'ebay玲琅': 'eBay-玲琅',
+        'ebay治润': 'eBay-治润',
+        'ebay雅秦': 'eBay-雅秦',
+        'shopifynextfur': 'Nextfur-Shopify',
+        'amazon旗辰': '旗辰',
+        'amazon赛迦曼': '赛迦曼',
+        'amazon启珊': '启珊',
+        'amazon驰甬': '驰甬',
+        'amazon杉绮': '杉绮',
+        'amazon治润': '治润',
+        'amazoncpower': 'Central_Power_International_Limited',
       }
     },
     {
@@ -201,6 +202,14 @@ const TableList: React.FC = () => {
       hideInTable: true,
       //数据库格式问题
       width: 90
+    },
+    {
+      title: '是否上传图片',
+      dataIndex: '是否上传图片',
+      hideInSearch: true,
+      //数据库格式问题
+      width: 90,
+      fixed: 'right',
     },
     {
       title: '操作',
@@ -937,7 +946,7 @@ const TableList: React.FC = () => {
     const excel_datas = tableData.excel;
 
     // 列标题，逗号隔开，每一个逗号就是隔开一个单元格
-    let str = `id,登记日期,更新日期,登记人,店铺,订单号,SKU,序号,订单状态,顾客反馈,客服操作,退款金额,备注\n`;
+    let str = `id,登记日期,更新日期,登记人,店铺,订单号,SKU,序号,订单状态,顾客反馈,客服操作,退款金额,备注,是否上传图片\n`;
     // 增加\t为了不让表格显示科学计数法或者其他格式
     for (let i = 0; i < excel_datas.length; i++) {
       // console.log(excel_datas[i])
@@ -1420,32 +1429,32 @@ const TableList: React.FC = () => {
                     listHeight: 450,
                   }}
                   valueEnum={{
-                    '赫曼': '赫曼',
-                    '信盒': '信盒',
-                    '宫本': '宫本',
-                    '森月': '森月',
-                    '维禄': '维禄',
-                    '玲琅': '玲琅',
-                    '信盒-法国': '信盒-法国',
-                    '信盒-意大利': '信盒-意大利',
-                    '信盒-西班牙': '信盒-西班牙',
-                    'Wayfair-信盒': 'Wayfair-信盒',
-                    'Wayfair-维禄': 'Wayfair-维禄',
-                    'Walmart-优瑞斯特': 'Walmart-优瑞斯特',
-                    'Walmart-赫曼': 'Walmart-赫曼',
-                    'Walmart-信盒': 'Walmart-信盒',
-                    'Walmart-宫本': 'Walmart-宫本',
-                    'eBay-玲琅': 'eBay-玲琅',
-                    'eBay-治润': 'eBay-治润',
-                    'eBay-雅秦': 'eBay-雅秦',
-                    'Nextfur-Shopify': 'Nextfur-Shopify',
-                    '旗辰': '旗辰',
-                    '赛迦曼': '赛迦曼',
-                    '启珊': '启珊',
-                    '驰甬': '驰甬',
-                    '杉绮': '杉绮',
-                    '治润': '治润',
-                    'Central_Power_International_Limited': 'Central_Power_International_Limited',
+                    'amazon赫曼': '赫曼',
+                    'amazon信盒': '信盒',
+                    'amazon宫本': '宫本',
+                    'amazon森月': '森月',
+                    'amazon维禄': '维禄',
+                    'amazon玲琅': '玲琅',
+                    'amazon信盒法国': '信盒-法国',
+                    'amazon信盒意大利': '信盒-意大利',
+                    'amazon信盒西班牙': '信盒-西班牙',
+                    'wayfair信盒': 'Wayfair-信盒',
+                    'wayfair维禄': 'Wayfair-维禄',
+                    'walmart优瑞斯特': 'Walmart-优瑞斯特',
+                    'walmart赫曼': 'Walmart-赫曼',
+                    'walmart信盒': 'Walmart-信盒',
+                    'walmart宫本': 'Walmart-宫本',
+                    'ebay玲琅': 'eBay-玲琅',
+                    'ebay治润': 'eBay-治润',
+                    'ebay雅秦': 'eBay-雅秦',
+                    'shopifynextfur': 'Nextfur-Shopify',
+                    'amazon旗辰': '旗辰',
+                    'amazon赛迦曼': '赛迦曼',
+                    'amazon启珊': '启珊',
+                    'amazon驰甬': '驰甬',
+                    'amazon杉绮': '杉绮',
+                    'amazon治润': '治润',
+                    'amazoncpower': 'Central_Power_International_Limited',
                   }}
                 />
               </ProForm.Item>
@@ -1534,6 +1543,28 @@ const TableList: React.FC = () => {
               </ProForm.Item>
             </Col>
             {getyuanyingFields()}
+            <Col span={5}>
+              <ProForm.Item
+                name="是否上传图片"
+                label="是否上传图片"
+                initialValue='未上传'
+                rules={[{ required: true, message: '请输入是否已上传!' }]}
+              >
+                <ProFormRadio.Group
+                  width="md"
+
+                  options={[
+                    {
+                      label: '已上传',
+                      value: '已上传'
+                    }, {
+                      label: '未上传',
+                      value: '未上传'
+                    }
+                  ]}
+                />
+              </ProForm.Item>
+            </Col>
             <Col span={20}>
               <ProForm.Item
                 name="备注" label="备注"
