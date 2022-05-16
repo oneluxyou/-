@@ -69,8 +69,7 @@ const SaleRank: FC<any> = () => {
             </Tooltip> */}
             <div style={{ textAlign: "center", color: "#EE7700", fontSize: 16 }}>
                 <p><SoundOutlined />　默认时间为{data?.startdate} 到 {data?.enddate}</p>
-                <p>注意:售后有些漏填补登的数据时间还没改成实际发生售后问题的时间，3月中旬以后的售后占比会比较大</p>
-                <p>今年ebay Promoted Listing Advanced的广告费还没拿进来。数据还在处理</p>
+                {/* <p>日期更改到5-7号(5月8号的广告费用不准确)</p> */}
             </div>
             <Tabs>
                 {(Tdata ? JSON.parse(Tdata).sale : data?.sale)?.map((item: any) => (

@@ -4,12 +4,13 @@ import React, { useState, useRef } from 'react';
 import ProTable from '@ant-design/pro-table';
 import { PageContainer } from '@ant-design/pro-layout';
 import request from 'umi-request';
-import { Button, message, Col, Row, AutoComplete } from 'antd';
+import { Button, message, Col, Row, AutoComplete, DatePicker, Input } from 'antd';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
-import ProForm, { ProFormSelect } from '@ant-design/pro-form';
+import ProForm, { ProFormSelect, ProFormRadio } from '@ant-design/pro-form';
 import type { ProFormInstance } from '@ant-design/pro-form';
-import Edit from '../components/Edit';
-import { useRequest, useAccess, Access } from 'umi';
+import Edit from '../components/azEdit';
+import { useRequest, useAccess, Access, useModel } from 'umi';
+import moment from 'moment';
 
 /**
  * 更新节点
@@ -39,144 +40,135 @@ const TableList: React.FC = () => {
     //表格part、
     const column: ProColumns[] = [
         {
-            title: '渠道sku',
-            dataIndex: '渠道sku',
-            key: '渠道sku',
-        },
-        {
-            title: 'ASIN',
-            dataIndex: 'ASIN',
-            key: 'ASIN',
-            ellipsis: true,
+            title: '处理人',
+            dataIndex: '处理人',
+            key: '处理人',
+            width: 70,
         },
         {
             title: '公司SKU',
             dataIndex: '公司SKU',
             key: '公司SKU',
-        },
-        {
-            title: '运营',
-            dataIndex: '运营',
-            key: '运营',
-        },
-        {
-            title: '运维',
-            dataIndex: '运维',
-            key: '运维',
-        },
-        {
-            title: '组别',
-            dataIndex: '组别',
-            key: '组别',
-            filters: true,
-            onFilter: true,
-            valueEnum: {
-                利芬组_A组: '利芬组_A组',
-                利芬组_B组: '利芬组_B组',
-                利芬组_C组: '利芬组_C组',
-                利芬组_D组: '利芬组_D组',
-                利芬组_E组: '利芬组_E组',
-                利芬组_F组: '利芬组_F组',
-                利芬组_G组: '利芬组_G组',
-                利芬组_H组: '利芬组_H组',
-                利芬组_I组: '利芬组_I组',
-                利芬组_J组: '利芬组_J组',
-            },
+            width: 120,
         },
         {
             title: '店铺',
             dataIndex: '店铺',
-            key: '店铺',
+            // hideInSearch: true,
             filters: true,
             onFilter: true,
+            width: 80,
+            ellipsis: true,
             valueEnum: {
-                walmart优瑞斯特: 'Walmart-优瑞斯特',
-                walmart赫曼: 'Walmart-赫曼',
-                walmart信盒: 'Walmart-信盒',
-                walmart宫本: 'Walmart-宫本',
-                walmart: 'Walmart',
-                amazon哒唛旺: 'Amazon-哒唛旺',
-                amazon简砾: 'Amazon-简砾',
-                amazon赫曼: 'Amazon-赫曼',
-                amazon信盒: 'Amazon-信盒',
-                amazon宫本: 'Amazon-宫本',
-                amazon森月: 'Amazon-森月',
-                amazon维禄: 'Amazon-维禄',
-                amazon玲琅: 'Amazon-玲琅',
-                amazon治润: 'Amazon-治润',
-                amazon驰甬: 'Amazon-驰甬',
-                amazon启珊: 'Amazon-启珊',
-                amazon旗辰: 'Amazon-旗辰',
-                amazoncpower: 'Central_Power_International_Limited',
-                amazon: 'Amazon',
-                wayfair信盒: 'Wayfair-信盒',
-                wayfair维禄: 'Wayfair-维禄',
-                wayfair: 'Wayfair',
-                ebay玲琅: 'eBay-玲琅',
-                ebay治润: 'eBay-治润',
-                ebay雅秦: 'eBay-雅秦',
-                shopifynextfur: 'Nextfur-Shopify',
-            },
+                'amazon赫曼': '赫曼',
+                'amazon信盒': '信盒',
+                'amazon宫本': '宫本',
+                'amazon森月': '森月',
+                'amazon维禄': '维禄',
+                'amazon玲琅': '玲琅',
+                'amazon信盒法国': '信盒-法国',
+                'amazon信盒意大利': '信盒-意大利',
+                'amazon信盒西班牙': '信盒-西班牙',
+                'wayfair信盒': 'Wayfair-信盒',
+                'wayfair维禄': 'Wayfair-维禄',
+                'walmart优瑞斯特': 'Walmart-优瑞斯特',
+                'walmart赫曼': 'Walmart-赫曼',
+                'walmart信盒': 'Walmart-信盒',
+                'walmart宫本': 'Walmart-宫本',
+                'ebay玲琅': 'eBay-玲琅',
+                'ebay治润': 'eBay-治润',
+                'ebay雅秦': 'eBay-雅秦',
+                'shopifynextfur': 'Nextfur-Shopify',
+                'amazon旗辰': '旗辰',
+                'amazon赛迦曼': '赛迦曼',
+                'amazon启珊': '启珊',
+                'amazon驰甬': '驰甬',
+                'amazon杉绮': '杉绮',
+                'amazon治润': '治润',
+                'amazoncpower': 'Central_Power_International_Limited',
+            }
         },
-        // {
-        //   title: 'KEY',
-        //   dataIndex: 'KEY',
-        //   hideInSearch: true,
-        //   key: 'KEY',
-        //   tooltip: '自动生成',
-        // },
         {
-            title: 'sku序号',
-            dataIndex: 'sku序号',
+            title: '订单号',
+            dataIndex: '订单号',
+            key: '订单号',
+        },
+        {
+            title: '投诉日期',
+            dataIndex: '投诉日期',
+            key: '投诉日期',
             hideInSearch: true,
-            key: 'sku序号',
-            tooltip: '自动生成',
         },
         {
-            title: '款式序号',
-            dataIndex: '款式序号',
+            title: '更新日期',
+            dataIndex: '更新日期',
+            key: '更新日期',
             hideInSearch: true,
-            key: '款式序号',
-            tooltip: '自动生成',
-        },
-        {
-            title: '开始时间',
-            dataIndex: '开始时间',
-            hideInSearch: true,
-            key: '开始时间',
-            tooltip: '自动生成',
-        },
-        {
-            title: '结束时间',
-            dataIndex: '结束时间',
-            // hideInSearch: true,
-            key: '结束时间',
-            tooltip: '自动生成',
         },
         {
             title: '状态',
             dataIndex: '状态',
-            // hideInSearch: true,
             key: '状态',
             valueEnum: {
-                "停用": {
-                    text: '停用',
-                    status: 'Default',
-                },
-                "迭代": {
-                    text: '迭代',
-                    status: 'error',
-                },
-                "正常": { text: '正常', status: 'Success' },
-            },
+                'Seller funded': 'Seller funded',
+                'Order refunded': 'Order refunded',
+                'Claim withdrawn': 'Claim withdrawn',
+                'Claim denied': 'Claim denied',
+                'Under review': 'Under review',
+                'Amazon funded': 'Amazon funded',
+                'Chargeback received': 'Chargeback received',
+            }
+        },
+        {
+            title: '是否可申诉',
+            dataIndex: '是否可申诉',
+            key: '是否可申诉',
+            valueEnum: {
+                '是': '是',
+                '否': '否',
+            }
+        },
+        {
+            title: '责任方',
+            dataIndex: '责任方',
+            key: '责任方',
+        },
+        {
+            title: '原因',
+            dataIndex: '原因',
+            key: '原因',
+        },
+
+        {
+            title: 'Customer Issue',
+            dataIndex: 'Customer Issue',
+            key: 'Customer Issue',
+            hideInSearch: true,
+            ellipsis: true,
+            copyable: true,
+        },
+        {
+            title: 'AZ上的评论',
+            dataIndex: 'AZ上的评论',
+            key: 'AZ上的评论',
+            hideInSearch: true,
+            ellipsis: true,
+            copyable: true,
+        },
+        {
+            title: '备注',
+            dataIndex: '备注',
+            key: '备注',
+            hideInSearch: true,
         },
         {
             title: '操作',
             valueType: 'option',
-            key: '操作',
-            tooltip: '只有当信息出错时，才使用‘编辑’功能，若有人员更换或者产品迭代，请提交表单，增添记录',
-            render: (text, record) => [
-                <div>
+            width: 150,
+            fixed: 'right',
+
+            render: (text, record, _, action) => [
+                <>
                     <a
                         onClick={() => {
                             isShowModalEdit(true, record.id);
@@ -184,14 +176,304 @@ const TableList: React.FC = () => {
                     >
                         编辑
                     </a>
-                    {/* <a onClick={() => {isDelete(record.id)}}>
-                    删除  
-                </a> */}
-                </div>,
-            ],
+                    <a
+                        onClick={() => {
+                            isShowModalEdit(true, record.id);
+                        }}
+                    >
+                        登记
+                    </a>
+                    <a
+                        onClick={() => {
+                            settablecol(column1);
+                        }}
+                    >
+                        更多
+                    </a>
+                </>
+            ]
         },
-    ];
+        {
+            title: '投诉开始日期',
+            dataIndex: '投诉开始日期',
+            valueType: 'date',
+            hideInTable: true,
+            //数据库格式问题
+            width: 90
+        },
+        {
+            title: '投诉结束日期',
+            dataIndex: '投诉结束日期',
+            valueType: 'date',
+            hideInTable: true,
+            //数据库格式问题
+            width: 90
+        },
+        {
+            title: '更改开始日期',
+            dataIndex: '更改开始日期',
+            valueType: 'date',
+            hideInTable: true,
+            //数据库格式问题
+            width: 90
+        },
+        {
+            title: '更改结束日期',
+            dataIndex: '更改结束日期',
+            valueType: 'date',
+            hideInTable: true,
+            //数据库格式问题
+            width: 90
+        },
 
+    ];
+    const column1: ProColumns[] = [
+        {
+            title: '处理人',
+            dataIndex: '处理人',
+            key: '处理人',
+            width: 70,
+        },
+        {
+            title: '公司SKU',
+            dataIndex: '公司SKU',
+            key: '公司SKU',
+            width: 120,
+        },
+        {
+            title: '店铺',
+            dataIndex: '店铺',
+            // hideInSearch: true,
+            filters: true,
+            onFilter: true,
+            width: 80,
+            ellipsis: true,
+            valueEnum: {
+                'amazon赫曼': '赫曼',
+                'amazon信盒': '信盒',
+                'amazon宫本': '宫本',
+                'amazon森月': '森月',
+                'amazon维禄': '维禄',
+                'amazon玲琅': '玲琅',
+                'amazon信盒法国': '信盒-法国',
+                'amazon信盒意大利': '信盒-意大利',
+                'amazon信盒西班牙': '信盒-西班牙',
+                'wayfair信盒': 'Wayfair-信盒',
+                'wayfair维禄': 'Wayfair-维禄',
+                'walmart优瑞斯特': 'Walmart-优瑞斯特',
+                'walmart赫曼': 'Walmart-赫曼',
+                'walmart信盒': 'Walmart-信盒',
+                'walmart宫本': 'Walmart-宫本',
+                'ebay玲琅': 'eBay-玲琅',
+                'ebay治润': 'eBay-治润',
+                'ebay雅秦': 'eBay-雅秦',
+                'shopifynextfur': 'Nextfur-Shopify',
+                'amazon旗辰': '旗辰',
+                'amazon赛迦曼': '赛迦曼',
+                'amazon启珊': '启珊',
+                'amazon驰甬': '驰甬',
+                'amazon杉绮': '杉绮',
+                'amazon治润': '治润',
+                'amazoncpower': 'Central_Power_International_Limited',
+            }
+        },
+        {
+            title: '订单号',
+            dataIndex: '订单号',
+            key: '订单号',
+        },
+        {
+            title: '投诉日期',
+            dataIndex: '投诉日期',
+            key: '投诉日期',
+            hideInSearch: true,
+        },
+        {
+            title: '更新日期',
+            dataIndex: '更新日期',
+            key: '更新日期',
+            hideInSearch: true,
+        },
+        {
+            title: '状态',
+            dataIndex: '状态',
+            key: '状态',
+            valueEnum: {
+                'Seller funded': 'Seller funded',
+                'Order refunded': 'Order refunded',
+                'Claim withdrawn': 'Claim withdrawn',
+                'Claim denied': 'Claim denied',
+                'Under review': 'Under review',
+                'Amazon funded': 'Amazon funded',
+                'Chargeback received': 'Chargeback received',
+            }
+        },
+        {
+            title: '是否可申诉',
+            dataIndex: '是否可申诉',
+            key: '是否可申诉',
+            valueEnum: {
+                '是': '是',
+                '否': '否',
+            }
+        },
+        {
+            title: '责任方',
+            dataIndex: '责任方',
+            key: '责任方',
+        },
+        {
+            title: '原因',
+            dataIndex: '原因',
+            key: '原因',
+        },
+
+        {
+            title: 'Customer Issue',
+            dataIndex: 'Customer Issue',
+            key: 'Customer Issue',
+            hideInSearch: true,
+            ellipsis: true,
+            copyable: true,
+        },
+        {
+            title: 'AZ上的评论',
+            dataIndex: 'AZ上的评论',
+            key: 'AZ上的评论',
+            hideInSearch: true,
+            ellipsis: true,
+            copyable: true,
+        },
+        {
+            title: '备注',
+            dataIndex: '备注',
+            key: '备注',
+            hideInSearch: true,
+        },
+        {
+            title: '操作',
+            valueType: 'option',
+            width: 420,
+            fixed: 'right',
+
+            render: (text, record, _, action) => [
+                <>
+                    <a
+                        onClick={() => {
+                            isShowModalEdit(true, record.id);
+                        }}
+                    >
+                        编辑
+                    </a>
+                    <a
+                        onClick={() => {
+                            isShowModalEdit(true, record.id);
+                        }}
+                    >
+                        售后登记
+                    </a>
+                    <a
+                        onClick={() => {
+                            settablecol(column);
+                        }}
+                    >
+                        隐藏
+                    </a>
+                    <a
+                        onClick={() => {
+                            isShowModalEdit(true, record.id);
+                        }}
+                    >
+                        CB
+                    </a>
+                    <a
+                        onClick={() => {
+                            isShowModalEdit(true, record.id);
+                        }}
+                    >
+                        退货
+                    </a>
+                    <a
+                        onClick={() => {
+                            isShowModalEdit(true, record.id);
+                        }}
+                    >
+                        RP
+                    </a>
+                    <a
+                        onClick={() => {
+                            isShowModalEdit(true, record.id);
+                        }}
+                    >
+                        投诉
+                    </a>
+                    <a
+                        onClick={() => {
+                            isShowModalEdit(true, record.id);
+                        }}
+                    >
+                        ST
+                    </a>
+                    <a
+                        onClick={() => {
+                            isShowModalEdit(true, record.id);
+                        }}
+                    >
+                        RV
+                    </a>
+                    <a
+                        onClick={() => {
+                            isShowModalEdit(true, record.id);
+                        }}
+                    >
+                        RV
+                    </a>
+                    {/* <a
+                        onClick={() => {
+                            isShowModalAfterEdit(true, record.id);
+                        }}
+                    >
+                        售后登记
+                    </a> */}
+                </>
+            ]
+        },
+        {
+            title: '投诉开始日期',
+            dataIndex: '投诉开始日期',
+            valueType: 'date',
+            hideInTable: true,
+            //数据库格式问题
+            width: 90
+        },
+        {
+            title: '投诉结束日期',
+            dataIndex: '投诉结束日期',
+            valueType: 'date',
+            hideInTable: true,
+            //数据库格式问题
+            width: 90
+        },
+        {
+            title: '更改开始日期',
+            dataIndex: '更改开始日期',
+            valueType: 'date',
+            hideInTable: true,
+            //数据库格式问题
+            width: 90
+        },
+        {
+            title: '更改结束日期',
+            dataIndex: '更改结束日期',
+            valueType: 'date',
+            hideInTable: true,
+            //数据库格式问题
+            width: 90
+        },
+
+    ];
+    // 表格列名绑定
+    const [tablecol, settablecol] = useState(column);
     // 导出报表
     const downloadExcel = () => {
         const excel_datas = tableData.data;
@@ -221,12 +503,14 @@ const TableList: React.FC = () => {
         link.download = 'ASIN对应信息表.csv';
         link.click();
     };
+    const { initialState } = useModel('@@initialState');
     // 表单缓存
     const storage = window.localStorage;
     const temp_dict = [new Array(), new Array(), new Array(), new Array(), new Array()] as any;
     let temp_data = new Array();
     const item_dict = ['qudaosku', 'asin', 'sku', 'yunying', 'yunwei'];
-    const form_dict = ['渠道sku', 'ASIN', '公司SKU', '运营', '运维']
+    const form_dict = ['渠道sku', 'ASIN', '公司SKU', '运营', '运维'];
+    const { TextArea } = Input;
     const renderItem = (title: string, index: number, item: string) => ({
         value: title,
         label: (
@@ -247,24 +531,6 @@ const TableList: React.FC = () => {
                         let temp_storage = item_data.join('|');
                         temp_storage = JSON.stringify(temp_storage);
                         storage[item] = temp_storage;
-                        //自行根据条件清除
-                        // eslint-disable-next-line @typescript-eslint/no-use-before-define
-                        if (item_dict.indexOf(item) == 0) {
-                            // eslint-disable-next-line @typescript-eslint/no-use-before-define
-                            setqudaosku(temp_dict[0]);
-                        } else if (item_dict.indexOf(item) == 1) {
-                            // eslint-disable-next-line @typescript-eslint/no-use-before-define
-                            setasin(temp_dict[1]);
-                        } else if (item_dict.indexOf(item) == 2) {
-                            // eslint-disable-next-line @typescript-eslint/no-use-before-define
-                            setosku(temp_dict[2]);
-                        } else if (item_dict.indexOf(item) == 3) {
-                            // eslint-disable-next-line @typescript-eslint/no-use-before-define
-                            setyunying(temp_dict[3]);
-                        } else if (item_dict.indexOf(item) == 4) {
-                            // eslint-disable-next-line @typescript-eslint/no-use-before-define
-                            setyunwei(temp_dict[4]);
-                        }
                     }}
                 >
                     Delete
@@ -289,93 +555,42 @@ const TableList: React.FC = () => {
         }
     }
 
-
-    const [qudaosku, setqudaosku] = useState(temp_dict[0]) as any;
-    const [asin, setasin] = useState(temp_dict[1]) as any;
-    const [osku, setosku] = useState(temp_dict[2]) as any;
-    const [yunying, setyunying] = useState(temp_dict[3]) as any;
-    const [yunwei, setyunwei] = useState(temp_dict[4]) as any;
     return (
         <PageContainer>
-            <Access accessible={access.MatchManager()}>        <ProForm<{
+            <ProForm<{
                 name: string;
                 company: string;
             }>
                 size="small"
                 autoComplete="on"
                 formRef={formRef}
+                initialValues={{
+                    '处理人': initialState.currentUser?.name
+                }}
                 onFinish={async (values) => {
                     let sku_in = true;
-                    let temp_sku = values['公司SKU'].replace('，', ',');
-                    temp_sku = temp_sku.replace('	', '');
-                    temp_sku = temp_sku.replace(' ', '');
-                    const sku = temp_sku.split(',');
-                    sku.forEach((element: string) => {
-                        if (!data.sku_name.find((item: string) => item == element)) {
+                    console.log(values)
+                    console.log(typeof (values['投诉日期']))
+                    if ('公司SKU' in values) {
+                        let temp_sku = values['公司SKU'].replace('，', ',');
+                        temp_sku = temp_sku.replace('	', '');
+                        temp_sku = temp_sku.replace(' ', '');
+                        const sku = temp_sku.split(',');
+                        if (!data.sku_name.find((item: string) => item == sku)) {
                             sku_in = false;
-                            message.error('传入的SKU:' + element + '不正确(注:捆绑sku要拆成产品sku)');
+                            message.error('传入的SKU:' + sku + '不正确(注:捆绑sku要拆成产品sku)');
                         }
-                    });
+                    }
+
                     // eslint-disable-next-line @typescript-eslint/dot-notation
 
                     if (sku_in == true) {
                         values['店铺'] = JSON.stringify(values['店铺']);
-                        return request(`/api/sku/insert`, {
+                        return request(`/api/afterinsertaz`, {
                             method: 'POST',
                             data: { ...values },
                             requestType: 'form',
                         }).then(() => {
-                            for (const key in item_dict) {
-                                temp_dict[key] = new Array();
-                                if (item_dict[key] in storage) {
-                                    temp_data = eval(storage[item_dict[key]]).split('|');
-                                    for (const key2 in temp_data) {
-                                        if (Object.prototype.hasOwnProperty.call(temp_data, key2)) {
-                                            const element = temp_data[key2];
-                                            temp_dict[key].push(renderItem(element, parseInt(key2), item_dict[key]));
-                                        }
-                                    }
-                                    if (temp_data.indexOf(values[form_dict[key]]) == -1) {
-                                        temp_data.push(values[form_dict[key]]);
-                                        temp_dict[key].push(renderItem(values[form_dict[key]], temp_data.length - 1, item_dict[key]));
-                                        console.log('提交后', temp_data)
-                                        let temp_storage = temp_data.join('|');
-                                        temp_storage = JSON.stringify(temp_storage);
-                                        storage[item_dict[key]] = temp_storage;
-                                        //自行根据条件清除
-                                        if (parseInt(key) == 0) {
-                                            setqudaosku(temp_dict[0]);
-                                        } else if (parseInt(key) == 1) {
-                                            setasin(temp_dict[1]);
-                                        } else if (parseInt(key) == 2) {
-                                            setosku(temp_dict[2]);
-                                        } else if (parseInt(key) == 3) {
-                                            setyunying(temp_dict[3]);
-                                        } else if (parseInt(key) == 4) {
-                                            setyunwei(temp_dict[4]);
-                                        }
-                                    }
-                                } else {
-                                    temp_data = []
-                                    temp_data.push(values[form_dict[key]]);
-                                    temp_dict[key].push(renderItem(values[form_dict[key]], temp_data.length - 1, item_dict[key]));
-                                    let temp_storage = temp_data.join('|');
-                                    temp_storage = JSON.stringify(temp_storage);
-                                    storage[item_dict[key]] = temp_storage;
-                                    //自行根据条件清除
-                                    if (parseInt(key) == 0) {
-                                        setqudaosku(temp_dict[0]);
-                                    } else if (parseInt(key) == 1) {
-                                        setasin(temp_dict[1]);
-                                    } else if (parseInt(key) == 2) {
-                                        setosku(temp_dict[2]);
-                                    } else if (parseInt(key) == 3) {
-                                        setyunying(temp_dict[3]);
-                                    } else if (parseInt(key) == 4) {
-                                        setyunwei(temp_dict[4]);
-                                    }
-                                }
-                            }
                             //自行根据条件清除
                             message.success('提交成功');
                             formRef.current?.resetFields();
@@ -386,43 +601,47 @@ const TableList: React.FC = () => {
                 <Row>
                     <Col span={5}>
                         <ProForm.Item
-                            name="渠道sku"
-                            label="渠道sku"
-                            tooltip="例如USAN1023801-1+2"
-                            rules={[{ required: true, message: '请输入渠道SKU!' }]}
+                            name="处理人"
+                            label="处理人"
                         >
                             <AutoComplete
-                                placeholder="请输入渠道sku"
-                                options={qudaosku}
+                                placeholder="请输入处理人"
                             />
                         </ProForm.Item>
                     </Col>
                     <Col span={5} offset={1}>
                         <ProForm.Item
-                            name="ASIN"
-                            label="ASIN"
-                            tooltip="为亚马逊平台上的编码标识,例如B08NBZLZJQ,其他平台上则写Item ID字段,例如568192404"
+                            name="订单号"
+                            label="订单号"
+                            rules={[{ required: true, message: '请输入订单号!' }]}
                         >
                             <AutoComplete
-                                placeholder="请输入ASIN"
-                                options={asin}
+                                placeholder="请输入订单号"
                             />
+                        </ProForm.Item>
+                    </Col>
+                    <Col span={5} offset={1}>
+                        <ProForm.Item
+                            name="投诉日期"
+                            label="投诉日期"
+                            initialValue={moment(new Date())}
+
+                        >
+                            <DatePicker format={'YYYY-MM-DD'} />
                         </ProForm.Item>
                     </Col>
                     <Col span={5} offset={1}>
                         <ProForm.Item
                             name="公司SKU"
                             label="公司SKU"
-                            tooltip="例如USAN1023801-1,USAN1023801-2 (多个sku用,隔开)，捆绑SKU请拆成对应的SKU"
-                            rules={[{ required: true, message: '请输入SKU!' }]}
+                            rules={[{ required: true, message: '请输入公司SKU!' }]}
                         >
                             <AutoComplete
-                                placeholder="请输入SKU"
-                                options={osku}
+                                placeholder="请输入公司SKU"
                             />
                         </ProForm.Item>
                     </Col>
-                    <Col span={5} offset={1}>
+                    <Col span={5}>
                         <ProForm.Item
                             name="店铺"
                             label="店铺"
@@ -430,89 +649,166 @@ const TableList: React.FC = () => {
                         >
                             <ProFormSelect
                                 width="md"
-                                // tooltip="产品所在的店铺"
-                                // options={data?.store_name || ['赫曼', '信盒', '信盒-法国', '信盒-西班牙', '维禄', '森月', '宫本', '卟噜卟噜', '玲琅', '哒唛旺', '简砾', 'Wayfair-信盒', 'Walmart-赫曼', 'Walmart-宫本', 'Walmart-信盒', 'Walmart-优瑞斯特', 'Nextfur-Shopify', 'eBay-雅秦', 'eBay-玲琅', 'Wayfair-维禄', 'eBay-治润']}
-                                valueEnum={{
-                                    walmart优瑞斯特: 'Walmart-优瑞斯特',
-                                    walmart赫曼: 'Walmart-赫曼',
-                                    walmart信盒: 'Walmart-信盒',
-                                    walmart宫本: 'Walmart-宫本',
-                                    amazon哒唛旺: 'Amazon-哒唛旺',
-                                    amazon简砾: 'Amazon-简砾',
-                                    amazon赫曼: 'Amazon-赫曼',
-                                    amazon信盒: 'Amazon-信盒',
-                                    amazon宫本: 'Amazon-宫本',
-                                    amazon森月: 'Amazon-森月',
-                                    amazon维禄: 'Amazon-维禄',
-                                    amazon玲琅: 'Amazon-玲琅',
-                                    amazon治润: 'Amazon-治润',
-                                    amazon驰甬: 'Amazon-驰甬',
-                                    amazon启珊: 'Amazon-启珊',
-                                    amazon旗辰: 'Amazon-旗辰',
-                                    amazoncpower: 'Central_Power_International_Limited',
-                                    wayfair信盒: 'Wayfair-信盒',
-                                    wayfair维禄: 'Wayfair-维禄',
-                                    ebay玲琅: 'eBay-玲琅',
-                                    ebay治润: 'eBay-治润',
-                                    ebay雅秦: 'eBay-雅秦',
-                                    Nextfur_Shopify: 'shopifynextfur',
+                                fieldProps={{
+                                    listHeight: 450,
                                 }}
-                                rules={[{ required: true, message: '请输入店铺!' }]}
-                            />
-                        </ProForm.Item>
-                    </Col>
-                </Row>
-                <Row>
-                    <Col span={5}>
-                        <ProForm.Item
-                            name="运营"
-                            label="运营"
-                            rules={[{ required: true, message: '请输入运营人员!' }]}
-                        >
-                            <AutoComplete
-                                placeholder="请输入运营人员,若为多个,请用英文','隔开"
-                                options={yunying}
+                                valueEnum={{
+                                    'amazon赫曼': '赫曼',
+                                    'amazon信盒': '信盒',
+                                    'amazon宫本': '宫本',
+                                    'amazon森月': '森月',
+                                    'amazon维禄': '维禄',
+                                    'amazon玲琅': '玲琅',
+                                    'amazon信盒法国': '信盒-法国',
+                                    'amazon信盒意大利': '信盒-意大利',
+                                    'amazon信盒西班牙': '信盒-西班牙',
+                                    'wayfair信盒': 'Wayfair-信盒',
+                                    'wayfair维禄': 'Wayfair-维禄',
+                                    'walmart优瑞斯特': 'Walmart-优瑞斯特',
+                                    'walmart赫曼': 'Walmart-赫曼',
+                                    'walmart信盒': 'Walmart-信盒',
+                                    'walmart宫本': 'Walmart-宫本',
+                                    'ebay玲琅': 'eBay-玲琅',
+                                    'ebay治润': 'eBay-治润',
+                                    'ebay雅秦': 'eBay-雅秦',
+                                    'shopifynextfur': 'Nextfur-Shopify',
+                                    'amazon旗辰': '旗辰',
+                                    'amazon赛迦曼': '赛迦曼',
+                                    'amazon启珊': '启珊',
+                                    'amazon驰甬': '驰甬',
+                                    'amazon杉绮': '杉绮',
+                                    'amazon治润': '治润',
+                                    'amazoncpower': 'Central_Power_International_Limited',
+                                }}
                             />
                         </ProForm.Item>
                     </Col>
                     <Col span={5} offset={1}>
                         <ProForm.Item
-                            name="运维"
-                            label="运维"
-                            rules={[{ required: true, message: '请输入运维人员!' }]}
-                        >
-                            <AutoComplete
-                                placeholder="请输入运维人员,若为多个,请用英文','隔开"
-                                options={yunwei}
-                            />
-                        </ProForm.Item>
-                    </Col>
-                    <Col span={5} offset={1}>
-                        <ProForm.Item
-                            name="组别"
-                            label="组别"
+                            name="状态"
+                            label="状态"
                         >
                             <ProFormSelect
                                 width="md"
-                                // placeholder="请输入小组组别,若为多个,请用英文','隔开"
-                                rules={[{ required: true, message: '请输入小组组别' }]}
                                 valueEnum={{
-                                    利芬组_A组: '利芬组_A组',
-                                    利芬组_B组: '利芬组_B组',
-                                    利芬组_C组: '利芬组_C组',
-                                    利芬组_D组: '利芬组_D组',
-                                    利芬组_E组: '利芬组_E组',
-                                    利芬组_F组: '利芬组_F组',
-                                    利芬组_G组: '利芬组_G组',
-                                    利芬组_H组: '利芬组_H组',
-                                    利芬组_I组: '利芬组_I组',
-                                    利芬组_J组: '利芬组_J组',
+                                    'Seller funded': 'Seller funded',
+                                    'Order refunded': 'Order refunded',
+                                    'Claim withdrawn': 'Claim withdrawn',
+                                    'Claim denied': 'Claim denied',
+                                    'Under review': 'Under review',
+                                    'Amazon funded': 'Amazon funded',
+                                    'Chargeback received': 'Chargeback received',
                                 }}
                             />
                         </ProForm.Item>
                     </Col>
+                    <Col span={5} offset={1}>
+                        <ProForm.Item
+                            name="是否可申诉"
+                            label="是否可申诉"
+                            initialValue='否'
+                        >
+                            <ProFormRadio.Group
+                                width="md"
+
+                                options={[
+                                    {
+                                        label: '是',
+                                        value: '是'
+                                    }, {
+                                        label: '否',
+                                        value: '否'
+                                    }
+                                ]}
+                            />
+                        </ProForm.Item>
+                    </Col>
+                    <Col span={5} offset={1}>
+                        <ProForm.Item
+                            name="责任方"
+                            label="责任方"
+
+                        >
+                            <ProFormSelect
+                                width="md"
+                                valueEnum={{
+                                    物流: '物流',
+                                    买家: '买家',
+                                    工厂: '工厂',
+                                    销售: '销售',
+                                    系统: '系统',
+                                    仓库: '仓库',
+                                }}
+                            />
+                        </ProForm.Item>
+                    </Col>
+                    <Col span={5}>
+                        <ProForm.Item
+                            name="原因"
+                            label="原因"
+                        >
+                            <AutoComplete
+                            >
+                                <TextArea
+                                    placeholder="请填写详细(不得超过255个字)"
+                                    className="custom"
+                                    style={{ height: 50 }}
+                                    showCount={true}
+                                />
+                            </AutoComplete>
+                        </ProForm.Item>
+                    </Col>
+
+                    <Col span={5} offset={1}>
+                        <ProForm.Item
+                            name="Customer Issue"
+                            label="Customer Issue"
+                        >
+                            <AutoComplete
+                            >
+                                <TextArea
+                                    placeholder="请填写详细(不得超过255个字)"
+                                    className="custom"
+                                    style={{ height: 50 }}
+                                    showCount={true}
+                                />
+                            </AutoComplete>
+                        </ProForm.Item>
+                    </Col>
+                    <Col span={5} offset={1}>
+                        <ProForm.Item
+                            name="AZ上的评论"
+                            label="AZ上的评论"
+                        >
+                            <AutoComplete
+                            >
+                                <TextArea
+                                    placeholder="请填写详细(不得超过255个字)"
+                                    className="custom"
+                                    style={{ height: 50 }}
+                                    showCount={true}
+                                />
+                            </AutoComplete>
+                        </ProForm.Item>
+                    </Col>
+                    <Col span={5} offset={1}>
+                        <ProForm.Item
+                            name="备注"
+                            label="备注"
+                        >
+                            <AutoComplete
+                            >
+                                <TextArea
+                                    placeholder="请填写详细(不得超过255个字)"
+                                    className="custom"
+                                    style={{ height: 50 }}
+                                    showCount={true}
+                                />
+                            </AutoComplete>
+                        </ProForm.Item>
+                    </Col>
                 </Row>
-            </ProForm></Access>
+            </ProForm>
             <br />
             <ProTable
                 size="small"
@@ -521,17 +817,22 @@ const TableList: React.FC = () => {
                     defaultCollapsed: false,
                     span: 6
                 }}
-                columns={column}
+                scroll={{ x: 1800, y: 500 }}
+                columns={tablecol}
                 actionRef={actionRef}
                 onChange={onTableChange}
                 request={async (params = {}) => {
-                    const result = request('/api/skuinfo', {
+                    const result = request('/api/aftersaleaz/', {
                         method: 'POST',
                         data: { ...params },
                         requestType: 'form',
                         success: true,
                     });
                     settableData(await result);
+                    const temp_result = await result;
+                    if (temp_result == '请重新登录') {
+                        message.error('账户过期,请重新登录账号');
+                    }
                     return result;
                 }}
                 rowKey="key"
@@ -549,19 +850,15 @@ const TableList: React.FC = () => {
                 }}
             />
             {
-                !isModalVisibleEdit ? (
-                    ''
-                ) : (
-                    <Access accessible={access.MatchManager()} >
+                !isModalVisibleEdit ? '' :
+                    <Access accessible={access.AfterManager()} >
                         <Edit
                             isModalVisible={isModalVisibleEdit}
                             isShowModal={isShowModalEdit}
                             actionRef={actionRef}
                             editId={editId}
-                            skuName={data.sku_name}
                         />
                     </Access>
-                )
             }
         </PageContainer >
     );

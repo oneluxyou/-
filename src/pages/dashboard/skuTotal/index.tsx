@@ -20,9 +20,10 @@ const SkuTotal = () => {
     const [expand, setExpand] = useState(false);
     // 属性参数
     const attribute_sort: string[] = ['运营', '运维', '组别']
-    const attribute_value: string[] = ['成本单价', '销量', '平均售价', '交易额', '损耗', '广告', '净毛利润']
+    const attribute_value: string[] = ['成本单价', '销量', '平均售价', '交易额', '损耗', '广告', '净毛利润', '七天日销(店铺)', '七天日销', '目标日销', '在库', '在库+在途', '在库周转', '在库+在途周转']
     const attribute_per: string[] = ['成本占比', '损耗占比', '广告占比', '净毛利润率']
-    const total_attribute = ['sku', '品名'].concat(attribute_value).concat(attribute_per).concat(['销量贡献率', '交易额贡献率', '广告贡献率', '售后贡献率', '净毛利贡献率', '运营', '运维', '组别', '店铺'])
+    const total_attribute = ['sku序号', 'sku', '品名'].concat(attribute_value).concat(attribute_per).concat(['运营', '运维', '组别', '店铺'])
+    // const total_attribute = ['sku', '品名'].concat(attribute_value).concat(attribute_per).concat(['销量贡献率', '交易额贡献率', '广告贡献率', '售后贡献率', '净毛利贡献率', '运营', '运维', '组别', '店铺'])
     let first_data_temp: string | any[] = [];
     const [first_data, setfirst_data] = useState() as any;
     // 个人信息数据，input历史记录
@@ -277,309 +278,453 @@ const SkuTotal = () => {
     };
 
 
-    const temp_columns = [{
-        title: () => (
-            <span>
-                sku
-                <Tooltip
-                    title={'公司sku'}
-                >
-                    <QuestionCircleOutlined />
-                </Tooltip>
-            </span>
-        ),
-        dataIndex: 'sku',
-        render: (text: string, record: { 品名: any, 店铺: any; }) => <a type="link"
-            onClick={async () => {
-                setsku(text);
-                setskuName(record.品名);
-                const result = request(`/api/sku/sale/item/info`, {
-                    method: 'POST',
-                    data: { 'sku': text, 'store': record.店铺 },
-                    requestType: 'form',
-                });
-                if (await result) {
-                    setlineData(await result);
-                    first_data_temp = []
-                    for (const iterator of eval(await result)) {
-                        if ((iterator.type == "销售总数/天/PC") || (iterator.type == "七天日销")) {
-                            first_data_temp.push(iterator);
+    const temp_columns = [
+        {
+            title: 'sku序号',
+            dataIndex: 'sku序号',
+            fixed: 'left',
+            width: 70,
+            ellipsis: true,
+            copyable: true,
+        }, {
+            title: () => (
+                <span>
+                    sku
+                    <Tooltip
+                        title={'公司sku'}
+                    >
+                        <QuestionCircleOutlined />
+                    </Tooltip>
+                </span>
+            ),
+            dataIndex: 'sku',
+            render: (text: string, record: { 品名: any, 店铺: any; }) => <a type="link"
+                onClick={async () => {
+                    setsku(text);
+                    setskuName(record.品名);
+                    const result = request(`/api/sku/sale/item/info`, {
+                        method: 'POST',
+                        data: { 'sku': text, 'store': record.店铺 },
+                        requestType: 'form',
+                    });
+                    if (await result) {
+                        setlineData(await result);
+                        first_data_temp = []
+                        for (const iterator of eval(await result)) {
+                            if ((iterator.type == "销售总数/天/PC") || (iterator.type == "七天日销")) {
+                                first_data_temp.push(iterator);
+                            }
                         }
+                        setfirst_data(first_data_temp)
+                        setIsModalVisible(true);
+                    } else {
+                        message.error('提交失败');
                     }
-                    setfirst_data(first_data_temp)
-                    setIsModalVisible(true);
-                } else {
-                    message.error('提交失败');
                 }
-            }
-            }
-        >
-            {text}
-        </a>,
-        fixed: 'left',
-        width: 150,
-        ellipsis: true,
-        copyable: true,
-        tip: '标题过长会自动收缩',
-    },
-    {
-        title: '品名',
-        dataIndex: '品名',
-        fixed: 'left',
-        width: 180,
-        ellipsis: true,
-        copyable: true,
-    },
-    {
-        title: '成本单价',
-        dataIndex: '成本单价',
-        render: (text: number) => <span>{text.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</span>,
-        width: 100,
-    },
-    {
-        title: '销量',
-        dataIndex: '销量',
-        sorter: (a: { 销量: number; }, b: { 销量: number; }) => a.销量 - b.销量,
-        width: 100,
-    },
-    {
-        title: '平均售价',
-        dataIndex: '平均售价',
-        // sorter: (a: { 平均售价: number; }, b: { 平均售价: number; }) => a.平均售价 - b.平均售价,
-        render: (text: number) => <span>{text.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</span>,
-        width: 120,
-    },
-    {
-        title: '交易额',
-        dataIndex: '交易额',
-        sorter: (a: { 交易额: number; }, b: { 交易额: number; }) => a.交易额 - b.交易额,
-        render: (text: number) => <span>{text.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</span>,
-        width: 100,
-    },
-    // {
-    //     title: '推广费',
-    //     dataIndex: '推广费',
-    //     render: (text: number) => <span> {text.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</span>,
-    //     width: 100,
-    // },
-    {
-        title: '损耗',
-        dataIndex: '损耗',
-        sorter: (a: { 损耗: number; }, b: { 损耗: number; }) => a.损耗 - b.损耗,
-        render: (text: number) => <span>{text.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</span>,
-        width: 100,
-    },
-    {
-        title: () => (
-            <span>
-                广告
-                {/* <Tooltip
-                    title={'=广告 / 交易额'}
+                }
+            >
+                {text}
+            </a>,
+            fixed: 'left',
+            width: 150,
+            ellipsis: true,
+            copyable: true,
+            tip: '标题过长会自动收缩',
+        },
+        {
+            title: '品名',
+            dataIndex: '品名',
+            fixed: 'left',
+            width: 180,
+            ellipsis: true,
+            copyable: true,
+        },
+        {
+            title: '成本单价',
+            dataIndex: '成本单价',
+            render: (text: number) => <span>{text.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</span>,
+            width: 100,
+        },
+        {
+            title: '销量',
+            dataIndex: '销量',
+            sorter: (a: { 销量: number; }, b: { 销量: number; }) => a.销量 - b.销量,
+            width: 100,
+        },
+        {
+            title: '平均售价',
+            dataIndex: '平均售价',
+            // sorter: (a: { 平均售价: number; }, b: { 平均售价: number; }) => a.平均售价 - b.平均售价,
+            render: (text: number) => <span>{text.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</span>,
+            width: 120,
+        },
+        {
+            title: '交易额',
+            dataIndex: '交易额',
+            sorter: (a: { 交易额: number; }, b: { 交易额: number; }) => a.交易额 - b.交易额,
+            render: (text: number) => <span>{text.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</span>,
+            width: 100,
+        },
+        // {
+        //     title: '推广费',
+        //     dataIndex: '推广费',
+        //     render: (text: number) => <span> {text.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</span>,
+        //     width: 100,
+        // },
+        {
+            title: '损耗',
+            dataIndex: '损耗',
+            sorter: (a: { 损耗: number; }, b: { 损耗: number; }) => a.损耗 - b.损耗,
+            render: (text: number) => <span>{text.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</span>,
+            width: 100,
+        },
+        {
+            title: () => (
+                <span>
+                    广告
+                    {/* <Tooltip
+                    title={'=广告 / 销售额'}
                 >
                     <QuestionCircleOutlined />
                 </Tooltip> */}
-            </span>
-        ),
-        dataIndex: '广告',
-        sorter: (a: { 广告: number; }, b: { 广告: number; }) => a.广告 - b.广告,
-        render: (text: number) => <span>{text.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</span>,
-        width: 100,
-    },
-    {
-        title: () => (
-            <span>
-                毛利润
-                {/* <Tooltip
-                    title={'=0.85*交易额 - 销售总成本 - 推广费-售后'}
+                </span>
+            ),
+            dataIndex: '广告',
+            sorter: (a: { 广告: number; }, b: { 广告: number; }) => a.广告 - b.广告,
+            render: (text: number) => <span>{text.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</span>,
+            width: 100,
+        },
+        {
+            title: () => (
+                <span>
+                    毛利润
+                    {/* <Tooltip
+                    title={'=0.85*销售额 - 销售总成本 - 推广费-售后'}
                 >
                     <QuestionCircleOutlined />
                 </Tooltip> */}
-            </span>
-        ),
-        dataIndex: '净毛利润',
-        sorter: (a: { 净毛利润: number; }, b: { 净毛利润: number; }) => a.净毛利润 - b.净毛利润,
-        render: (text: number) => <span>{text.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</span>,
-        width: 110,
-    },
-    {
-        title: () => (
-            <span>
-                成本占比(%)
-                <Tooltip
-                    title={'=销售总成本/交易额'}
+                </span>
+            ),
+            dataIndex: '净毛利润',
+            sorter: (a: { 净毛利润: number; }, b: { 净毛利润: number; }) => a.净毛利润 - b.净毛利润,
+            render: (text: number) => <span>{text.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</span>,
+            width: 110,
+        },
+        {
+            title: () => (
+                <span>
+                    最近七日平均销量(店铺)
+                    {/* <Tooltip
+                    title={'sku在店铺内的最新过去7天平均销量'}
                 >
                     <QuestionCircleOutlined />
-                </Tooltip>
-            </span>
-        ),
-        dataIndex: '成本占比',
-        render: (text: number) => <span>{text.toFixed(2).toString()}%</span>,
-        width: 125,
-    },
-    {
-        title: () => (
-            <span>
-                损耗占比(%)
-                <Tooltip
-                    title={'=售后 / 交易额'}
+                </Tooltip> */}
+                </span>
+            ),
+            dataIndex: '七天日销(店铺)',
+            sorter: (a: { '七天日销(店铺)': number; }, b: { '七天日销(店铺)': number; }) => a.七天日销(店铺) - b.七天日销(店铺),
+            width: 200,
+        },
+        {
+            title: () => (
+                <span>
+                    最近七日平均销量(总)
+                    {/* <Tooltip
+                    title={'sku最新过去7天平均销量'}
                 >
                     <QuestionCircleOutlined />
-                </Tooltip>
-            </span>
-        ),
-        dataIndex: '损耗占比',
-        render: (text: number) => <span>{text.toFixed(2).toString()}%</span>,
-        width: 125,
-    },
-    // {
-    //     title: () => (
-    //         <span>
-    //             推广占比(%)
-    //             <Tooltip
-    //                 title={'=推广费 / 交易额'}
-    //             >
-    //                 <QuestionCircleOutlined />
-    //             </Tooltip>
-    //         </span>
-    //     ),
-    //     dataIndex: '推广占比',
-    //     render: (text: number) => <span>{text.toFixed(4).toString()}%</span>,
-    //     width: 125,
-    // },
-    {
-        title: () => (
-            <span>
-                广告占比(%)
-                <Tooltip
-                    title={'=广告 / 交易额'}
-                >
-                    <QuestionCircleOutlined />
-                </Tooltip>
-            </span>
-        ),
-        dataIndex: '广告占比',
-        render: (text: number) => <span>{text.toFixed(2).toString()}%</span>,
-        width: 135,
-    },
-    {
-        title: () => (
-            <span>
-                毛利润率(%)
-                <Tooltip
-                    title={'=净毛利润 / '}
-                >
-                    <QuestionCircleOutlined />
-                </Tooltip>
-            </span>
-        ),
-        dataIndex: '净毛利润率',
-        render: (text: number) => <span>{text.toFixed(2).toString()}%</span>,
-        width: 145,
-    },
-    {
-        title: () => (
-            <span>
-                销量贡献值(%)
-                <Tooltip
-                    title={'=销量 / 所有sku销量'}
-                >
-                    <QuestionCircleOutlined />
-                </Tooltip>
-            </span>
-        ),
-        dataIndex: '销量贡献率',
-        render: (text: number) => <span>{text.toFixed(2).toString()}%</span>,
-        width: 145,
-    },
-    {
-        title: () => (
-            <span>
-                交易额贡献值(%)
-                <Tooltip
-                    title={'=交易额 / 所有sku交易额'}
-                >
-                    <QuestionCircleOutlined />
-                </Tooltip>
-            </span>
-        ),
-        dataIndex: '交易额贡献率',
-        render: (text: number) => <span>{text.toFixed(2).toString()}%</span>,
-        width: 170,
-    },
-    {
-        title: () => (
-            <span>
-                广告贡献值(%)
-                <Tooltip
-                    title={'=广告费 / 所有sku推广费'}
-                >
-                    <QuestionCircleOutlined />
-                </Tooltip>
-            </span>
-        ),
-        dataIndex: '广告贡献率',
-        render: (text: number) => <span>{text.toFixed(2).toString()}%</span>,
-        width: 170,
-    },
-    {
-        title: () => (
-            <span>
-                售后贡献值(%)
-                <Tooltip
-                    title={'=售后 / 所有sku售后'}
-                >
-                    <QuestionCircleOutlined />
-                </Tooltip>
-            </span>
-        ),
-        dataIndex: '售后贡献率',
-        render: (text: number) => <span>{text.toFixed(2).toString()}%</span>,
-        width: 145,
-    },
-    {
-        title: () => (
-            <span>
-                毛利贡献值(%)
-                <Tooltip
-                    title={'=净毛利 / 所有sku净毛利'}
-                >
-                    <QuestionCircleOutlined />
-                </Tooltip>
-            </span>
-        ),
-        dataIndex: '净毛利贡献率',
-        render: (text: number) => <span>{text.toFixed(2).toString()}%</span>,
-        width: 170,
-    },
-    {
-        title: '运营',
-        dataIndex: '运营',
-        width: 100,
-        ellipsis: true,
-        copyable: true,
-    },
-    {
-        title: '运维',
-        dataIndex: '运维',
-        width: 100,
-        ellipsis: true,
-        copyable: true,
-    },
-    {
-        title: '组别',
-        dataIndex: '组别',
-        width: 120,
-        ellipsis: true,
-        copyable: true,
-    },
-    {
-        title: '店铺',
-        dataIndex: '店铺',
-        width: 120,
-        ellipsis: true,
-        copyable: true,
-    }
+                </Tooltip> */}
+                </span>
+            ),
+            dataIndex: '七天日销',
+            sorter: (a: { 七天日销: number; }, b: { 七天日销: number; }) => a.七天日销 - b.七天日销,
+            width: 180,
+        },
+        {
+            title: () => (
+                <span>
+                    总目标日销
+                    {/* <Tooltip
+                                    title={'=0.85*销售额 - 销售总成本 - 推广费-售后'}
+                                >
+                                    <QuestionCircleOutlined />
+                                </Tooltip> */}
+                </span>
+            ),
+            dataIndex: '目标日销',
+            sorter: (a: { 目标日销: number; }, b: { 目标日销: number; }) => a.目标日销 - b.目标日销,
+            width: 140,
+        },
+        {
+            title: () => (
+                <span>
+                    预估在库
+                    {/* <Tooltip
+                        title={'=0.85*销售额 - 销售总成本 - 推广费-售后'}
+                    >
+                        <QuestionCircleOutlined />
+                    </Tooltip> */}
+                </span>
+            ),
+            dataIndex: '在库',
+            sorter: (a: { 在库: number; }, b: { 在库: number; }) => a.在库 - b.在库,
+            width: 130,
+        },
+        {
+            title: () => (
+                <span>
+                    预估在库+在途
+                    {/* <Tooltip
+                        title={'=0.85*销售额 - 销售总成本 - 推广费-售后'}
+                    >
+                        <QuestionCircleOutlined />
+                    </Tooltip> */}
+                </span>
+            ),
+            dataIndex: '在库+在途',
+            sorter: (a: { '在库+在途': number; }, b: { '在库+在途': number; }) => a['在库+在途'] - b['在库+在途'],
+            width: 170,
+        },
+        {
+            title: () => (
+                <span>
+                    预估在库周转(天)
+                    <Tooltip
+                        title={'=预估在库 / 最近七日平均销量(总)'}
+                    >
+                        <QuestionCircleOutlined />
+                    </Tooltip>
+                </span>
+            ),
+            dataIndex: '在库周转',
+            sorter: (a: { '在库周转': number; }, b: { '在库周转': number; }) => a['在库周转'] - b['在库周转'],
+            width: 160,
+        },
+        {
+            title: () => (
+                <span>
+                    预估在库+在途周转(天)
+                    <Tooltip
+                        title={'=预估在库+在途周转(天) / 最近七日平均销量(总)'}
+                    >
+                        <QuestionCircleOutlined />
+                    </Tooltip>
+                </span>
+            ),
+            dataIndex: '在库+在途周转',
+            sorter: (a: { '在库+在途周转': number; }, b: { '在库+在途周转': number; }) => a['在库+在途周转'] - b['在库+在途周转'],
+            width: 200,
+        },
+        // {
+        //     title: () => (
+        //         <span>
+        //             在库周转(目标日销)
+        //             {/* <Tooltip
+        //                         title={'=0.85*销售额 - 销售总成本 - 推广费-售后'}
+        //                     >
+        //                         <QuestionCircleOutlined />
+        //                     </Tooltip> */}
+        //         </span>
+        //     ),
+        //     dataIndex: '在库周转(目标日销)',
+        //     // render: (text: number) => <span>{text.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</span>,
+        //     width: 110,
+        // },
+        // {
+        //     title: () => (
+        //         <span>
+        //             在库+在途周转(目标日销)
+        //             {/* <Tooltip
+        //                         title={'=0.85*销售额 - 销售总成本 - 推广费-售后'}
+        //                     >
+        //                         <QuestionCircleOutlined />
+        //                     </Tooltip> */}
+        //         </span>
+        //     ),
+        //     dataIndex: '在库+在途周转(目标日销)',
+        //     // render: (text: number) => <span>{text.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</span>,
+        //     width: 110,
+        // },
+        {
+            title: () => (
+                <span>
+                    成本占比(%)
+                    <Tooltip
+                        title={'=销售总成本/销售额'}
+                    >
+                        <QuestionCircleOutlined />
+                    </Tooltip>
+                </span>
+            ),
+            dataIndex: '成本占比',
+            render: (text: number) => <span>{text.toFixed(2).toString()}%</span>,
+            width: 125,
+        },
+        {
+            title: () => (
+                <span>
+                    损耗占比(%)
+                    <Tooltip
+                        title={'=售后 / 销售额'}
+                    >
+                        <QuestionCircleOutlined />
+                    </Tooltip>
+                </span>
+            ),
+            dataIndex: '损耗占比',
+            render: (text: number) => <span>{text.toFixed(2).toString()}%</span>,
+            width: 125,
+        },
+        // {
+        //     title: () => (
+        //         <span>
+        //             推广占比(%)
+        //             <Tooltip
+        //                 title={'=推广费 / 销售额'}
+        //             >
+        //                 <QuestionCircleOutlined />
+        //             </Tooltip>
+        //         </span>
+        //     ),
+        //     dataIndex: '推广占比',
+        //     render: (text: number) => <span>{text.toFixed(4).toString()}%</span>,
+        //     width: 125,
+        // },
+        {
+            title: () => (
+                <span>
+                    广告占比(%)
+                    <Tooltip
+                        title={'=广告 / 销售额'}
+                    >
+                        <QuestionCircleOutlined />
+                    </Tooltip>
+                </span>
+            ),
+            dataIndex: '广告占比',
+            render: (text: number) => <span>{text.toFixed(2).toString()}%</span>,
+            width: 135,
+        },
+        {
+            title: () => (
+                <span>
+                    毛利润率(%)
+                    <Tooltip
+                        title={'=净毛利润 / 销售额'}
+                    >
+                        <QuestionCircleOutlined />
+                    </Tooltip>
+                </span>
+            ),
+            dataIndex: '净毛利润率',
+            render: (text: number) => <span>{text.toFixed(2).toString()}%</span>,
+            width: 145,
+        },
+        // {
+        //     title: () => (
+        //         <span>
+        //             销量贡献值(%)
+        //             <Tooltip
+        //                 title={'=销量 / 所有sku销量'}
+        //             >
+        //                 <QuestionCircleOutlined />
+        //             </Tooltip>
+        //         </span>
+        //     ),
+        //     dataIndex: '销量贡献率',
+        //     render: (text: number) => <span>{text.toFixed(2).toString()}%</span>,
+        //     width: 145,
+        // },
+        // {
+        //     title: () => (
+        //         <span>
+        //             交易额贡献值(%)
+        //             <Tooltip
+        //                 title={'=交易额 / 所有sku交易额'}
+        //             >
+        //                 <QuestionCircleOutlined />
+        //             </Tooltip>
+        //         </span>
+        //     ),
+        //     dataIndex: '交易额贡献率',
+        //     render: (text: number) => <span>{text.toFixed(2).toString()}%</span>,
+        //     width: 170,
+        // },
+        // {
+        //     title: () => (
+        //         <span>
+        //             广告贡献值(%)
+        //             <Tooltip
+        //                 title={'=广告费 / 所有sku推广费'}
+        //             >
+        //                 <QuestionCircleOutlined />
+        //             </Tooltip>
+        //         </span>
+        //     ),
+        //     dataIndex: '广告贡献率',
+        //     render: (text: number) => <span>{text.toFixed(2).toString()}%</span>,
+        //     width: 170,
+        // },
+        // {
+        //     title: () => (
+        //         <span>
+        //             售后贡献值(%)
+        //             <Tooltip
+        //                 title={'=售后 / 所有sku售后'}
+        //             >
+        //                 <QuestionCircleOutlined />
+        //             </Tooltip>
+        //         </span>
+        //     ),
+        //     dataIndex: '售后贡献率',
+        //     render: (text: number) => <span>{text.toFixed(2).toString()}%</span>,
+        //     width: 145,
+        // },
+        // {
+        //     title: () => (
+        //         <span>
+        //             毛利贡献值(%)
+        //             <Tooltip
+        //                 title={'=净毛利 / 所有sku净毛利'}
+        //             >
+        //                 <QuestionCircleOutlined />
+        //             </Tooltip>
+        //         </span>
+        //     ),
+        //     dataIndex: '净毛利贡献率',
+        //     render: (text: number) => <span>{text.toFixed(2).toString()}%</span>,
+        //     width: 170,
+        // },
+        {
+            title: '运营',
+            dataIndex: '运营',
+            width: 100,
+            ellipsis: true,
+            copyable: true,
+        },
+        {
+            title: '运维',
+            dataIndex: '运维',
+            width: 100,
+            ellipsis: true,
+            copyable: true,
+        },
+        {
+            title: '组别',
+            dataIndex: '组别',
+            width: 120,
+            ellipsis: true,
+            copyable: true,
+        },
+        {
+            title: '店铺',
+            dataIndex: '店铺',
+            width: 120,
+            ellipsis: true,
+            copyable: true,
+        }
     ];
+
     const [columns, setcolumns] = useState(temp_columns) as any;
     const [attribute, setattribute] = useState(total_attribute) as any;
     const onFinish = async (values: any) => {
@@ -595,12 +740,14 @@ const SkuTotal = () => {
             requestType: 'form',
         });
         if (await result) {
-            if (await result != 'false') {
+            const temp_res = await result;
+            if ((temp_res != 'false') && (temp_res != 'noAuth')) {
+
                 const resp_data = await result;
                 const detail = document.getElementsByClassName("detail")[0] as HTMLElement;
                 detail.style.display = "block";
                 message.success('提交成功');
-                console.log(resp_data);
+                console.log(temp_res);
                 // 表格数据
                 setdataT(resp_data.sku_sale_table);
                 setdataE(resp_data.sku_sale_table);
@@ -612,13 +759,14 @@ const SkuTotal = () => {
                 setgross_profit_sum(resp_data.gross_profit_sum);
                 setgross_profit_per(resp_data.gross_profit_per);
                 setpromotion_per(resp_data.promotion_per);
+
             }
-            else {
+            else if (temp_res == 'false') {
                 message.error('无对应sku信息');
             }
-        }
-        else {
-            message.error('提交失败');
+            else if (temp_res == 'noAuth') {
+                message.error('账号过期，请重新登录');
+            }
         }
 
     };
@@ -649,10 +797,10 @@ const SkuTotal = () => {
         str = str.replace(new RegExp("净毛利润", ("gm")), '毛利润');
         // 增加\t为了不让表格显示科学计数法或者其他格式
         for (let i = 0; i < excel_datas.length; i++) {
-            excel_datas[i]['sku'] = excel_datas[i]['sku'].replace(new RegExp(",", ("gm")), "|")
-            excel_datas[i]['运营'] = excel_datas[i]['运营'].replace(new RegExp(",", ("gm")), "|")
-            excel_datas[i]['运维'] = excel_datas[i]['运维'].replace(new RegExp(",", ("gm")), "|")
-            excel_datas[i]['组别'] = excel_datas[i]['组别'].replace(new RegExp(",", ("gm")), "|")
+            excel_datas[i]['sku'] = excel_datas[i]['sku'].toString().replace(new RegExp(",", ("gm")), "|")
+            excel_datas[i]['运营'] = excel_datas[i]['运营'].toString().replace(new RegExp(",", ("gm")), "|")
+            excel_datas[i]['运维'] = excel_datas[i]['运维'].toString().replace(new RegExp(",", ("gm")), "|")
+            excel_datas[i]['组别'] = excel_datas[i]['组别'].toString().replace(new RegExp(",", ("gm")), "|")
             for (const key in attribute) {
                 if (Object.prototype.hasOwnProperty.call(excel_datas[i], attribute[key])) {
                     str += `${excel_datas[i][attribute[key]]},`;
@@ -718,7 +866,7 @@ const SkuTotal = () => {
                 </Form>
             </div>
             <div style={{ backgroundColor: "white", paddingLeft: 10, paddingRight: 10 }}>
-                <p style={{ display: "none" }} className="detail">销量总计:　{num_sum}　　　交易额总计:　{money_sum}　　　广告费用总计:　{promotion_sum}　　　售后费用总计:　{after_sale_sum}　　　毛利润:　{gross_profit_sum}　　　广告占比:　{promotion_per}%　　　总毛利润率:　{gross_profit_per}%</p>
+                <p style={{ display: "none" }} className="detail">美元--销量总计:　{num_sum}　　　交易额总计:　{money_sum}　　　广告费用总计:　{promotion_sum}　　　售后费用总计:　{after_sale_sum}　　　毛利润:　{gross_profit_sum}　　　广告占比:　{promotion_per}%　　　毛利润占比:　{gross_profit_per}%</p>
                 <Row style={{ marginBottom: 5 }}>
                     <Col span={12}>
                         <span>列选择器：</span>
@@ -738,7 +886,7 @@ const SkuTotal = () => {
                 <Table
                     size='small'
                     columns={columns}
-                    scroll={{ x: 1300, y: 500 }}
+                    scroll={{ x: 1800, y: 500 }}
                     dataSource={dataT}
                     rowSelection={rowSelection}
                     pagination={{

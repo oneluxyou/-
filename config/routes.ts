@@ -36,6 +36,33 @@
         icon: 'smile',
         component: './After/After_ana',
       },
+      {
+        path: '/after/sort',
+        name: '绩效管理表',
+        icon: 'smile',
+        routes: [
+          {
+            path: '/after/sort/az',
+            name: 'AZ',
+            icon: 'smile',
+            component: './After/sort/az',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    path: '/after2021',
+    icon: 'smile',
+    name: '售后2021补登',
+    access: 'AllManager',
+    routes: [
+      {
+        path: '/after2021/add',
+        name: '售后登记2021',
+        icon: 'smile',
+        component: './After2021',
+      },
       // {
       //   path: '/after/sort',
       //   name: '分页',

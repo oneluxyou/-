@@ -34,7 +34,23 @@ export async function edit_after(editId: any) {
     requestType: 'form',
   });
 }
+export async function edit_afteraz(editId: any) {
+  console.log(editId);
+  return request('/api/after/changeaz', {
+    method: 'PUT',
+    data: { editId },
+    requestType: 'form',
+  });
+}
 
+export async function edit_after2021(editId: any) {
+  console.log(editId);
+  return request('/api/after/change2021', {
+    method: 'PUT',
+    data: { editId },
+    requestType: 'form',
+  });
+}
 /*
 周转的data数据
  */

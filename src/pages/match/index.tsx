@@ -34,7 +34,7 @@ const TableList: React.FC = () => {
     setIsModalVisibleEdit(show);
     setEditId(id);
   };
-
+  console.log('1', formRef)
   const onTableChange = (value: any) => { console.log(value) };
   //表格part、
   const column: ProColumns[] = [
@@ -48,11 +48,15 @@ const TableList: React.FC = () => {
       dataIndex: 'ASIN',
       key: 'ASIN',
       ellipsis: true,
+      width: 150
+      // copyable: true,
+      // render: (text: string) => <a href={"https://www.amazon.com/bp/" + text.props.children}>{text}</a>,
     },
     {
       title: '公司SKU',
-      dataIndex: '公司SKU',
+      dataIndex: '发货公司SKU',
       key: '公司SKU',
+      tooltip: 'a表示AB箱情况，|表示可能会发不同的货',
     },
     {
       title: '运营',
@@ -81,6 +85,7 @@ const TableList: React.FC = () => {
         利芬组_H组: '利芬组_H组',
         利芬组_I组: '利芬组_I组',
         利芬组_J组: '利芬组_J组',
+        利芬组_K组: '利芬组_K组',
       },
     },
     {
@@ -129,20 +134,21 @@ const TableList: React.FC = () => {
     {
       title: 'sku序号',
       dataIndex: 'sku序号',
-      hideInSearch: true,
+      // hideInSearch: true,
       key: 'sku序号',
       tooltip: '自动生成',
     },
     {
       title: '款式序号',
       dataIndex: '款式序号',
-      hideInSearch: true,
+      // hideInSearch: true,
       key: '款式序号',
       tooltip: '自动生成',
     },
     {
       title: '开始时间',
       dataIndex: '开始时间',
+      // valueType: 'date',
       hideInSearch: true,
       key: '开始时间',
       tooltip: '自动生成',
@@ -150,7 +156,7 @@ const TableList: React.FC = () => {
     {
       title: '结束时间',
       dataIndex: '结束时间',
-      // hideInSearch: true,
+      // valueType: 'date',
       key: '结束时间',
       tooltip: '自动生成',
     },
@@ -195,21 +201,24 @@ const TableList: React.FC = () => {
 
   // 导出报表
   const downloadExcel = () => {
-    const excel_datas = tableData.data;
+    const excel_datas = tableData.excel;
     console.log(excel_datas);
 
     // 列标题，逗号隔开，每一个逗号就是隔开一个单元格
-    let str = `id,渠道sku,ASIN,公司SKU,运营,运维,组别,店铺,KEY,sku序号,款式序号,开始时间,结束时间,状态\n`;
+    let str = `id,渠道sku,ASIN,发货公司SKU,运营,运维,组别,店铺,KEY,sku序号,款式序号,开始时间,结束时间,状态\n`;
+    const dict = ['id', '渠道sku', 'ASIN', '发货公司SKU', '运营', '运维', '组别', '店铺', 'KEY', 'sku序号', '款式序号', '开始时间', '结束时间', '状态']
     // 增加\t为了不让表格显示科学计数法或者其他格式
     for (let i = 0; i < excel_datas.length; i++) {
       // console.log(excel_datas[i])
-      for (const key in excel_datas[i]) {
-        console.log(excel_datas[i].公司SKU);
-        const temp_dict = excel_datas[i].公司SKU.split(',');
-        excel_datas[i].公司SKU = temp_dict.join('a');
-        if (Object.prototype.hasOwnProperty.call(excel_datas[i], key)) {
-          str += `${excel_datas[i][key]},`;
+      for (const key in dict) {
+        const temp_dict = excel_datas[i].发货公司SKU.split(',');
+        excel_datas[i].发货公司SKU = temp_dict.join('a');
+        if (dict[key] in excel_datas[i]) {
+          str += `${excel_datas[i][dict[key]]},`;
+        } else {
+          str += `,`;
         }
+
       }
       str += '\n';
     }
@@ -339,7 +348,6 @@ const TableList: React.FC = () => {
                   if (temp_data.indexOf(values[form_dict[key]]) == -1) {
                     temp_data.push(values[form_dict[key]]);
                     temp_dict[key].push(renderItem(values[form_dict[key]], temp_data.length - 1, item_dict[key]));
-                    console.log('提交后', temp_data)
                     let temp_storage = temp_data.join('|');
                     temp_storage = JSON.stringify(temp_storage);
                     storage[item_dict[key]] = temp_storage;
@@ -521,10 +529,31 @@ const TableList: React.FC = () => {
         search={{
           labelWidth: 'auto',
           defaultCollapsed: false,
-          span: 6
+          span: 6,
+          optionRender: ({ searchText, resetText }, { form }, dom) => [
+            <Button
+              key="searchText"
+              type="primary"
+              onClick={() => {
+                // console.log(params);
+                form?.submit();
+              }}
+            >
+              {searchText}
+            </Button>,
+            <Button
+              key="resetText"
+              onClick={() => {
+                form?.resetFields();
+              }}
+            >
+              {resetText}
+            </Button>
+          ]
         }}
         columns={column}
         actionRef={actionRef}
+        formRef={formRef}
         onChange={onTableChange}
         request={async (params = {}) => {
           const result = request('/api/skuinfo/', {
@@ -533,6 +562,7 @@ const TableList: React.FC = () => {
             requestType: 'form',
           });
           settableData(await result);
+          console.log(await result);
           return result;
         }}
         rowKey="key"
@@ -544,11 +574,14 @@ const TableList: React.FC = () => {
         toolbar={{
           actions: [
             <>
-              <Access accessible={access.MatchManager()} >
+              <Access accessible={access.MatchExcel()} >
                 <Button key="primary" type="primary" >
                   <a href="/api/skuinfototal/">导出总表</a>
                 </Button>
               </Access>
+              <Button key="primary" type="primary" onClick={() => downloadExcel()}>
+                导出为excel(仅限一千条)
+              </Button>,
             </>
           ],
         }}

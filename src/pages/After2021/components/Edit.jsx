@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import ProForm, { ProFormDigit, ProFormSelect, ProFormText, ProFormTextArea, ProFormRadio } from "@ant-design/pro-form";
+import ProForm, { ProFormDigit, ProFormRadio, ProFormSelect, ProFormText, ProFormTextArea } from "@ant-design/pro-form";
 import { message, Modal, Skeleton, Cascader, Input } from "antd";
-import { edit_after } from "@/services/myapi";
+import { edit_after2021 } from "@/services/myapi";
 import request from "umi-request";
 import { useRequest } from 'umi';
 
@@ -431,7 +431,7 @@ const Edit = (props) => {
 
     //发请求取售后详情
     if (editId !== undefined) {
-      const response = await edit_after(editId);
+      const response = await edit_after2021(editId);
       console.log(response);
       // 创建初始数组(用来存配件)
       let initial_dic = {
@@ -446,6 +446,7 @@ const Edit = (props) => {
         序号: response.序号,
         是否上传图片: response.是否上传图片,
       };
+      console.log(response.顾客反馈)
       // 对顾客反馈和客服操作进行处理
       response.顾客反馈 = response.顾客反馈.split("&");
       response.客服操作 = response.客服操作.split("&");
@@ -851,20 +852,11 @@ const Edit = (props) => {
                 values['SKU'] = values['SKU'].replace(new RegExp('，', ("gm")), ',');
                 values['SKU'] = values['SKU'].replace(new RegExp(' ', ("gm")), '');
                 values['SKU'] = values['SKU'].replace(new RegExp('  ', ("gm")), '');
-                // 判断sku是否含有
-                if (!data.sku_name.find((item) => item == values['SKU'])) {
-                  sku_in = false;
-                  message.error('传入的SKU:' + values['SKU'] + '不正确(注:AB箱只填有问题的那箱，不同SKU请分条填写。)');
-                }
                 if ('3-1-0' in values) {
                   // 如果不为空，则重新判断是否正确
                   values['3-1-0'] = values['3-1-0'].replace(new RegExp('，', ("gm")), ',');
                   values['3-1-0'] = values['3-1-0'].replace(new RegExp(' ', ("gm")), '');
                   values['3-1-0'] = values['3-1-0'].replace(new RegExp('  ', ("gm")), '');
-                  if (!data.sku_name.find((item) => item == values['3-1-0'])) {
-                    sku_in = false;
-                    message.error('传入的补寄新件SKU:' + values['3-1-0'] + '不正确(注:AB箱只填有问题的那箱，不同SKU请分条填写。)');
-                  }
                 } else {
                   if ('3-1-0数量' in values) {
                     values['3-1-0'] = values['SKU'];
@@ -875,10 +867,6 @@ const Edit = (props) => {
                   values['3-2-0'] = values['3-2-0'].replace(new RegExp('，', ("gm")), ',');
                   values['3-2-0'] = values['3-2-0'].replace(new RegExp(' ', ("gm")), '');
                   values['3-2-0'] = values['3-2-0'].replace(new RegExp('  ', ("gm")), '');
-                  if (!data.sku_name.find((item) => item == values['3-2-0'])) {
-                    sku_in = false;
-                    message.error('传入的补寄新件SKU:' + values['3-2-0'] + '不正确(注:AB箱只填有问题的那箱，不同SKU请分条填写。)');
-                  }
                 } else {
                   if ('3-2-0数量' in values) {
                     values['3-2-0'] = values['SKU'];
@@ -889,10 +877,6 @@ const Edit = (props) => {
                   values['3-3-0'] = values['3-3-0'].replace(new RegExp('，', ("gm")), ',');
                   values['3-3-0'] = values['3-3-0'].replace(new RegExp(' ', ("gm")), '');
                   values['3-3-0'] = values['3-3-0'].replace(new RegExp('  ', ("gm")), '');
-                  if (!data.sku_name.find((item) => item == values['3-3-0'])) {
-                    sku_in = false;
-                    message.error('传入的补寄新件SKU:' + values['3-3-0'] + '不正确(注:AB箱只填有问题的那箱，不同SKU请分条填写。)');
-                  }
                 } else {
                   if ('3-3-0数量' in values) {
                     values['3-3-0'] = values['SKU'];
@@ -972,7 +956,7 @@ const Edit = (props) => {
                 }
                 values['kefu'] = values['kefu'].join('&');
                 if (sku_in == true) {
-                  return request(`/api/after/change`, {
+                  return request(`/api/after/change2021`, {
                     method: 'POST',
                     data: { ...values },
                     requestType: 'form',
@@ -1018,6 +1002,8 @@ const Edit = (props) => {
                   listHeight: 250,
                 }}
                 valueEnum={{
+                  'amazon尚铭': '尚铭',
+                  'amazon优瑞斯特': '优瑞斯特',
                   'amazon赫曼': '赫曼',
                   'amazon信盒': '信盒',
                   'amazon宫本': '宫本',
@@ -1082,7 +1068,6 @@ const Edit = (props) => {
                   maxTagCount={4}
                   onChange={fankuionChange}
                   style={{ width: '300px' }}
-                  dropdownMenuColumnStyle={{ height: '3vh' }}
                   options={fankuicol}
                 />
               </ProForm.Item>
@@ -1106,6 +1091,7 @@ const Edit = (props) => {
                 width="md"
                 name="是否上传图片"
                 label="是否上传图片"
+                initialValue='未上传'
                 valueEnum={{
                   '已上传': '已上传',
                   '未上传': '未上传',

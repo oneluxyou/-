@@ -47,7 +47,7 @@ export default defineConfig({
   ignoreMomentLocale: true,
   proxy: {
     '/api': {
-      target: 'http://192.168.1.115:5000',
+      target: 'http://192.168.1.115:5001',
       changeOrigin: true,
     },
   },
