@@ -26,6 +26,7 @@ export async function updateRule(data: { [key: string]: any }, options?: { [key:
  * @param params
  * @returns
  */
+// 售后页面的编辑功能
 export async function edit_after(editId: any) {
   console.log(editId);
   return request('/api/after/change', {
@@ -34,11 +35,43 @@ export async function edit_after(editId: any) {
     requestType: 'form',
   });
 }
-export async function edit_afteraz(editId: any) {
+// 其他售后页面的【售后登记】的编辑
+export async function edit_after_after(editOrder: any, editSKU: any) {
+  console.log(editOrder, editSKU);
+  return request('/api/after/changeafter', {
+    method: 'PUT',
+    data: { editOrder, editSKU },
+    requestType: 'form',
+  });
+}
+
+// export async function edit_afterafter(editId: any) {
+//   console.log(editId);
+//   return request('/api/after/change', {
+//     method: 'PUT',
+//     data: { editId },
+//     requestType: 'form',
+//   });
+// }
+// AZ的编辑
+export async function edit_after_sort(editId: any) {
   console.log(editId);
   return request('/api/after/changeaz', {
     method: 'PUT',
     data: { editId },
+    requestType: 'form',
+  });
+}
+
+export async function edit_after_sort_sku(
+  editOrder: any,
+  editSKU: any,
+  editSaler: any,
+  editStore: any,
+) {
+  return request('/api/after/changeaz', {
+    method: 'PUT',
+    data: { editOrder, editSKU, editSaler, editStore },
     requestType: 'form',
   });
 }

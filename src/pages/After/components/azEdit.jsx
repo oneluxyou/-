@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import ProForm, { ProFormDigit, ProFormSelect, ProFormText, ProFormTextArea, ProFormRadio } from "@ant-design/pro-form";
 import { message, Modal, Skeleton, Cascader, Input } from "antd";
-import { edit_afteraz } from "@/services/myapi";
+import { edit_after_sort, edit_after_sort_sku } from "@/services/myapi";
 import request from "umi-request";
 import { useRequest } from 'umi';
 
-const Edit = (props) => {
+const AZEdit = (props) => {
   const [initialValues, setInitialValues] = useState(undefined);
   const { data } = useRequest({
     url: '/api/sku/static',
@@ -416,12 +416,16 @@ const Edit = (props) => {
   const { isShowModal } = props;
   const { actionRef } = props;
   const { editId } = props;
+  const { editOrder } = props;
+  const { editSKU } = props;
+  const { editSaler } = props;
+  const { editStore } = props;
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(async () => {
 
     //发请求取售后详情
     if (editId !== undefined) {
-      const response = await edit_afteraz(editId);
+      const response = await edit_after_sort(editId);
       console.log(response);
       // 创建初始数组(用来存配件)
       let initial_dic = {
@@ -439,6 +443,49 @@ const Edit = (props) => {
         备注: response.备注,
       };
       setInitialValues(initial_dic);
+    } else {
+      const response = await edit_after_sort_sku(editOrder, editSKU, editSaler, editStore);
+      console.log(response);
+      let initial_dic = {};
+      if (response.length == 0) {
+        // 创建初始数组(用来存配件)
+        initial_dic = {
+          处理人: editSaler,
+          店铺: editStore,
+          订单号: editOrder,
+          公司SKU: editSKU,
+          id: '新增'
+        };
+        message.info('AZ无该订单号');
+      } else {
+        // 创建初始数组(用来存配件)
+        initial_dic = {
+          id: response.id,
+          处理人: response.处理人,
+          店铺: response.店铺,
+          公司SKU: response.公司SKU,
+          订单号: response.订单号,
+          投诉日期: response.投诉日期,
+          状态: response.状态,
+          是否可申诉: response.是否可申诉,
+          责任方: response.责任方,
+          原因: response.原因,
+          CustomerIssue: response.CustomerIssue,
+          AZ上的评论: response.AZ上的评论,
+          备注: response.备注,
+        };
+        if (response[0].result == '正常') {
+          message.info('AZ有该记录，可直接编辑');
+        } else if (response[0].result == '无该订单号') {
+          message.info('AZ无该订单号');
+        } else if (response[0].result == '该订单号下无该SKU') {
+          message.error('售AZ页面该订单号无对应公司sku，请核查');
+        } else if (response[0].result == '该订单号有多条数据') {
+          message.info('该订单号有多条记录为该sku，只能选择其中一条记录');
+        }
+      }
+
+      setInitialValues(initial_dic);
     }
   }, [])
   /**
@@ -447,13 +494,13 @@ const Edit = (props) => {
    */
   const editafter = async values => {
     //发送请求，修改售后
-    const response = await editafter(editId, values)
+    const response = await editafter(editId, values);
     if (response.status === undefined) {
-      message.success('修改成功')
+      message.success('修改成功');
       //刷新表格数据
-      actionRef.current.reload()
+      actionRef.current.reload();
       //关闭模态框
-      isShowModal(false)
+      isShowModal(false);
     }
   }
 
@@ -618,8 +665,8 @@ const Edit = (props) => {
                 maxLength={150}
               />
               <ProFormTextArea
-                name="Customer Issue"
-                label="Customer Issue"
+                name="CustomerIssue"
+                label="CustomerIssue"
                 style={{ height: 50 }}
                 maxLength={150}
               />
@@ -642,5 +689,5 @@ const Edit = (props) => {
   )
 }
 
-export default Edit
+export default AZEdit
 

@@ -36,18 +36,12 @@
         icon: 'smile',
         component: './After/After_ana',
       },
+
       {
-        path: '/after/sort',
-        name: '绩效管理表',
+        path: '/after/sort/az',
+        name: '绩效管理表-AZ',
         icon: 'smile',
-        routes: [
-          {
-            path: '/after/sort/az',
-            name: 'AZ',
-            icon: 'smile',
-            component: './After/sort/az',
-          },
-        ],
+        component: './After/sort/az',
       },
     ],
   },

@@ -16,6 +16,7 @@ import ProForm, {
 } from '@ant-design/pro-form';
 import type { ProFormInstance } from '@ant-design/pro-form';
 import Edit from './components/Edit'
+import AZEdit from './components/azEdit';
 import styles from './index.less'
 import { useRequest, useAccess, Access, useModel } from 'umi';
 
@@ -34,13 +35,28 @@ const TableList: React.FC = () => {
     url: '/api/sku/static',
     method: 'get',
   });
+  // 编辑传参
+  const [AZisModalVisibleEdit, setAZIsModalVisibleEdit] = useState(false);
+  const [editOrder, setEditOrder] = useState(false);
+  const [editSKU, setEditSKU] = useState(false);
+  const [editSaler, setEditSaler] = useState(false);
+  const [editStore, setEditStore] = useState(false);
+
   //编辑part
   const [isModalVisibleEdit, setIsModalVisibleEdit] = useState(false)
   //控制模态框的显示和隐藏
   const isShowModalEdit = (show: boolean, id: any) => {
-    setIsModalVisibleEdit(show)
-    setEditId(id)
+    setIsModalVisibleEdit(show);
+    setEditId(id);
   }
+  const AZisShowModalEdit = (show: boolean, id: any, order: any, sku: any, store: any, saler: any) => {
+    setAZIsModalVisibleEdit(show);
+    setEditOrder(order);
+    setEditSKU(sku);
+    setEditSaler(saler);
+    setEditStore(store);
+    setEditId(id);
+  };
   const [editId, setEditId] = useState(false)
   const actionRef = useRef<ActionType>();
   const formRef = useRef<ProFormInstance>();
@@ -214,20 +230,287 @@ const TableList: React.FC = () => {
     {
       title: '操作',
       valueType: 'option',
-      width: 50,
+      width: 70,
       fixed: 'right',
 
       render: (text, record, _, action) => [
-        <a
-          onClick={() => {
-            isShowModalEdit(true, record.id);
-          }}
-        >
-          编辑
-        </a>
+        <>
+          <a
+            onClick={() => {
+              isShowModalEdit(true, record.id);
+            }}
+          >
+            编辑
+          </a>
+          <a
+            onClick={() => {
+              // eslint-disable-next-line @typescript-eslint/no-use-before-define
+              settablecol(column1);
+            }}
+          >
+            更多
+          </a>
+        </>
       ]
     },
   ]
+
+  // 扩展表格
+  const column1: ProColumns[] = [
+    {
+      title: '状态',
+      dataIndex: '订单状态',
+      filters: true,
+      onFilter: true,
+      valueEnum: {
+        "已解决": {
+          text: '已解决',
+          status: 'Default',
+        },
+        "解决中": {
+          text: '解决中',
+          status: 'error',
+        },
+        "已校对": { text: '已校对', status: 'Success' },
+      },
+      width: 75
+    },
+    {
+      title: '登记日期',
+      dataIndex: '登记日期',
+      hideInSearch: true,
+      sorter: (a, b) => a.id - b.id,
+      //数据库格式问题
+      width: 90
+    },
+    {
+      title: '更新日期',
+      dataIndex: '更新日期',
+      hideInSearch: true,
+      sorter: (a, b) => a.id - b.id,
+      //数据库格式问题
+      width: 90
+    },
+    {
+      title: '登记人',
+      dataIndex: '登记人',
+      filters: true,
+      onFilter: true,
+      width: 70,
+      ellipsis: true,
+    },
+    {
+      title: '店铺',
+      dataIndex: '店铺',
+      // hideInSearch: true,
+      filters: true,
+      onFilter: true,
+      width: 80,
+      ellipsis: true,
+      valueEnum: {
+        'amazon赫曼': '赫曼',
+        'amazon信盒': '信盒',
+        'amazon宫本': '宫本',
+        'amazon森月': '森月',
+        'amazon维禄': '维禄',
+        'amazon玲琅': '玲琅',
+        'amazon信盒法国': '信盒-法国',
+        'amazon信盒意大利': '信盒-意大利',
+        'amazon信盒西班牙': '信盒-西班牙',
+        'wayfair信盒': 'Wayfair-信盒',
+        'wayfair维禄': 'Wayfair-维禄',
+        'walmart优瑞斯特': 'Walmart-优瑞斯特',
+        'walmart赫曼': 'Walmart-赫曼',
+        'walmart信盒': 'Walmart-信盒',
+        'walmart宫本': 'Walmart-宫本',
+        'ebay玲琅': 'eBay-玲琅',
+        'ebay治润': 'eBay-治润',
+        'ebay雅秦': 'eBay-雅秦',
+        'shopifynextfur': 'Nextfur-Shopify',
+        'amazon旗辰': '旗辰',
+        'amazon赛迦曼': '赛迦曼',
+        'amazon启珊': '启珊',
+        'amazon驰甬': '驰甬',
+        'amazon杉绮': '杉绮',
+        'amazon治润': '治润',
+        'amazoncpower': 'Central_Power_International_Limited',
+      }
+    },
+    {
+      title: '订单号',
+      dataIndex: '订单号',
+      width: 100,
+      tip: '订单号过长会自动收缩',
+    },
+    {
+      title: 'SKU',
+      dataIndex: 'SKU',
+      width: 100,
+    },
+    {
+      title: '序号',
+      dataIndex: '序号',
+      hideInSearch: true,
+      width: 50,
+    },
+    {
+      title: '顾客反馈',
+      dataIndex: '顾客反馈',
+      hideInSearch: true,
+      width: 100,
+    },
+    {
+      title: '客服操作',
+      dataIndex: '客服操作',
+      hideInSearch: true,
+      width: 100,
+    },
+    {
+      title: '退款',
+      dataIndex: 'Refund',
+      width: 60,
+      hideInSearch: true,
+      sorter: (a, b) => a.Refund - b.Refund,
+    },
+    {
+      title: '备注',
+      dataIndex: '备注',
+      width: 100,
+      tip: '备注过长会自动收缩',
+      hideInSearch: true,
+    },
+    {
+      title: '登记开始日期',
+      dataIndex: '登记开始日期',
+      valueType: 'date',
+      hideInTable: true,
+      //数据库格式问题
+      width: 90
+    },
+    {
+      title: '登记结束日期',
+      dataIndex: '登记结束日期',
+      valueType: 'date',
+      hideInTable: true,
+      //数据库格式问题
+      width: 90
+    },
+    {
+      title: '更改开始日期',
+      dataIndex: '更改开始日期',
+      valueType: 'date',
+      hideInTable: true,
+      //数据库格式问题
+      width: 90
+    },
+    {
+      title: '更改结束日期',
+      dataIndex: '更改结束日期',
+      valueType: 'date',
+      hideInTable: true,
+      //数据库格式问题
+      width: 90
+    },
+    {
+      title: '是否上传图片',
+      dataIndex: '是否上传图片',
+      hideInSearch: true,
+      //数据库格式问题
+      width: 90,
+      fixed: 'right',
+    },
+    {
+      title: '操作',
+      valueType: 'option',
+      width: 400,
+      fixed: 'right',
+
+      render: (text, record, _, action) => [
+        <>
+          <a
+            onClick={() => {
+              isShowModalEdit(true, record.id);
+            }}
+          >
+            编辑
+          </a>
+          <a
+            onClick={() => {
+              AZisShowModalEdit(true, record.id, record.订单号, record.公司SKU, record.店铺, record.处理人);
+            }}
+          >
+            AZ
+          </a>
+          <a
+            onClick={() => {
+              isShowModalEdit(true, record.id);
+            }}
+          >
+            FB
+          </a>
+          <a
+            onClick={() => {
+              isShowModalEdit(true, record.id);
+            }}
+          >
+            CB
+          </a>
+          <a
+            onClick={() => {
+              isShowModalEdit(true, record.id);
+            }}
+          >
+            退货
+          </a>
+          <a
+            onClick={() => {
+              isShowModalEdit(true, record.id);
+            }}
+          >
+            RP
+          </a>
+          <a
+            onClick={() => {
+              isShowModalEdit(true, record.id);
+            }}
+          >
+            投诉
+          </a>
+          <a
+            onClick={() => {
+              isShowModalEdit(true, record.id);
+            }}
+          >
+            ST
+          </a>
+          <a
+            onClick={() => {
+              isShowModalEdit(true, record.id);
+            }}
+          >
+            RV
+          </a>
+          <a
+            onClick={() => {
+              isShowModalEdit(true, record.id);
+            }}
+          >
+            RV
+          </a>
+          <a
+            onClick={() => {
+              // eslint-disable-next-line @typescript-eslint/no-use-before-define
+              settablecol(column);
+            }}
+          >
+            隐藏
+          </a>
+        </>
+      ]
+    },
+  ]
+  // 表单
+  const [tablecol, settablecol] = useState(column);
   // 订单记录
   const [order_name, setorder_name] = useState([]);
   // 表单缓存
@@ -1548,6 +1831,7 @@ const TableList: React.FC = () => {
                 name="是否上传图片"
                 label="是否上传图片"
                 initialValue='未上传'
+                tooltip="图片上传地址：\\Bd10\销售部共享盘\@销售数据\@销售共享盘\客诉图片\<SKU>\<订单号>"
                 rules={[{ required: true, message: '请输入是否已上传!' }]}
               >
                 <ProFormRadio.Group
@@ -1605,7 +1889,7 @@ const TableList: React.FC = () => {
           defaultCollapsed: false,
         }}
         rowKey="key"
-        columns={column}
+        columns={tablecol}
         actionRef={actionRef}
         onChange={onTableChange}
         scroll={{ x: 900, y: 500 }}
@@ -1638,6 +1922,20 @@ const TableList: React.FC = () => {
               isShowModal={isShowModalEdit}
               actionRef={actionRef}
               editId={editId}
+            />
+          </Access>
+      }
+      {
+        !AZisModalVisibleEdit ? '' :
+          <Access accessible={access.AfterManager()} >
+            <AZEdit
+              isModalVisible={AZisModalVisibleEdit}
+              isShowModal={AZisShowModalEdit}
+              actionRef={actionRef}
+              editOrder={editOrder}
+              editSaler={editSaler}
+              editStore={editStore}
+              editSKU={editSKU}
             />
           </Access>
       }

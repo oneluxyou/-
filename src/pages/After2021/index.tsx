@@ -1520,6 +1520,7 @@ const TableList: React.FC = () => {
                 name="是否上传图片"
                 label="是否上传图片"
                 initialValue='未上传'
+                tooltip="图片上传地址：\\Bd10\销售部共享盘\@销售数据\@销售共享盘\客诉图片\<SKU>\<订单号>"
                 rules={[{ required: true, message: '请输入是否已上传!' }]}
               >
                 <ProFormRadio.Group

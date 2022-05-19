@@ -8,7 +8,8 @@ import { Button, message, Col, Row, AutoComplete, DatePicker, Input } from 'antd
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProForm, { ProFormSelect, ProFormRadio } from '@ant-design/pro-form';
 import type { ProFormInstance } from '@ant-design/pro-form';
-import Edit from '../components/azEdit';
+import AZEdit from '../components/azEdit';
+import Edit from '../components/afterEdit';
 import { useRequest, useAccess, Access, useModel } from 'umi';
 import moment from 'moment';
 
@@ -25,15 +26,29 @@ const TableList: React.FC = () => {
         method: 'get',
     });
     //编辑part
+    const [AZisModalVisibleEdit, setAZIsModalVisibleEdit] = useState(false);
+    const [AZeditId, setAZEditId] = useState(false);
     const [isModalVisibleEdit, setIsModalVisibleEdit] = useState(false);
+    // 给编辑组件的传参
     const [editId, setEditId] = useState(false);
+    const [editOrder, setEditOrder] = useState(false);
+    const [editSKU, setEditSKU] = useState(false);
+    const [editSaler, setEditSaler] = useState(false);
+    const [editStore, setEditStore] = useState(false);
     const [tableData, settableData] = useState<any>({ data: '' });
     const actionRef = useRef<ActionType>();
     const formRef = useRef<ProFormInstance>();
     //控制模态框的显示和隐藏
-    const isShowModalEdit = (show: boolean, id: any) => {
+    const AZisShowModalEdit = (show: boolean, id: any) => {
+        setAZIsModalVisibleEdit(show);
+        setAZEditId(id);
+    };
+    const isShowModalEdit = (show: boolean, order: any, sku: any, store: any, saler: any) => {
         setIsModalVisibleEdit(show);
-        setEditId(id);
+        setEditOrder(order);
+        setEditSKU(sku);
+        setEditSaler(saler);
+        setEditStore(store);
     };
 
     const onTableChange = (value: any) => { console.log(value) };
@@ -140,9 +155,9 @@ const TableList: React.FC = () => {
         },
 
         {
-            title: 'Customer Issue',
-            dataIndex: 'Customer Issue',
-            key: 'Customer Issue',
+            title: 'CustomerIssue',
+            dataIndex: 'CustomerIssue',
+            key: 'CustomerIssue',
             hideInSearch: true,
             ellipsis: true,
             copyable: true,
@@ -171,20 +186,21 @@ const TableList: React.FC = () => {
                 <>
                     <a
                         onClick={() => {
-                            isShowModalEdit(true, record.id);
+                            AZisShowModalEdit(true, record.id);
                         }}
                     >
                         编辑
                     </a>
                     <a
                         onClick={() => {
-                            isShowModalEdit(true, record.id);
+                            isShowModalEdit(true, record.订单号, record.公司SKU, record.店铺, record.处理人);
                         }}
                     >
                         登记
                     </a>
                     <a
                         onClick={() => {
+                            // eslint-disable-next-line @typescript-eslint/no-use-before-define
                             settablecol(column1);
                         }}
                     >
@@ -329,9 +345,9 @@ const TableList: React.FC = () => {
         },
 
         {
-            title: 'Customer Issue',
-            dataIndex: 'Customer Issue',
-            key: 'Customer Issue',
+            title: 'CustomerIssue',
+            dataIndex: 'CustomerIssue',
+            key: 'CustomerIssue',
             hideInSearch: true,
             ellipsis: true,
             copyable: true,
@@ -353,80 +369,88 @@ const TableList: React.FC = () => {
         {
             title: '操作',
             valueType: 'option',
-            width: 420,
+            width: 450,
             fixed: 'right',
 
             render: (text, record, _, action) => [
                 <>
                     <a
                         onClick={() => {
-                            isShowModalEdit(true, record.id);
+                            AZisShowModalEdit(true, record.id);
                         }}
                     >
                         编辑
                     </a>
                     <a
                         onClick={() => {
-                            isShowModalEdit(true, record.id);
+                            isShowModalEdit(true, record.订单号, record.公司SKU, record.店铺, record.处理人);
                         }}
                     >
                         售后登记
                     </a>
                     <a
                         onClick={() => {
-                            settablecol(column);
+                            AZisShowModalEdit(true, record.id);
                         }}
                     >
-                        隐藏
+                        FB
                     </a>
                     <a
                         onClick={() => {
-                            isShowModalEdit(true, record.id);
+                            AZisShowModalEdit(true, record.id);
                         }}
                     >
                         CB
                     </a>
                     <a
                         onClick={() => {
-                            isShowModalEdit(true, record.id);
+                            AZisShowModalEdit(true, record.id);
                         }}
                     >
                         退货
                     </a>
                     <a
                         onClick={() => {
-                            isShowModalEdit(true, record.id);
+                            AZisShowModalEdit(true, record.id);
                         }}
                     >
                         RP
                     </a>
                     <a
                         onClick={() => {
-                            isShowModalEdit(true, record.id);
+                            AZisShowModalEdit(true, record.id);
                         }}
                     >
                         投诉
                     </a>
                     <a
                         onClick={() => {
-                            isShowModalEdit(true, record.id);
+                            AZisShowModalEdit(true, record.id);
                         }}
                     >
                         ST
                     </a>
                     <a
                         onClick={() => {
-                            isShowModalEdit(true, record.id);
+                            AZisShowModalEdit(true, record.id);
                         }}
                     >
                         RV
                     </a>
                     <a
                         onClick={() => {
-                            isShowModalEdit(true, record.id);
+                            AZisShowModalEdit(true, record.id);
                         }}
                     >
                         RV
+                    </a>
+                    <a
+                        onClick={() => {
+                            // eslint-disable-next-line @typescript-eslint/no-use-before-define
+                            settablecol(column);
+                        }}
+                    >
+                        隐藏
                     </a>
                     {/* <a
                         onClick={() => {
@@ -761,8 +785,8 @@ const TableList: React.FC = () => {
 
                     <Col span={5} offset={1}>
                         <ProForm.Item
-                            name="Customer Issue"
-                            label="Customer Issue"
+                            name="CustomerIssue"
+                            label="CustomerIssue"
                         >
                             <AutoComplete
                             >
@@ -850,13 +874,27 @@ const TableList: React.FC = () => {
                 }}
             />
             {
+                !AZisModalVisibleEdit ? '' :
+                    <Access accessible={access.AfterManager()} >
+                        <AZEdit
+                            isModalVisible={AZisModalVisibleEdit}
+                            isShowModal={AZisShowModalEdit}
+                            actionRef={actionRef}
+                            editId={AZeditId}
+                        />
+                    </Access>
+            }
+            {
                 !isModalVisibleEdit ? '' :
                     <Access accessible={access.AfterManager()} >
                         <Edit
                             isModalVisible={isModalVisibleEdit}
                             isShowModal={isShowModalEdit}
                             actionRef={actionRef}
-                            editId={editId}
+                            editOrder={editOrder}
+                            editSaler={editSaler}
+                            editStore={editStore}
+                            editSKU={editSKU}
                         />
                     </Access>
             }
