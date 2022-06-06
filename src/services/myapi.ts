@@ -54,7 +54,7 @@ export async function edit_after_after(editOrder: any, editSKU: any) {
 //   });
 // }
 // AZ的编辑
-export async function edit_after_sort(editId: any) {
+export async function edit_after_az(editId: any) {
   console.log(editId);
   return request('/api/after/changeaz', {
     method: 'PUT',
@@ -63,7 +63,8 @@ export async function edit_after_sort(editId: any) {
   });
 }
 
-export async function edit_after_sort_sku(
+export async function edit_after_az_sku(
+  editId: any,
   editOrder: any,
   editSKU: any,
   editSaler: any,
@@ -71,7 +72,30 @@ export async function edit_after_sort_sku(
 ) {
   return request('/api/after/changeaz', {
     method: 'PUT',
-    data: { editOrder, editSKU, editSaler, editStore },
+    data: { editId, editOrder, editSKU, editSaler, editStore },
+    requestType: 'form',
+  });
+}
+// FB的编辑
+export async function edit_after_fb(editId: any) {
+  console.log(editId);
+  return request('/api/after/changefb', {
+    method: 'PUT',
+    data: { editId },
+    requestType: 'form',
+  });
+}
+
+export async function edit_after_fb_sku(
+  editId: any,
+  editOrder: any,
+  editSKU: any,
+  editSaler: any,
+  editStore: any,
+) {
+  return request('/api/after/changefb', {
+    method: 'PUT',
+    data: { editId, editOrder, editSKU, editSaler, editStore },
     requestType: 'form',
   });
 }

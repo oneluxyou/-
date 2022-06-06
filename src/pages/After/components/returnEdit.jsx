@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import ProForm, { ProFormDigit, ProFormSelect, ProFormText, ProFormTextArea, ProFormRadio, ProFormDatePicker } from "@ant-design/pro-form";
-import { message, Modal, Skeleton, Cascader, Input } from "antd";
-import { edit_after_az, edit_after_az_sku } from "@/services/myapi";
+import { message, Modal, Skeleton, Cascader, Input, AutoComplete } from "antd";
+import { edit_after_return, edit_after_return_sku } from "@/services/myapi";
 import request from "umi-request";
 import { useRequest } from 'umi';
 import moment from "moment";
 
-const AZEdit = (props) => {
+const ReturnEdit = (props) => {
   const [initialValues, setInitialValues] = useState(undefined);
   const { data } = useRequest({
     url: '/api/sku/static',
@@ -424,66 +424,78 @@ const AZEdit = (props) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(async () => {
     let initial_dic = {};
+    console.log(editId, editOrder, editSKU, editSaler, editStore)
     //发请求取售后详情
     if (editId !== undefined) {
-      const response = await edit_after_az(editId);
-      response.责任方 = response.责任方.split("|");
+      const response = await edit_after_return(editId);
       // 创建初始数组(用来存配件)
       initial_dic = {
         id: response.id,
-        处理人: response.处理人,
+        负责人: response.负责人,
         公司SKU: response.公司SKU,
+        ASIN: response.ASIN,
         订单号: response.订单号,
         店铺: response.店铺,
-        投诉日期: response.投诉日期,
-        状态: response.状态,
-        是否可处理: response.是否可处理,
-        责任方: response.责任方,
-        原因: response.原因,
-        CustomerIssue: response.CustomerIssue,
-        AZ上的评论: response.AZ上的评论,
+        更新日期: response.更新日期,
+        退货时间: response.退货时间,
+        A_Z: response.A_Z,
+        申请次数: response.申请次数,
+        快递方: response.快递方,
+        退货单号: response.退货单号,
+        运输状态: response.运输状态,
+        订单额: response.订单额,
+        退款额: response.退款额,
+        数量: response.数量,
+        SAFE_T: response.SAFE_T,
+        处理方式: response.处理方式,
         备注: response.备注,
       };
       setInitialValues(initial_dic);
     } else {
-      const response = await edit_after_az_sku('无', editOrder, editSKU, editSaler, editStore);
+      const response = await edit_after_return_sku('无', editOrder, editSKU, editSaler, editStore);
       console.log(response);
       if (response.length == 0) {
         // 创建初始数组(用来存配件)
         initial_dic = {
-          处理人: editSaler,
+          负责人: editSaler,
           店铺: editStore,
           订单号: editOrder,
           公司SKU: editSKU,
           id: '新增',
-          投诉日期: moment(new Date()),
-          是否可处理: '否'
+          退货时间: moment(new Date()),
+          数量: 0,
+          申请次数: 1
         };
-        message.info('AZ无该订单号');
+        message.info('退货无该订单号');
       } else {
-        response[0].责任方 = response[0].责任方.split("|");
         // 创建初始数组(用来存配件)
         initial_dic = {
           id: response[0].id,
-          处理人: response[0].处理人,
-          店铺: response[0].店铺,
+          负责人: response[0].负责人,
           公司SKU: response[0].公司SKU,
+          ASIN: response[0].ASIN,
           订单号: response[0].订单号,
-          投诉日期: response[0].投诉日期,
-          状态: response[0].状态,
-          是否可处理: response[0].是否可处理,
-          责任方: response[0].责任方,
-          原因: response[0].原因,
-          CustomerIssue: response[0].CustomerIssue,
-          AZ上的评论: response[0].AZ上的评论,
+          店铺: response[0].店铺,
+          更新日期: response[0].更新日期,
+          退货时间: response[0].退货时间,
+          A_Z: response[0].A_Z,
+          申请次数: response[0].申请次数,
+          快递方: response[0].快递方,
+          退货单号: response[0].退货单号,
+          运输状态: response[0].运输状态,
+          订单额: response[0].订单额,
+          退款额: response[0].退款额,
+          数量: response[0].数量,
+          SAFE_T: response[0].SAFE_T,
+          处理方式: response[0].处理方式,
           备注: response[0].备注,
         };
         if (response[0].result == '正常') {
-          message.info('AZ有该记录，可直接编辑');
+          message.info('退货有该记录，可直接编辑');
         } else if (response[0].result == '无该订单号') {
-          message.info('AZ无该订单号');
+          message.info('退货无该订单号');
         } else if (response[0].result == '该订单号下无该SKU') {
-          message.error('AZ页面该订单号无对应公司sku，请核查');
+          message.error('退货页面该订单号无对应公司sku，请核查');
         } else if (response[0].result == '该订单号有多条数据') {
           message.info('该订单号有多条记录为该sku，只能选择其中一条记录');
         }
@@ -555,11 +567,8 @@ const AZEdit = (props) => {
               if (!data.sku_name.find((item) => item == values['公司SKU'])) {
                 message.error('传入的SKU:' + values['公司SKU'] + '不正确(注:AB箱只填有问题的那箱，不同SKU请分条填写。)');
               }
-              if ('责任方' in values) {
-                values['责任方'] = values['责任方'].join('|')
-              }
               if (values['id'] !== '新增') {
-                return request(`/api/after/changeaz`, {
+                return request(`/api/after/changereturn`, {
                   method: 'POST',
                   data: { ...values },
                   requestType: 'form',
@@ -573,7 +582,7 @@ const AZEdit = (props) => {
                   }
                 });
               } else {
-                return request(`/api/afterinsertaz`, {
+                return request(`/api/afterinsertreturn`, {
                   method: 'POST',
                   data: { ...values },
                   requestType: 'form',
@@ -602,15 +611,16 @@ const AZEdit = (props) => {
               />
               <ProFormText
                 width="md"
-                name="处理人"
-                label="处理人"
-                placeholder="请输入处理人"
-                rules={[{ required: true, message: '请输入处理人!' }]}
+                name="负责人"
+                label="负责人"
+                placeholder="请输入负责人"
+                rules={[{ required: true, message: '请输入负责人!' }]}
               />
               <ProFormText width="md" name="订单号" label="订单号" rules={[{ required: true, message: '请输入订单号!' }]} />
               <ProFormText width="md" name="公司SKU" label="公司SKU" tooltip="AB箱只填有问题的，限填一个。" placeholder="AB箱只填有问题的，限填一个。"
                 rules={[{ required: true, message: 'AB箱只填有问题的，限填一个。' }, { pattern: /[^,||^，]$/, message: '限填一件' }]}
               />
+              <ProFormText width="md" name="ASIN" label="ASIN" />
               <ProFormSelect
                 width="md"
                 name="店铺"
@@ -652,77 +662,124 @@ const AZEdit = (props) => {
               />
               <ProFormDatePicker
                 width="md"
-                name="投诉日期"
-                label="投诉日期"
-                placeholder="请输入投诉日期"
+                name="退货时间"
+                label="退货时间"
+                placeholder="请输入退货时间"
 
               />
-              <ProForm.Item
-                name="状态"
-                label="状态"
-
-              >
-                <ProFormSelect
-                  width="md"
-                  mode="multiple"
-                  valueEnum={{
-                    'Seller funded': 'Seller funded',
-                    'Order refunded': 'Order refunded',
-                    'Claim withdrawn': 'Claim withdrawn',
-                    'Claim denied': 'Claim denied',
-                    'Under review': 'Under review',
-                    'Amazon funded': 'Amazon funded',
-                    'Chargeback received': 'Chargeback received',
-                    'Action required': 'Action required',
-                  }}
-                />
-              </ProForm.Item>
-              <ProFormRadio.Group
+              <ProFormDigit
                 width="md"
-                name="是否可处理"
-                label="是否可处理"
+                name="申请次数"
+                label="申请次数"
+                placeholder=""
+                initialValue={0}
+                tooltip="若无,默认输入0"
+                rules={[{ required: true, message: '若无,请输入0' }]}
+              />
+              <ProFormSelect width="md" name="快递方" label="快递方"
                 valueEnum={{
-                  '是': '是',
-                  '否': '否',
+                  '无': '无',
+                  '可申请': '可申请',
+                  '申请中': '申请中',
+                  '无需申请': '无需申请',
                 }}
-                rules={[{ required: true, message: '请输入是否可处理!' }]}
+              />
+              <ProFormText width="md" name="退货单号" label="退货单号" />
+              <ProFormSelect
+                width="md"
+                name="运输状态"
+                label="运输状态"
+                placeholder="请输入运输状态"
+                fieldProps={{
+                  size: "small",
+                  listHeight: 250,
+                }}
+                valueEnum={{
+                  '成功签收': '成功签收',
+                  '查询不到': '查询不到',
+                  '未传': '未传',
+                  '未查': '未查',
+                  '未寄出': '未寄出',
+                  '运输途中': '运输途中',
+                  '到达待取': '到达待取',
+                  '运输过久': '运输过久',
+                  '投递失败': '投递失败',
+                }}
+              />
+              <ProFormDigit
+                width="md"
+                name="订单额"
+                label="订单额"
+                placeholder=""
+              />
+              <ProFormDigit
+                width="md"
+                name="退款额"
+                label="退款额"
+                placeholder=""
+              />
+              <ProFormDigit
+                width="md"
+                name="数量"
+                label="数量"
+                placeholder=""
+                initialValue={0}
+                tooltip="若无,默认输入1"
+                rules={[{ required: true, message: '若无,请输入0' }]}
+              />
+              <ProFormSelect
+                width="md"
+                name="SAFE_T"
+                label="SAFE-T"
+                placeholder="请输入SAFE-T"
+                fieldProps={{
+                  size: "small",
+                  listHeight: 250,
+                }}
+                valueEnum={{
+                  '无': '无',
+                  '可申请': '可申请',
+                  '申请中': '申请中',
+                  '无需申请': '无需申请',
+                }}
+
               />
               <ProForm.Item
-                name="责任方"
-                label="责任方"
-
+                name="处理方式"
+                label="处理方式"
               >
-                <ProFormSelect
-                  width="md"
-                  mode="multiple"
-                  valueEnum={{
-                    物流: '物流',
-                    买家: '买家',
-                    工厂: '工厂',
-                    销售: '销售',
-                    系统: '系统',
-                    仓库: '仓库',
-                  }}
+                <AutoComplete
+                  placeholder="请输入处理方式"
+                  style={{ width: 220 }}
+                  options={[
+                    { value: 'SafeT' },
+                    { value: '系统问题' },
+                    { value: 'Chargeback' },
+                    { value: '发错货' },
+                    { value: '劝保留' },
+                    { value: '已保留' },
+                    { value: '已被退款+补发' },
+                    { value: '已补购' },
+                    { value: '已补寄' },
+                    { value: '已换货' },
+                    { value: '已拒收' },
+                    { value: '申请拦截' },
+                    { value: '运输停滞' },
+                    { value: '关AZ退款' },
+                    { value: '已保留被AZ' },
+                    { value: '已联系' },
+                    { value: '未处理' },
+                    { value: '已退款' },
+                    { value: '尚未退款' },
+                    { value: '重量不符，不能退款' },
+                    { value: '其他问题，不能退款' },
+                    { value: '无需申请' },
+                  ]}
+                  filterOption={(inputValue, option) =>
+                    option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+                  }
                 />
               </ProForm.Item>
-              <ProFormTextArea
-                name="原因"
-                label="原因"
-                style={{ height: 50 }}
-                maxLength={150}
-              />
-              <ProFormTextArea
-                name="CustomerIssue"
-                label="CustomerIssue"
-                style={{ height: 50 }}
-                maxLength={150}
-              />
-              <ProFormTextArea
-                name="AZ上的评论"
-                label="AZ上的评论"
-                style={{ height: 50 }}
-                maxLength={150}
-              />
               <ProFormTextArea
                 name="备注"
                 label="备注"
@@ -736,5 +793,5 @@ const AZEdit = (props) => {
   )
 }
 
-export default AZEdit
+export default ReturnEdit
 

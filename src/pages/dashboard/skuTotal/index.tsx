@@ -181,10 +181,12 @@ const SkuTotal = () => {
                                         { label: 'B组', value: '利芬组_B组' },
                                         { label: 'C组', value: '利芬组_C组' },
                                         { label: 'D组', value: '利芬组_D组' },
+                                        { label: 'E组', value: '利芬组_E组' },
                                         { label: 'F组', value: '利芬组_F组' },
                                         { label: 'H组', value: '利芬组_H组' },
                                         { label: 'G组', value: '利芬组_G组' },
                                         { label: 'J组', value: '利芬组_J组' },
+                                        { label: 'K组', value: '利芬组_K组' },
                                         { label: 'I组', value: '利芬组_I组' },
                                     ]}
                                     placeholder="请输入组别"

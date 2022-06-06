@@ -69,7 +69,6 @@ const SaleRank: FC<any> = () => {
             </Tooltip> */}
             <div style={{ textAlign: "center", color: "#EE7700", fontSize: 16 }}>
                 <p><SoundOutlined />　默认时间为{data?.startdate} 到 {data?.enddate}</p>
-                {/* <p>日期更改到5-7号(5月8号的广告费用不准确)</p> */}
             </div>
             <Tabs>
                 {(Tdata ? JSON.parse(Tdata).sale : data?.sale)?.map((item: any) => (

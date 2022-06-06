@@ -4,17 +4,20 @@ import React, { useState, useRef } from 'react';
 import ProTable from '@ant-design/pro-table';
 import { PageContainer } from '@ant-design/pro-layout';
 import request from 'umi-request';
-import { Button, message, Col, Row, AutoComplete, DatePicker, Input } from 'antd';
+import { Button, message, Col, Row, AutoComplete, DatePicker, Input, Upload, Tooltip, Icon } from 'antd';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
-import ProForm, { ProFormSelect, ProFormRadio } from '@ant-design/pro-form';
+import ProForm, { ProFormSelect, ProFormRadio, ProFormDigit } from '@ant-design/pro-form';
 import type { ProFormInstance } from '@ant-design/pro-form';
-import ReturnEdit from '../components/returnEdit';
 import AZEdit from '../components/azEdit';
 import FBEdit from '../components/fbEdit';
+import ReturnEdit from '../components/returnEdit';
 import CBEdit from '../components/cbEdit';
 import Edit from '../components/afterEdit';
 import { useRequest, useAccess, Access, useModel } from 'umi';
 import moment from 'moment';
+import * as XLSX from 'xlsx';
+import { UploadOutlined } from '@ant-design/icons';
+import type { UploadProps } from 'antd';
 
 /**
  * 更新节点
@@ -33,7 +36,6 @@ const TableList: React.FC = () => {
     const [CBisModalVisibleEdit, setCBIsModalVisibleEdit] = useState(false);
     const [FBisModalVisibleEdit, setFBIsModalVisibleEdit] = useState(false);
     const [AZisModalVisibleEdit, setAZIsModalVisibleEdit] = useState(false);
-    const [AZeditId, setAZEditId] = useState(false);
     const [isModalVisibleEdit, setIsModalVisibleEdit] = useState(false);
     // 给编辑组件的传参
     const [editId, setEditId] = useState(false);
@@ -45,33 +47,36 @@ const TableList: React.FC = () => {
     const actionRef = useRef<ActionType>();
     const formRef = useRef<ProFormInstance>();
     //控制模态框的显示和隐藏
-    const AZisShowModalEdit = (show: boolean, id: any) => {
-        setAZIsModalVisibleEdit(show);
-        setAZEditId(id);
-    };
-    const isShowModalEdit = (show: boolean, order: any, sku: any, store: any, saler: any) => {
-        setIsModalVisibleEdit(show);
-        setEditOrder(order);
-        setEditSKU(sku);
-        setEditSaler(saler);
-        setEditStore(store);
-    };
-    const FBisShowModalEdit = (show: boolean, order: any, sku: any, store: any, saler: any) => {
+    const FBisShowModalEdit = (show: boolean, id: any, order: any, sku: any, store: any, saler: any) => {
         setFBIsModalVisibleEdit(show);
         setEditOrder(order);
         setEditSKU(sku);
         setEditSaler(saler);
         setEditStore(store);
+        setEditId(id);
     };
-    const CBisShowModalEdit = (show: boolean, order: any, sku: any, store: any, saler: any) => {
+    const ReturnisShowModalEdit = (show: boolean, id: any) => {
+        setReturnIsModalVisibleEdit(show);
+        setEditId(id);
+    };
+    const AZisShowModalEdit = (show: boolean, id: any, order: any, sku: any, store: any, saler: any) => {
+        setAZIsModalVisibleEdit(show);
+        setEditOrder(order);
+        setEditSKU(sku);
+        setEditSaler(saler);
+        setEditStore(store);
+        setEditId(id);
+    };
+    const CBisShowModalEdit = (show: boolean, id: any, order: any, sku: any, store: any, saler: any) => {
         setCBIsModalVisibleEdit(show);
         setEditOrder(order);
         setEditSKU(sku);
         setEditSaler(saler);
         setEditStore(store);
+        setEditId(id);
     };
-    const ReturnisShowModalEdit = (show: boolean, order: any, sku: any, store: any, saler: any) => {
-        setReturnIsModalVisibleEdit(show);
+    const isShowModalEdit = (show: boolean, order: any, sku: any, store: any, saler: any) => {
+        setIsModalVisibleEdit(show);
         setEditOrder(order);
         setEditSKU(sku);
         setEditSaler(saler);
@@ -87,27 +92,27 @@ const TableList: React.FC = () => {
             key: '订单号',
         },
         {
-            title: '投诉日期',
-            dataIndex: '投诉日期',
-            key: '投诉日期',
+            title: '退货时间',
+            dataIndex: '退货时间',
+            key: '退货时间',
             hideInSearch: true,
         },
         {
-            title: '更新日期',
-            dataIndex: '更新日期',
-            key: '更新日期',
-            hideInSearch: true,
-        },
-        {
-            title: '处理人',
-            dataIndex: '处理人',
-            key: '处理人',
+            title: '负责人',
+            dataIndex: '负责人',
+            key: '负责人',
             width: 70,
         },
         {
             title: '公司SKU',
             dataIndex: '公司SKU',
             key: '公司SKU',
+            width: 120,
+        },
+        {
+            title: 'ASIN',
+            dataIndex: 'ASIN',
+            key: 'ASIN',
             width: 120,
         },
         {
@@ -147,57 +152,85 @@ const TableList: React.FC = () => {
                 'amazoncpower': 'Central_Power_International_Limited',
             }
         },
-
         {
-            title: '状态',
-            dataIndex: '状态',
-            key: '状态',
+            title: 'A-Z',
+            dataIndex: 'A_Z',
+            key: 'A-Z',
             valueEnum: {
-                'Seller funded': 'Seller funded',
-                'Order refunded': 'Order refunded',
-                'Claim withdrawn': 'Claim withdrawn',
-                'Claim denied': 'Claim denied',
-                'Under review': 'Under review',
-                'Amazon funded': 'Amazon funded',
-                'Chargeback received': 'Chargeback received',
-                'Action Required': 'Action Required',
+                'N': 'N',
+                'Y': 'Y',
             }
         },
         {
-            title: '是否可处理',
-            dataIndex: '是否可处理',
-            key: '是否可处理',
+            title: '申请次数',
+            dataIndex: '申请次数',
+            key: '申请次数',
+            hideInSearch: true,
+        },
+        {
+            title: '快递方',
+            dataIndex: '快递方',
+            key: '快递方',
             valueEnum: {
-                '是': '是',
-                '否': '否',
+                'FedEx': 'FedEx',
+                'UPS': 'UPS',
+                'USPS': 'USPS',
             }
         },
         {
-            title: '责任方',
-            dataIndex: '责任方',
-            key: '责任方',
+            title: '退货单号',
+            dataIndex: '退货单号',
+            key: '退货单号',
         },
         {
-            title: '原因',
-            dataIndex: '原因',
-            key: '原因',
+            title: '运输状态',
+            dataIndex: '运输状态',
+            key: '运输状态',
+            valueEnum: {
+                '成功签收': '成功签收',
+                '查询不到': '查询不到',
+                '未传': '未传',
+                '未查': '未查',
+                '未寄出': '未寄出',
+                '运输途中': '运输途中',
+                '到达待取': '到达待取',
+                '运输过久': '运输过久',
+                '投递失败': '投递失败',
+            }
         },
-
         {
-            title: 'CustomerIssue',
-            dataIndex: 'CustomerIssue',
-            key: 'CustomerIssue',
+            title: '订单额',
+            dataIndex: '订单额',
+            key: '订单额',
             hideInSearch: true,
-            ellipsis: true,
-            copyable: true,
         },
         {
-            title: 'AZ上的评论',
-            dataIndex: 'AZ上的评论',
-            key: 'AZ上的评论',
+            title: '退款额',
+            dataIndex: '退款额',
+            key: '退款额',
             hideInSearch: true,
-            ellipsis: true,
-            copyable: true,
+        },
+        {
+            title: '数量',
+            dataIndex: '数量',
+            key: '数量',
+            hideInSearch: true,
+        },
+        {
+            title: 'SAFE-T',
+            dataIndex: 'SAFE_T',
+            key: 'SAFE-T',
+            valueEnum: {
+                '可申诉': '可申诉',
+                '申请中': '申请中',
+                '无需申请': '无需申请',
+            }
+        },
+        {
+            title: '处理方式',
+            dataIndex: '处理方式',
+            key: '处理方式',
+            hideInSearch: true,
         },
         {
             title: '备注',
@@ -205,6 +238,7 @@ const TableList: React.FC = () => {
             key: '备注',
             hideInSearch: true,
         },
+
         {
             title: '操作',
             valueType: 'option',
@@ -215,7 +249,7 @@ const TableList: React.FC = () => {
                 <>
                     <a
                         onClick={() => {
-                            AZisShowModalEdit(true, record.id);
+                            ReturnisShowModalEdit(true, record.id);
                         }}
                     >
                         编辑
@@ -239,38 +273,21 @@ const TableList: React.FC = () => {
             ]
         },
         {
-            title: '投诉开始日期',
-            dataIndex: '投诉开始日期',
+            title: '开始日期',
+            dataIndex: '开始日期',
             valueType: 'date',
             hideInTable: true,
             //数据库格式问题
             width: 90
         },
         {
-            title: '投诉结束日期',
-            dataIndex: '投诉结束日期',
+            title: '结束日期',
+            dataIndex: '结束日期',
             valueType: 'date',
             hideInTable: true,
             //数据库格式问题
             width: 90
         },
-        {
-            title: '更改开始日期',
-            dataIndex: '更改开始日期',
-            valueType: 'date',
-            hideInTable: true,
-            //数据库格式问题
-            width: 90
-        },
-        {
-            title: '更改结束日期',
-            dataIndex: '更改结束日期',
-            valueType: 'date',
-            hideInTable: true,
-            //数据库格式问题
-            width: 90
-        },
-
     ];
     const column1: ProColumns[] = [
         {
@@ -279,27 +296,27 @@ const TableList: React.FC = () => {
             key: '订单号',
         },
         {
-            title: '投诉日期',
-            dataIndex: '投诉日期',
-            key: '投诉日期',
+            title: '退货时间',
+            dataIndex: '退货时间',
+            key: '退货时间',
             hideInSearch: true,
         },
         {
-            title: '更新日期',
-            dataIndex: '更新日期',
-            key: '更新日期',
-            hideInSearch: true,
-        },
-        {
-            title: '处理人',
-            dataIndex: '处理人',
-            key: '处理人',
+            title: '负责人',
+            dataIndex: '负责人',
+            key: '负责人',
             width: 70,
         },
         {
             title: '公司SKU',
             dataIndex: '公司SKU',
             key: '公司SKU',
+            width: 120,
+        },
+        {
+            title: 'ASIN',
+            dataIndex: 'ASIN',
+            key: 'ASIN',
             width: 120,
         },
         {
@@ -339,57 +356,85 @@ const TableList: React.FC = () => {
                 'amazoncpower': 'Central_Power_International_Limited',
             }
         },
-
-
         {
-            title: '状态',
-            dataIndex: '状态',
-            key: '状态',
+            title: 'A-Z',
+            dataIndex: 'A_Z',
+            key: 'A-Z',
             valueEnum: {
-                'Seller funded': 'Seller funded',
-                'Order refunded': 'Order refunded',
-                'Claim withdrawn': 'Claim withdrawn',
-                'Claim denied': 'Claim denied',
-                'Under review': 'Under review',
-                'Amazon funded': 'Amazon funded',
-                'Chargeback received': 'Chargeback received',
+                'N': 'N',
+                'Y': 'Y',
             }
         },
         {
-            title: '是否可处理',
-            dataIndex: '是否可处理',
-            key: '是否可处理',
+            title: '申请次数',
+            dataIndex: '申请次数',
+            key: '申请次数',
+            hideInSearch: true,
+        },
+        {
+            title: '快递方',
+            dataIndex: '快递方',
+            key: '快递方',
             valueEnum: {
-                '是': '是',
-                '否': '否',
+                'FedEx': 'FedEx',
+                'UPS': 'UPS',
+                'USPS': 'USPS',
             }
         },
         {
-            title: '责任方',
-            dataIndex: '责任方',
-            key: '责任方',
+            title: '退货单号',
+            dataIndex: '退货单号',
+            key: '退货单号',
         },
         {
-            title: '原因',
-            dataIndex: '原因',
-            key: '原因',
+            title: '运输状态',
+            dataIndex: '运输状态',
+            key: '运输状态',
+            valueEnum: {
+                '成功签收': '成功签收',
+                '查询不到': '查询不到',
+                '未传': '未传',
+                '未查': '未查',
+                '未寄出': '未寄出',
+                '运输途中': '运输途中',
+                '到达待取': '到达待取',
+                '运输过久': '运输过久',
+                '投递失败': '投递失败',
+            }
         },
-
         {
-            title: 'CustomerIssue',
-            dataIndex: 'CustomerIssue',
-            key: 'CustomerIssue',
+            title: '订单额',
+            dataIndex: '订单额',
+            key: '订单额',
             hideInSearch: true,
-            ellipsis: true,
-            copyable: true,
         },
         {
-            title: 'AZ上的评论',
-            dataIndex: 'AZ上的评论',
-            key: 'AZ上的评论',
+            title: '退款额',
+            dataIndex: '退款额',
+            key: '退款额',
             hideInSearch: true,
-            ellipsis: true,
-            copyable: true,
+        },
+        {
+            title: '数量',
+            dataIndex: '数量',
+            key: '数量',
+            hideInSearch: true,
+        },
+        {
+            title: 'SAFE-T',
+            dataIndex: 'SAFE_T',
+            key: 'SAFE-T',
+            valueEnum: {
+                '可申诉': '可申诉',
+                '申请中': '申请中',
+                '无需申请': '无需申请',
+            }
+        },
+        {
+            title: '处理方式',
+            dataIndex: '处理方式',
+            key: '处理方式',
+            hideInSearch: true,
         },
         {
             title: '备注',
@@ -397,6 +442,7 @@ const TableList: React.FC = () => {
             key: '备注',
             hideInSearch: true,
         },
+
         {
             title: '操作',
             valueType: 'option',
@@ -407,38 +453,38 @@ const TableList: React.FC = () => {
                 <>
                     <a
                         onClick={() => {
-                            AZisShowModalEdit(true, record.id);
+                            ReturnisShowModalEdit(true, record.id);
                         }}
                     >
                         编辑
                     </a>
                     <a
                         onClick={() => {
-                            isShowModalEdit(true, record.订单号, record.公司SKU, record.店铺, record.处理人);
+                            isShowModalEdit(true, record.订单号, record.公司SKU, record.店铺, record.负责人);
                         }}
                     >
                         售后登记
                     </a>
                     <a
                         onClick={() => {
-                            FBisShowModalEdit(true, record.订单号, record.公司SKU, record.店铺, record.处理人);
+                            AZisShowModalEdit(true, record.id, record.订单号, record.公司SKU, record.店铺, record.负责人);
                         }}
                     >
-                        FB
+                        AZ
                     </a>
                     <a
                         onClick={() => {
-                            CBisShowModalEdit(true, record.订单号, record.公司SKU, record.店铺, record.处理人);
+                            CBisShowModalEdit(true, record.id, record.订单号, record.公司SKU, record.店铺, record.负责人);
                         }}
                     >
                         CB
                     </a>
                     <a
                         onClick={() => {
-                            ReturnisShowModalEdit(true, record.订单号, record.公司SKU, record.店铺, record.处理人);
+                            FBisShowModalEdit(true, record.id, record.订单号, record.公司SKU, record.店铺, record.负责人);
                         }}
                     >
-                        退货
+                        FB
                     </a>
                     <a
                         onClick={() => {
@@ -494,32 +540,16 @@ const TableList: React.FC = () => {
             ]
         },
         {
-            title: '投诉开始日期',
-            dataIndex: '投诉开始日期',
+            title: '开始日期',
+            dataIndex: '开始日期',
             valueType: 'date',
             hideInTable: true,
             //数据库格式问题
             width: 90
         },
         {
-            title: '投诉结束日期',
-            dataIndex: '投诉结束日期',
-            valueType: 'date',
-            hideInTable: true,
-            //数据库格式问题
-            width: 90
-        },
-        {
-            title: '更改开始日期',
-            dataIndex: '更改开始日期',
-            valueType: 'date',
-            hideInTable: true,
-            //数据库格式问题
-            width: 90
-        },
-        {
-            title: '更改结束日期',
-            dataIndex: '更改结束日期',
+            title: '结束日期',
+            dataIndex: '结束日期',
             valueType: 'date',
             hideInTable: true,
             //数据库格式问题
@@ -529,6 +559,76 @@ const TableList: React.FC = () => {
     ];
     // 表格列名绑定
     const [tablecol, settablecol] = useState(column);
+    // 导入报表
+    const uploadprops = {
+        // 这里我们只接受excel2007以后版本的文件，accept就是指定文件选择框的文件类型
+        accept: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        name: 'file',
+        headers: {
+            authorization: 'authorization-text',
+        },
+        showUploadList: false,
+        // 把excel的处理放在beforeUpload事件，否则要把文件上传到通过action指定的地址去后台处理
+        // 这里我们没有指定action地址，因为没有传到后台
+        beforeUpload: (file, fileList) => {
+            const rABS = true;
+            const f = fileList[0];
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const data = e.target.result;
+                if (!rABS) data = new Uint8Array(data);
+                const workbook = XLSX.read(data, {
+                    type: rABS ? 'binary' : 'array'
+                });
+                // 假设我们的数据在第一个标签
+                const first_worksheet = workbook.Sheets[workbook.SheetNames[0]];
+                console.log(workbook.SheetNames[0])
+                if (workbook.SheetNames[0].indexOf('Amazon') == -1) {
+                    message.error("工作表1命名出错,数据要放在表1中,命名方式按照'Amazon-店铺英文名',必须为xlsx文件")
+                } else {
+                    // XLSX自带了一个工具把导入的数据转成json
+                    const jsonArr = XLSX.utils.sheet_to_json(first_worksheet, { header: 1 });
+                    // 检测传入数据是否正确
+                    const temp_check1 = jsonArr.toString()
+                    console.log(jsonArr);
+                    if (temp_check1.indexOf('Order ID') == -1) {
+                        message.error('Order ID列不存在');
+                    } else if (temp_check1.indexOf('Return request date') == -1) {
+                        message.error('Order date列不存在');
+                    } else if (temp_check1.indexOf('ASIN') == -1) {
+                        message.error('ASIN列不存在');
+                    } else if (temp_check1.indexOf('A-to-Z Claim') == -1) {
+                        message.error('A-to-Z Claim列不存在');
+                    } else if (temp_check1.indexOf('Return quantity') == -1) {
+                        message.error('Return quantity列不存在');
+                    } else if (temp_check1.indexOf('Return carrier') == -1) {
+                        message.error('Return carrier列不存在');
+                    } else if (temp_check1.indexOf('Tracking ID') == -1) {
+                        message.error('Tracking ID列不存在');
+                    } else if (temp_check1.indexOf('Label cost') == -1) {
+                        message.error('Label cost列不存在');
+                    } else if (temp_check1.indexOf('Order quantity') == -1) {
+                        message.error('Order quantity列不存在');
+                    }
+                    else {
+                        // 通过自定义的方法处理Json
+                        request(`/api/afterinsertreturnex`, {
+                            method: 'POST',
+                            data: { jsonArr: JSON.stringify(jsonArr), name: workbook.SheetNames[0] },
+                            requestType: 'form',
+                        }).then((res) => {
+                            //自行根据条件清除
+                            message.info(res);
+                        });
+                    }
+                }
+
+
+            };
+            if (rABS) reader.readAsBinaryString(f); else reader.readAsArrayBuffer(f);
+            return false;
+        }
+    };
     // 导出报表
     const downloadExcel = () => {
         const excel_datas = tableData.data;
@@ -620,12 +720,12 @@ const TableList: React.FC = () => {
                 autoComplete="on"
                 formRef={formRef}
                 initialValues={{
-                    '处理人': initialState.currentUser?.name
+                    '负责人': initialState.currentUser?.name
                 }}
                 onFinish={async (values) => {
                     let sku_in = true;
-                    console.log(values)
-                    console.log(typeof (values['投诉日期']))
+                    console.log(values);
+                    console.log(typeof (values['投诉日期']));
                     if ('公司SKU' in values) {
                         let temp_sku = values['公司SKU'].replace('，', ',');
                         temp_sku = temp_sku.replace('	', '');
@@ -636,13 +736,11 @@ const TableList: React.FC = () => {
                             message.error('传入的SKU:' + sku + '不正确(注:捆绑sku要拆成产品sku)');
                         }
                     }
-                    if ('责任方' in values) {
-                        values['责任方'] = values['责任方'].join('|')
-                    }
+
                     // eslint-disable-next-line @typescript-eslint/dot-notation
 
                     if (sku_in == true) {
-                        return request(`/api/afterinsertaz`, {
+                        return request(`/api/afterinsertreturn`, {
                             method: 'POST',
                             data: { ...values },
                             requestType: 'form',
@@ -657,11 +755,11 @@ const TableList: React.FC = () => {
                 <Row>
                     <Col span={5}>
                         <ProForm.Item
-                            name="处理人"
-                            label="处理人"
+                            name="负责人"
+                            label="负责人"
                         >
                             <AutoComplete
-                                placeholder="请输入处理人"
+                                placeholder="请输入负责人"
                             />
                         </ProForm.Item>
                     </Col>
@@ -678,26 +776,16 @@ const TableList: React.FC = () => {
                     </Col>
                     <Col span={5} offset={1}>
                         <ProForm.Item
-                            name="投诉日期"
-                            label="投诉日期"
+                            name="退货时间"
+                            label="退货时间"
                             initialValue={moment(new Date())}
+                            rules={[{ required: true, message: '请输入退货时间!' }]}
 
                         >
                             <DatePicker format={'YYYY-MM-DD'} />
                         </ProForm.Item>
                     </Col>
                     <Col span={5} offset={1}>
-                        <ProForm.Item
-                            name="公司SKU"
-                            label="公司SKU"
-                            rules={[{ required: true, message: '请输入公司SKU!' }]}
-                        >
-                            <AutoComplete
-                                placeholder="请输入公司SKU"
-                            />
-                        </ProForm.Item>
-                    </Col>
-                    <Col span={5}>
                         <ProForm.Item
                             name="店铺"
                             label="店铺"
@@ -739,42 +827,76 @@ const TableList: React.FC = () => {
                             />
                         </ProForm.Item>
                     </Col>
-                    <Col span={5} offset={1}>
+                    <Col span={5}>
                         <ProForm.Item
-                            name="状态"
-                            label="状态"
+                            name="公司SKU"
+                            label="公司SKU"
+                            rules={[{ required: true, message: '请输入公司SKU!' }]}
                         >
-                            <ProFormSelect
-                                width="md"
-                                valueEnum={{
-                                    'Seller funded': 'Seller funded',
-                                    'Order refunded': 'Order refunded',
-                                    'Claim withdrawn': 'Claim withdrawn',
-                                    'Claim denied': 'Claim denied',
-                                    'Under review': 'Under review',
-                                    'Amazon funded': 'Amazon funded',
-                                    'Chargeback received': 'Chargeback received',
-                                    'Action required': 'Action required',
-                                }}
+                            <AutoComplete
+                                placeholder="请输入公司SKU"
                             />
                         </ProForm.Item>
                     </Col>
                     <Col span={5} offset={1}>
                         <ProForm.Item
-                            name="是否可处理"
-                            label="是否可处理"
-                            initialValue='否'
+                            name="ASIN"
+                            label="ASIN"
+                            rules={[{ required: true, message: '请输入ASIN!' }]}
+                        >
+                            <AutoComplete
+                                placeholder="请输入ASIN"
+                            />
+                        </ProForm.Item>
+                    </Col>
+                    <Col span={5} offset={1}>
+                        <ProForm.Item
+                            name="A_Z"
+                            label="A-Z"
+                            initialValue={'N'}
                         >
                             <ProFormRadio.Group
                                 width="md"
-
                                 options={[
                                     {
-                                        label: '是',
-                                        value: '是'
+                                        label: 'N',
+                                        value: 'N'
                                     }, {
-                                        label: '否',
-                                        value: '否'
+                                        label: 'Y',
+                                        value: 'Y'
+                                    }
+                                ]}
+                            />
+                        </ProForm.Item>
+                    </Col>
+                    <Col span={5} offset={1}>
+                        <ProFormDigit
+                            width="md"
+                            name="申请"
+                            label="申请次数"
+                            placeholder=""
+                            initialValue={1}
+                            tooltip="若无,默认输入1"
+                            rules={[{ required: true, message: '若无,请输入1' }]}
+                        />
+                    </Col>
+                    <Col span={5}>
+                        <ProForm.Item
+                            name="快递方"
+                            label="快递方"
+                        >
+                            <ProFormRadio.Group
+                                width="md"
+                                options={[
+                                    {
+                                        label: 'FedEx',
+                                        value: 'FedEx',
+                                    }, {
+                                        label: 'UPS',
+                                        value: 'UPS',
+                                    }, {
+                                        label: 'USPS',
+                                        value: 'USPS',
                                     }
                                 ]}
                             />
@@ -782,72 +904,130 @@ const TableList: React.FC = () => {
                     </Col>
                     <Col span={5} offset={1}>
                         <ProForm.Item
-                            name="责任方"
-                            label="责任方"
+                            name="退货单号"
+                            label="退货单号"
+                        >
+                            <AutoComplete
+                                placeholder="请输入退货单号"
+                            />
+                        </ProForm.Item>
+                    </Col>
+                    <Col span={5} offset={1}>
 
+                        <ProForm.Item
+                            name="运输状态"
+                            label="运输状态"
+                            initialValue={'未传'}
                         >
                             <ProFormSelect
                                 width="md"
-                                mode="multiple"
-                                valueEnum={{
-                                    物流: '物流',
-                                    买家: '买家',
-                                    工厂: '工厂',
-                                    销售: '销售',
-                                    系统: '系统',
-                                    仓库: '仓库',
+                                fieldProps={{
+                                    listHeight: 450,
                                 }}
+                                valueEnum={{
+                                    '成功签收': '成功签收',
+                                    '查询不到': '查询不到',
+                                    '未传': '未传',
+                                    '未查': '未查',
+                                    '未寄出': '未寄出',
+                                    '运输途中': '运输途中',
+                                    '到达待取': '到达待取',
+                                    '运输过久': '运输过久',
+                                    '投递失败': '投递失败',
+                                }}
+                            />
+
+                        </ProForm.Item>
+                    </Col>
+                    <Col span={5} offset={1}>
+                        <ProFormDigit
+                            width="md"
+                            name="订单额"
+                            label="订单额"
+                            placeholder=""
+                            tooltip="若无,默认输入0"
+                        />
+                    </Col>
+                    <Col span={5}>
+                        <ProFormDigit
+                            width="md"
+                            name="退款额"
+                            label="退款额"
+                            placeholder=""
+                            tooltip="若无,默认输入0"
+                        />
+                    </Col>
+                    <Col span={5} offset={1}>
+                        <ProFormDigit
+                            width="md"
+                            name="数量"
+                            label="数量"
+                            placeholder=""
+                            initialValue={1}
+                            tooltip="若无,默认输入1"
+                            rules={[{ required: true, message: '若无,请输入1' }]}
+                        />
+                    </Col>
+                    <Col span={5} offset={1}>
+
+                        <ProForm.Item
+                            name="SAFE_T"
+                            label="SAFE-T"
+                            initialValue={'无'}
+                        >
+                            <ProFormSelect
+                                width="md"
+                                fieldProps={{
+                                    listHeight: 450,
+                                }}
+                                valueEnum={{
+                                    '无': '无',
+                                    '可申请': '可申请',
+                                    '申请中': '申请中',
+                                    '无需申请': '无需申请',
+                                }}
+                            />
+
+                        </ProForm.Item>
+                    </Col>
+                    <Col span={5} offset={1}>
+                        <ProForm.Item
+                            name="处理方式"
+                            label="处理方式"
+                        >
+                            <AutoComplete
+                                placeholder="请输入处理方式"
+                                options={[
+                                    { value: 'SafeT' },
+                                    { value: '系统问题' },
+                                    { value: 'Chargeback' },
+                                    { value: '发错货' },
+                                    { value: '劝保留' },
+                                    { value: '已保留' },
+                                    { value: '已被退款+补发' },
+                                    { value: '已补购' },
+                                    { value: '已补寄' },
+                                    { value: '已换货' },
+                                    { value: '已拒收' },
+                                    { value: '申请拦截' },
+                                    { value: '运输停滞' },
+                                    { value: '关AZ退款' },
+                                    { value: '已保留被AZ' },
+                                    { value: '已联系' },
+                                    { value: '未处理' },
+                                    { value: '已退款' },
+                                    { value: '尚未退款' },
+                                    { value: '重量不符，不能退款' },
+                                    { value: '其他问题，不能退款' },
+                                    { value: '无需申请' },
+                                ]}
+                                filterOption={(inputValue, option) =>
+                                    option!.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+                                }
                             />
                         </ProForm.Item>
                     </Col>
                     <Col span={5}>
-                        <ProForm.Item
-                            name="原因"
-                            label="原因"
-                        >
-                            <AutoComplete
-                            >
-                                <TextArea
-                                    className="custom"
-                                    style={{ height: 50 }}
-                                    showCount={true}
-                                />
-                            </AutoComplete>
-                        </ProForm.Item>
-                    </Col>
-
-                    <Col span={5} offset={1}>
-                        <ProForm.Item
-                            name="CustomerIssue"
-                            label="CustomerIssue"
-                        >
-                            <AutoComplete
-                            >
-                                <TextArea
-                                    placeholder="请填写详细(不得超过255个字)"
-                                    className="custom"
-                                    style={{ height: 50 }}
-                                    showCount={true}
-                                />
-                            </AutoComplete>
-                        </ProForm.Item>
-                    </Col>
-                    <Col span={5} offset={1}>
-                        <ProForm.Item
-                            name="AZ上的评论"
-                            label="AZ上的评论"
-                        >
-                            <AutoComplete
-                            >
-                                <TextArea
-                                    className="custom"
-                                    style={{ height: 50 }}
-                                    showCount={true}
-                                />
-                            </AutoComplete>
-                        </ProForm.Item>
-                    </Col>
-                    <Col span={5} offset={1}>
                         <ProForm.Item
                             name="备注"
                             label="备注"
@@ -877,7 +1057,7 @@ const TableList: React.FC = () => {
                 actionRef={actionRef}
                 onChange={onTableChange}
                 request={async (params = {}) => {
-                    const result = request('/api/aftersaleaz/', {
+                    const result = request('/api/aftersalereturn/', {
                         method: 'POST',
                         data: { ...params },
                         requestType: 'form',
@@ -898,6 +1078,14 @@ const TableList: React.FC = () => {
                 dateFormatter="string"
                 toolbar={{
                     actions: [
+                        <Upload key="primary" {...uploadprops}>
+                            <Tooltip title='从店铺后台下载直接导入,必须为xlsx格式,工作表1命名格式必须为Amazon-店铺名'>
+                                <Button type="primary" >
+                                    <Icon type="upload" /> 导入表格
+                                </Button>
+                            </Tooltip>
+                        </Upload>
+                        ,
                         <Button key="primary" type="primary" onClick={() => downloadExcel()}>
                             导出为excel
                         </Button>,
@@ -905,27 +1093,14 @@ const TableList: React.FC = () => {
                 }}
             />
             {
-                !AZisModalVisibleEdit ? '' :
+                !ReturnisModalVisibleEdit ? '' :
                     <Access accessible={access.AfterManager()} >
-                        <AZEdit
-                            isModalVisible={AZisModalVisibleEdit}
-                            isShowModal={AZisShowModalEdit}
+                        <ReturnEdit
+                            isModalVisible={ReturnisModalVisibleEdit}
+                            isShowModal={ReturnisShowModalEdit}
                             actionRef={actionRef}
-                            editId={AZeditId}
-                        />
-                    </Access>
-            }
-            {
-                !isModalVisibleEdit ? '' :
-                    <Access accessible={access.AfterManager()} >
-                        <Edit
-                            isModalVisible={isModalVisibleEdit}
-                            isShowModal={isShowModalEdit}
-                            actionRef={actionRef}
-                            editOrder={editOrder}
-                            editSaler={editSaler}
-                            editStore={editStore}
-                            editSKU={editSKU}
+                            editId={editId}
+
                         />
                     </Access>
             }
@@ -944,11 +1119,11 @@ const TableList: React.FC = () => {
                     </Access>
             }
             {
-                !CBisModalVisibleEdit ? '' :
+                !AZisModalVisibleEdit ? '' :
                     <Access accessible={access.AfterManager()} >
-                        <CBEdit
-                            isModalVisible={CBisModalVisibleEdit}
-                            isShowModal={CBisShowModalEdit}
+                        <AZEdit
+                            isModalVisible={AZisModalVisibleEdit}
+                            isShowModal={AZisShowModalEdit}
                             actionRef={actionRef}
                             editOrder={editOrder}
                             editSaler={editSaler}
@@ -958,11 +1133,25 @@ const TableList: React.FC = () => {
                     </Access>
             }
             {
-                !ReturnisModalVisibleEdit ? '' :
+                !isModalVisibleEdit ? '' :
                     <Access accessible={access.AfterManager()} >
-                        <ReturnEdit
-                            isModalVisible={ReturnisModalVisibleEdit}
-                            isShowModal={ReturnisShowModalEdit}
+                        <Edit
+                            isModalVisible={isModalVisibleEdit}
+                            isShowModal={isShowModalEdit}
+                            actionRef={actionRef}
+                            editOrder={editOrder}
+                            editSaler={editSaler}
+                            editStore={editStore}
+                            editSKU={editSKU}
+                        />
+                    </Access>
+            }
+            {
+                !CBisModalVisibleEdit ? '' :
+                    <Access accessible={access.AfterManager()} >
+                        <CBEdit
+                            isModalVisible={CBisModalVisibleEdit}
+                            isShowModal={CBisShowModalEdit}
                             actionRef={actionRef}
                             editOrder={editOrder}
                             editSaler={editSaler}

@@ -17,6 +17,9 @@ import ProForm, {
 import type { ProFormInstance } from '@ant-design/pro-form';
 import Edit from './components/Edit'
 import AZEdit from './components/azEdit';
+import ReturnEdit from './components/returnEdit';
+import CBEdit from './components/cbEdit';
+import FBEdit from './components/fbEdit';
 import styles from './index.less'
 import { useRequest, useAccess, Access, useModel } from 'umi';
 
@@ -36,7 +39,10 @@ const TableList: React.FC = () => {
     method: 'get',
   });
   // 编辑传参
+  const [CBisModalVisibleEdit, setCBIsModalVisibleEdit] = useState(false);
+  const [FBisModalVisibleEdit, setFBIsModalVisibleEdit] = useState(false);
   const [AZisModalVisibleEdit, setAZIsModalVisibleEdit] = useState(false);
+  const [ReturnisModalVisibleEdit, setReturnIsModalVisibleEdit] = useState(false);
   const [editOrder, setEditOrder] = useState(false);
   const [editSKU, setEditSKU] = useState(false);
   const [editSaler, setEditSaler] = useState(false);
@@ -51,6 +57,30 @@ const TableList: React.FC = () => {
   }
   const AZisShowModalEdit = (show: boolean, id: any, order: any, sku: any, store: any, saler: any) => {
     setAZIsModalVisibleEdit(show);
+    setEditOrder(order);
+    setEditSKU(sku);
+    setEditSaler(saler);
+    setEditStore(store);
+    setEditId(id);
+  };
+  const FBisShowModalEdit = (show: boolean, id: any, order: any, sku: any, store: any, saler: any) => {
+    setFBIsModalVisibleEdit(show);
+    setEditOrder(order);
+    setEditSKU(sku);
+    setEditSaler(saler);
+    setEditStore(store);
+    setEditId(id);
+  };
+  const CBisShowModalEdit = (show: boolean, id: any, order: any, sku: any, store: any, saler: any) => {
+    setCBIsModalVisibleEdit(show);
+    setEditOrder(order);
+    setEditSKU(sku);
+    setEditSaler(saler);
+    setEditStore(store);
+    setEditId(id);
+  };
+  const ReturnisShowModalEdit = (show: boolean, id: any, order: any, sku: any, store: any, saler: any) => {
+    setReturnIsModalVisibleEdit(show);
     setEditOrder(order);
     setEditSKU(sku);
     setEditSaler(saler);
@@ -436,28 +466,28 @@ const TableList: React.FC = () => {
           </a>
           <a
             onClick={() => {
-              AZisShowModalEdit(true, record.id, record.订单号, record.公司SKU, record.店铺, record.处理人);
+              AZisShowModalEdit(true, record.id, record.订单号, record.SKU, record.店铺, record.登记人);
             }}
           >
             AZ
           </a>
           <a
             onClick={() => {
-              isShowModalEdit(true, record.id);
+              FBisShowModalEdit(true, record.id, record.订单号, record.SKU, record.店铺, record.登记人);
             }}
           >
             FB
           </a>
           <a
             onClick={() => {
-              isShowModalEdit(true, record.id);
+              CBisShowModalEdit(true, record.id, record.订单号, record.SKU, record.店铺, record.登记人);
             }}
           >
             CB
           </a>
           <a
             onClick={() => {
-              isShowModalEdit(true, record.id);
+              ReturnisShowModalEdit(true, record.id, record.订单号, record.SKU, record.店铺, record.登记人);
             }}
           >
             退货
@@ -759,6 +789,7 @@ const TableList: React.FC = () => {
             name="Refund"
             label="退款金额"
             placeholder=""
+            initialValue={0}
             tooltip="若无退款,默认输入0"
             rules={[{ required: true, message: '若无退款,请输入0' }]}
           />
@@ -1255,10 +1286,12 @@ const TableList: React.FC = () => {
   };
   // 订单重复弹窗设置
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [GongchangModalVisible, setGongchangModalVisible] = useState(false);
   // 保存表单信息
   const [temp_values, settemp_values] = useState([]);
   const handleOk = () => {
     setIsModalVisible(false);
+    setGongchangModalVisible(false);
     console.log(temp_values);
     if ((yuanyingerror == true) || (fankuierror == true)) {
       message.error('顾客反馈和客服操作不能只选大类');
@@ -1463,6 +1496,9 @@ const TableList: React.FC = () => {
   const handleCancel = () => {
     setIsModalVisible(false);
   };
+  const handleCancel1 = () => {
+    setGongchangModalVisible(false);
+  };
   return (
     <>
       {/* <div style={{ textAlign: "center", color: "#EE7700", fontSize: 16 }}>
@@ -1478,6 +1514,10 @@ const TableList: React.FC = () => {
             '登记人': initialState.currentUser?.name
           }}
           onFinish={async (values, ...rest) => {
+            console.log(values);
+            // 校准是否要上传图片
+            const temp_dingdanhao = values['顾客反馈'].toString();
+            console.log(temp_dingdanhao);
             values['订单号'] = values['订单号'].replace(new RegExp(' ', ("gm")), '').replace(new RegExp('/[\r\n]/g', ("gm")), "").replace(new RegExp('　', ("gm")), "");
             if ((yuanyingerror == true) || (fankuierror == true)) {
               message.error('顾客反馈和客服操作不能只选大类');
@@ -1487,6 +1527,9 @@ const TableList: React.FC = () => {
             } else if ((data?.order_name.indexOf(values['订单号']) < -1) && (order_name?.indexOf(values['订单号']) > -1)) {
               settemp_values(values);
               setIsModalVisible(true);
+            } else if ((values['是否上传图片'] == '未上传') && ((temp_dingdanhao.indexOf('Z') > -1) || (temp_dingdanhao.indexOf('Y') > -1) || ((temp_dingdanhao.indexOf('S') > -1)))) {
+              settemp_values(values);
+              setGongchangModalVisible(true);
             }
             else {
               // 规范数据
@@ -1939,9 +1982,55 @@ const TableList: React.FC = () => {
             />
           </Access>
       }
+      {
+        !FBisModalVisibleEdit ? '' :
+          <Access accessible={access.AfterManager()} >
+            <FBEdit
+              isModalVisible={FBisModalVisibleEdit}
+              isShowModal={FBisShowModalEdit}
+              actionRef={actionRef}
+              editOrder={editOrder}
+              editSaler={editSaler}
+              editStore={editStore}
+              editSKU={editSKU}
+            />
+          </Access>
+      }
+      {
+        !CBisModalVisibleEdit ? '' :
+          <Access accessible={access.AfterManager()} >
+            <CBEdit
+              isModalVisible={CBisModalVisibleEdit}
+              isShowModal={CBisShowModalEdit}
+              actionRef={actionRef}
+              editOrder={editOrder}
+              editSaler={editSaler}
+              editStore={editStore}
+              editSKU={editSKU}
+            />
+          </Access>
+      }
+      {
+        !ReturnisModalVisibleEdit ? '' :
+          <Access accessible={access.AfterManager()} >
+            <ReturnEdit
+              isModalVisible={ReturnisModalVisibleEdit}
+              isShowModal={ReturnisShowModalEdit}
+              actionRef={actionRef}
+              editOrder={editOrder}
+              editSaler={editSaler}
+              editStore={editStore}
+              editSKU={editSKU}
+            />
+          </Access>
+      }
       {/* 订单重复提示 */}
       <Modal title="警示" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
         <p>记录中已含有该订单号，确认是否提交？</p>
+      </Modal>
+      {/* 订单重复提示 */}
+      <Modal title="提示" visible={GongchangModalVisible} onOk={handleOk} onCancel={handleCancel1}>
+        <p>含有工厂原因，若要到售后图片，在共享盘中上传并在【是否上传图片】里选择【已上传】</p>
       </Modal>
     </>
   );

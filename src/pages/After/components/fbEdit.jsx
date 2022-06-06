@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import ProForm, { ProFormDigit, ProFormSelect, ProFormText, ProFormTextArea, ProFormRadio, ProFormDatePicker } from "@ant-design/pro-form";
 import { message, Modal, Skeleton, Cascader, Input } from "antd";
-import { edit_after_az, edit_after_az_sku } from "@/services/myapi";
+import { edit_after_fb, edit_after_fb_sku } from "@/services/myapi";
 import request from "umi-request";
 import { useRequest } from 'umi';
 import moment from "moment";
 
-const AZEdit = (props) => {
+const FBEdit = (props) => {
   const [initialValues, setInitialValues] = useState(undefined);
   const { data } = useRequest({
     url: '/api/sku/static',
@@ -426,64 +426,64 @@ const AZEdit = (props) => {
     let initial_dic = {};
     //发请求取售后详情
     if (editId !== undefined) {
-      const response = await edit_after_az(editId);
-      response.责任方 = response.责任方.split("|");
+      const response = await edit_after_fb(editId);
       // 创建初始数组(用来存配件)
       initial_dic = {
         id: response.id,
-        处理人: response.处理人,
+        负责人: response.负责人,
         公司SKU: response.公司SKU,
         订单号: response.订单号,
         店铺: response.店铺,
-        投诉日期: response.投诉日期,
-        状态: response.状态,
-        是否可处理: response.是否可处理,
-        责任方: response.责任方,
-        原因: response.原因,
-        CustomerIssue: response.CustomerIssue,
-        AZ上的评论: response.AZ上的评论,
-        备注: response.备注,
+        日期: response.日期,
+        星级: response.星级,
+        留评原因: response.留评原因,
+        处理结果: response.处理结果,
+        评价内容: response.评价内容,
+        处理方案: response.处理方案,
+        分析与建议: response.分析与建议,
+        Case状态: response.Case状态,
+        公开回复: response.公开回复,
       };
       setInitialValues(initial_dic);
     } else {
-      const response = await edit_after_az_sku('无', editOrder, editSKU, editSaler, editStore);
+      const response = await edit_after_fb_sku('无', editOrder, editSKU, editSaler, editStore);
       console.log(response);
       if (response.length == 0) {
         // 创建初始数组(用来存配件)
         initial_dic = {
-          处理人: editSaler,
+          负责人: editSaler,
           店铺: editStore,
           订单号: editOrder,
           公司SKU: editSKU,
           id: '新增',
-          投诉日期: moment(new Date()),
-          是否可处理: '否'
+          日期: moment(new Date()),
+          处理结果: '未删除'
         };
         message.info('AZ无该订单号');
       } else {
-        response[0].责任方 = response[0].责任方.split("|");
         // 创建初始数组(用来存配件)
         initial_dic = {
           id: response[0].id,
-          处理人: response[0].处理人,
-          店铺: response[0].店铺,
+          负责人: response[0].负责人,
           公司SKU: response[0].公司SKU,
           订单号: response[0].订单号,
-          投诉日期: response[0].投诉日期,
-          状态: response[0].状态,
-          是否可处理: response[0].是否可处理,
-          责任方: response[0].责任方,
-          原因: response[0].原因,
-          CustomerIssue: response[0].CustomerIssue,
-          AZ上的评论: response[0].AZ上的评论,
-          备注: response[0].备注,
+          店铺: response[0].店铺,
+          日期: response[0].日期,
+          星级: response[0].星级,
+          留评原因: response[0].留评原因,
+          处理结果: response[0].处理结果,
+          评价内容: response[0].评价内容,
+          处理方案: response[0].处理方案,
+          分析与建议: response[0].分析与建议,
+          Case状态: response[0].Case状态,
+          公开回复: response[0].公开回复,
         };
         if (response[0].result == '正常') {
-          message.info('AZ有该记录，可直接编辑');
+          message.info('FB有该记录，可直接编辑');
         } else if (response[0].result == '无该订单号') {
-          message.info('AZ无该订单号');
+          message.info('FB无该订单号');
         } else if (response[0].result == '该订单号下无该SKU') {
-          message.error('AZ页面该订单号无对应公司sku，请核查');
+          message.error('FB页面该订单号无对应公司sku，请核查');
         } else if (response[0].result == '该订单号有多条数据') {
           message.info('该订单号有多条记录为该sku，只能选择其中一条记录');
         }
@@ -555,11 +555,8 @@ const AZEdit = (props) => {
               if (!data.sku_name.find((item) => item == values['公司SKU'])) {
                 message.error('传入的SKU:' + values['公司SKU'] + '不正确(注:AB箱只填有问题的那箱，不同SKU请分条填写。)');
               }
-              if ('责任方' in values) {
-                values['责任方'] = values['责任方'].join('|')
-              }
               if (values['id'] !== '新增') {
-                return request(`/api/after/changeaz`, {
+                return request(`/api/after/changefb`, {
                   method: 'POST',
                   data: { ...values },
                   requestType: 'form',
@@ -573,7 +570,7 @@ const AZEdit = (props) => {
                   }
                 });
               } else {
-                return request(`/api/afterinsertaz`, {
+                return request(`/api/afterinsertfb`, {
                   method: 'POST',
                   data: { ...values },
                   requestType: 'form',
@@ -587,8 +584,6 @@ const AZEdit = (props) => {
                   }
                 });
               }
-
-              //if (response.status === undefined) message.success('添加成功')
             }}
           >
             <ProForm.Group>
@@ -602,10 +597,10 @@ const AZEdit = (props) => {
               />
               <ProFormText
                 width="md"
-                name="处理人"
-                label="处理人"
-                placeholder="请输入处理人"
-                rules={[{ required: true, message: '请输入处理人!' }]}
+                name="负责人"
+                label="负责人"
+                placeholder="请输入负责人"
+                rules={[{ required: true, message: '请输入负责人!' }]}
               />
               <ProFormText width="md" name="订单号" label="订单号" rules={[{ required: true, message: '请输入订单号!' }]} />
               <ProFormText width="md" name="公司SKU" label="公司SKU" tooltip="AB箱只填有问题的，限填一个。" placeholder="AB箱只填有问题的，限填一个。"
@@ -652,80 +647,76 @@ const AZEdit = (props) => {
               />
               <ProFormDatePicker
                 width="md"
-                name="投诉日期"
-                label="投诉日期"
-                placeholder="请输入投诉日期"
+                name="日期"
+                label="日期"
+                placeholder="请输入日期"
 
               />
-              <ProForm.Item
-                name="状态"
-                label="状态"
-
-              >
-                <ProFormSelect
-                  width="md"
-                  mode="multiple"
-                  valueEnum={{
-                    'Seller funded': 'Seller funded',
-                    'Order refunded': 'Order refunded',
-                    'Claim withdrawn': 'Claim withdrawn',
-                    'Claim denied': 'Claim denied',
-                    'Under review': 'Under review',
-                    'Amazon funded': 'Amazon funded',
-                    'Chargeback received': 'Chargeback received',
-                    'Action required': 'Action required',
-                  }}
-                />
-              </ProForm.Item>
               <ProFormRadio.Group
                 width="md"
-                name="是否可处理"
-                label="是否可处理"
+                name="星级"
+                label="星级"
                 valueEnum={{
-                  '是': '是',
-                  '否': '否',
+                  '1': '1',
+                  '2': '2',
                 }}
-                rules={[{ required: true, message: '请输入是否可处理!' }]}
               />
               <ProForm.Item
-                name="责任方"
-                label="责任方"
-
+                name="留评原因"
+                label="留评原因"
               >
                 <ProFormSelect
                   width="md"
-                  mode="multiple"
                   valueEnum={{
-                    物流: '物流',
                     买家: '买家',
-                    工厂: '工厂',
+                    物流: '物流',
                     销售: '销售',
-                    系统: '系统',
+                    工厂: '工厂',
                     仓库: '仓库',
+                    少配件: '少配件',
                   }}
                 />
               </ProForm.Item>
+
+              <ProFormRadio.Group
+                width="md"
+                name="处理结果"
+                label="处理结果"
+                initialValue={'未删除'}
+                valueEnum={{
+                  '已删除': '已删除',
+                  '未删除': '未删除',
+                }}
+                rules={[{ required: true, message: '请输入处理结果!' }]}
+              />
+
               <ProFormTextArea
-                name="原因"
-                label="原因"
+                name="评价内容"
+                label="评价内容"
                 style={{ height: 50 }}
                 maxLength={150}
               />
               <ProFormTextArea
-                name="CustomerIssue"
-                label="CustomerIssue"
+                name="处理方案"
+                label="处理方案"
                 style={{ height: 50 }}
                 maxLength={150}
               />
               <ProFormTextArea
-                name="AZ上的评论"
-                label="AZ上的评论"
+                name="分析与建议"
+                label="分析与建议"
                 style={{ height: 50 }}
                 maxLength={150}
               />
               <ProFormTextArea
-                name="备注"
-                label="备注"
+                name="Case状态"
+                label="Case状态"
+                style={{ height: 50 }}
+                maxLength={150}
+              />
+              <ProFormTextArea
+                name="公开回复"
+                label="公开回复"
                 style={{ height: 50 }}
                 maxLength={150}
               />
@@ -736,5 +727,5 @@ const AZEdit = (props) => {
   )
 }
 
-export default AZEdit
+export default FBEdit
 
